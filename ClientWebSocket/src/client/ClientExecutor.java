@@ -32,6 +32,9 @@ import javax.websocket.Session;
 
 import org.glassfish.tyrus.client.ClientManager;
 
+import client.ChatMessage.Type;
+
+
 
 /* Classe Client che si occupa di gestire le interazioni con l'utente e di
  * gestire la comunicazione WebSocket con il Web Service.
@@ -51,7 +54,7 @@ public class ClientExecutor {
 
 	 private static  CountDownLatch latch; 	 
 	 static Session ClientSession;
-	    
+	 
 	 
 	/**
 	 * Method run at the successful connection beetween Client & Server
@@ -60,8 +63,13 @@ public class ClientExecutor {
 	@OnOpen
 	public void onOpen(Session session) throws IOException, EncodeException { 		
 		Listmodel.addElement("Connected!");
+		
 		ClientSession = session;	
-		SendMex(new ChatMessage("Visiblity:VisibileNick:Lux",ChatMessage.Type.INITIALIZE));
+		ChatMessage Message=new ChatMessage("hello", Type.INITIALIZE); 
+		Message.appendAdditionalParams("Nickname", "Lux");
+		Message.appendAdditionalParams("Visibility", "Visibile");
+		SendMex(Message);
+		
 	}
 	
 	
@@ -70,8 +78,13 @@ public class ClientExecutor {
 	 * 
 	 */	 
 	@OnMessage
-	public void onMessage(ChatMessage message, Session session) { 		
-		Listmodel.addElement("SERVER SAYS:" + message);
+	public void onMessage(ChatMessage message, Session session) { 	
+		
+		Listmodel.addElement("## SERVER SAYS: \n Message:" /*obiviously, only for testing purposes*/
+				+ message.getMessage() + "\n Type:" + message.getType()
+				+ "\n Additional Params:"
+				+ message.getAdditionalParams().get(0).getKey() + " "
+				+ message.getAdditionalParams().get(0).getValue());
 	}
 
 	

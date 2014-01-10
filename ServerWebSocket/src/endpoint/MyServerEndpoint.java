@@ -24,6 +24,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import endpoint.ChatMessage.Param;
 import endpoint.ChatMessage.Type;
 
 
@@ -44,13 +45,12 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	
 	
 	@OnOpen
-	public void onOpen(Session aClientSession) throws IOException, EncodeException { // ## METODO CHIAMATO QUANDO UN CLIENT SI CONNETTE ##
+	public void onOpen(Session newSession) throws IOException, EncodeException { // ## METODO CHIAMATO QUANDO UN CLIENT SI CONNETTE ##
 				
-		clientSessions.add(aClientSession);
-
-		JsonObjectBuilder builder = Json.createObjectBuilder();
-		
-		aClientSession.getBasicRemote().sendObject(new ChatMessage("PROVA", Type.INITIALIZE));
+		clientSessions.add(newSession);
+		ChatMessage Message=new ChatMessage("PROVA", Type.INITIALIZE);
+		Message.appendAdditionalParams("Nickname", "Lux");
+		SendMex(Message, newSession);
 	}
 	
 	@OnClose
@@ -60,9 +60,11 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 
 	
 	@OnMessage
-	public void onMessage(String message, Session client) throws IOException,
+	public void onMessage(ChatMessage message, Session client) throws IOException,
 			EncodeException {
 
+		if(message.getType() == ChatMessage.Type.INITIALIZE)
+			System.out.println("#### ADDING NEW USER ####");
 		
 		// send data to all connected clients (including caller)
 		for (Session clientSession : clientSessions) {
@@ -108,7 +110,7 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) { //Launched at the web app starting time.
-        System.out.println("INIZIOOOOOOOOOOOOOOOOOOOOOOOOO");
+        System.out.println("#### Inizializing Server for first launch.. ####");
 		UsersList=new ArrayList<User>();
 	}  
 	
@@ -117,6 +119,9 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	public void contextDestroyed(ServletContextEvent sce) {
 		
 	}
-
+	
+	 public void SendMex(ChatMessage Mex,Session currsession) throws IOException, EncodeException{    
+	    	currsession.getBasicRemote().sendObject(Mex);
+	    }
 	
 }

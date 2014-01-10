@@ -52,8 +52,4 @@ public  class User {
 	public Session GetSession(){
 		return session;
 	}
-	
-	
-	
-	
 }

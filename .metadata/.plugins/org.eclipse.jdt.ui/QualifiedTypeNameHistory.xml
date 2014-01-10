@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="endpoint.MyServerEndpoint"/>
+<fullyQualifiedTypeName name="javax.json.JsonReader"/>
+<fullyQualifiedTypeName name="java.io.Reader"/>
+<fullyQualifiedTypeName name="org.codehaus.jackson.JsonParser"/>
+<fullyQualifiedTypeName name="java.util.Map"/>
+<fullyQualifiedTypeName name="javax.json.JsonArrayBuilder"/>
+<fullyQualifiedTypeName name="endpoint.ChatMessage"/>
+<fullyQualifiedTypeName name="endpoint.ChatMessage.Type"/>
+<fullyQualifiedTypeName name="javax.json.JsonValue"/>
+<fullyQualifiedTypeName name="javax.json.JsonValue.ValueType"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="javax.json.JsonArray"/>
+<fullyQualifiedTypeName name="endpoint.ChatMessage.Param"/>
+<fullyQualifiedTypeName name="javax.json.JsonObject"/>
+</qualifiedTypeNameHistroy>

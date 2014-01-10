@@ -1,0 +1,3 @@
+#GlassFish 3
+#Fri Jan 10 16:36:12 CET 2014
+org.eclipse.jst.jee.server\:ServerWebSocket=/home/lux/glassfish4/glassfish/domains/domain1/eclipseApps/ServerWebSocket

@@ -1,0 +1,25 @@
+package endpoint;
+
+import java.util.ArrayList;
+
+import javax.json.JsonArray;
+import javax.json.JsonValue;
+
+public class Utils {
+
+	public static JsonArray listToJsonArray(){
+		
+		
+		return null;		
+	}
+	
+	public static JsonArray jsonArrayToList(JsonArray param){
+		ArrayList<String> additionalParams = new ArrayList<>();
+		 param = jsonObject.getJsonArray("additionalParams");
+		for (JsonValue a : temp)
+			additionalParams.add(a.toString());
+		
+		String [] addiparams=param.toArray(new String[0]);
+		return null;		
+	}
+}

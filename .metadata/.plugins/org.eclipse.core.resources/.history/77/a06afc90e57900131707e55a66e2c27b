@@ -1,0 +1,50 @@
+package endpoint;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.websocket.EncodeException;
+import javax.websocket.Encoder;
+import javax.websocket.EndpointConfig;
+
+import org.codehaus.jackson.JsonParser;
+
+public class MessageEncoder implements Encoder.Text<ChatMessage> {
+
+  @Override
+  public String encode(ChatMessage message) throws EncodeException {
+
+	  
+    JsonObject jsonObject = Json.createObjectBuilder()
+        .add("Type", message.getType().toString())
+        .add("Message", message.getMessage())
+        .add("additionalParams",null)
+        .build();
+    
+  
+    return jsonObject.toString();
+
+  }
+
+  @Override
+  public void init(EndpointConfig ec) {
+    System.out.println("MessageEncoder - init method called");
+    
+  }
+
+  @Override
+  public void destroy() {
+    System.out.println("MessageEncoder - destroy method called");
+  }
+  
+  private static JsonArray arrStringToJsonArray(String[] param){
+	  JsonArray jsonArray=Json.createArrayBuilder().build();
+	return jsonArray;
+	  
+	  
+		//  jsonArray.add()
+  }
+
+}
