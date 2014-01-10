@@ -1,0 +1,58 @@
+package endpoint;
+
+import java.util.ArrayList;
+import java.util.Map;
+
+public class ChatMessage {
+	  
+	public enum Type {
+		INITIALIZE,
+		TEXT,
+		REQUEST
+	}
+	
+	Map<String, String> additionalParams;
+	private Type messageType;
+    private String message;
+    
+    
+    public ChatMessage(String message, Type MessageType){
+    	this.message=message;
+    	this.messageType=MessageType;
+    }
+    
+    public ChatMessage(String message, Type MessageType,Map<String, String> additionalParams){
+    	this.message=message;
+    	this.messageType=MessageType;
+    	this.additionalParams=additionalParams;
+    }
+  
+    public void setType(Type MessageType) {
+    	this.messageType=MessageType;
+    }
+    public Type getType() {
+    	return messageType;
+    }
+    public Map<String,String> getAdditionalParams() {
+    	return additionalParams;
+    }
+    public void appendAdditionalParams(String key,String value){
+    	
+    }
+ 
+    /**
+     * Return message
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
+    }
+ 
+    /**
+     * Set message
+     * @param message the message to set
+     */
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}

@@ -1,0 +1,63 @@
+package endpoint;
+
+import java.util.ArrayList;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.json.JsonValue;
+import javax.websocket.EncodeException;
+import javax.websocket.Encoder;
+import javax.websocket.EndpointConfig;
+
+import org.codehaus.jackson.JsonParser;
+
+public class MessageEncoder implements Encoder.Text<ChatMessage> {
+
+  @Override
+  public String encode(ChatMessage message) throws EncodeException {
+
+	  
+    JsonObject jsonObject = Json.createObjectBuilder()
+        .add("Type", message.getType().toString())
+        .add("Message", message.getMessage())
+        .add("additionalParams",null)
+        .build();
+    
+  
+    return jsonObject.toString();
+
+  }
+
+  @Override
+  public void init(EndpointConfig ec) {
+    System.out.println("MessageEncoder - init method called");
+    
+  }
+
+  @Override
+  public void destroy() {
+    System.out.println("MessageEncoder - destroy method called");
+  }
+  
+  private static JsonArray arrStringToJsonArray(ArrayList<Param> param){
+	
+	  JsonArray jsonArray = Json.createArrayBuilder()
+			     .add(Json.createObjectBuilder()
+			         .add("type", "home")
+			         .add("number", "212 555-1234"))
+			     .add(Json.createObjectBuilder()
+			         .add("type", "fax")
+			         .add("number", "646 555-4567"))
+			     .build();
+	  
+	  
+	return jsonArray;
+	  
+	  
+		//  jsonArray.add()
+  }
+
+}

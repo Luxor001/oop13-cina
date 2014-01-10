@@ -1,0 +1,18 @@
+package endpoint;
+
+import javax.json.JsonArray;
+
+public class Utils {
+
+	public static JsonArray listToJsonArray(){
+		
+		
+		return null;		
+	}
+	
+	public static JsonArray jsonArrayToList(){
+		
+		
+		return null;		
+	}
+}
