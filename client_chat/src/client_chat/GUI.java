@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,17 +20,19 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
 //Bozza per la GUI 
-public class GUI extends JFrame {
+public class GUI extends JFrame implements KeyListener, ActionListener {
 
 	// create tabView
 	JTabbedPane tabView = new JTabbedPane();
-	JButton enter = new JButton("Invia");
+	JButton enter = new JButton("Send");
 	// textarea for received message
 	JTextArea chat = new JTextArea();
 	JTextArea chat1 = new JTextArea();
 	// textarea for compose message
 	JTextArea text = new JTextArea();
 	JTextArea text1 = new JTextArea();
+	List<JTextArea> textList = new ArrayList<>();
+	List<JTextArea> chatList = new ArrayList<>();
 
 	public GUI() {
 		this.setTitle("CryptoChat");
@@ -76,6 +80,11 @@ public class GUI extends JFrame {
 		text1.setPreferredSize(new Dimension(text1.getPreferredSize().width,
 				text1.getPreferredSize().height * 3));
 
+		textList.add(text);
+		textList.add(text1);
+		chatList.add(chat);
+		chatList.add(chat1);
+
 		String[] data = { "pippo", "pluto", "paperino" };
 		// create listview
 		JList<String> userList = new JList<>(data);
@@ -104,38 +113,42 @@ public class GUI extends JFrame {
 		tabView.setMnemonicAt(1, KeyEvent.VK_2);
 		tabView.setMnemonicAt(0, KeyEvent.VK_1);
 
-		text.addKeyListener(new KeyListener() {
-			public void keyTyped(KeyEvent e) {
-			}
+		text.addKeyListener(this);
+		text1.addKeyListener(this);
 
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					e.consume(); // ignore the key pressed
-					chat.append(text.getText() + "\n");
-					text.setText("");
-					text.requestFocus();
-				}
-			}
+		enter.addActionListener(this);
 
-			public void keyReleased(KeyEvent e) {
-			}
-		});
+	}
 
-		enter.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+	public void keyTyped(KeyEvent e) {
+	}
 
-				JPanel pan = (JPanel) tabView.getComponentAt(tabView
-						.getSelectedIndex());
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			e.consume(); // ignore the key pressed
 
-				JPanel pan1 = (JPanel) pan.getComponent(1);
-				JTextArea testo = (JTextArea) pan1.getComponent(0);
-				chat.append(testo.getText() + "\n");
-				testo.setText("");
-				testo.requestFocus();
+			int index = tabView.getSelectedIndex();
 
-			}
-		});
+			chatList.get(index).append(textList.get(index).getText() + "\n");
+			textList.get(index).setText("");
+			textList.get(index).requestFocus();
+			/*
+			 * chat.append(text.getText() + "\n"); text.setText("");
+			 * text.requestFocus();
+			 */
+		}
+	}
 
+	public void keyReleased(KeyEvent e) {
+	}
+
+	public void actionPerformed(ActionEvent e) {
+
+		int index = tabView.getSelectedIndex();
+
+		chatList.get(index).append(textList.get(index).getText() + "\n");
+		textList.get(index).setText("");
+		textList.get(index).requestFocus();
 	}
 
 	public static void main(String[] Args) {
