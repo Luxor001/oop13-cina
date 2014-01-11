@@ -1,7 +1,0 @@
-INDEX VERSION 1.3+/home/lux/Universita/ElaboratoOop/.metadata/.plugins/org.eclipse.wst.jsdt.core/indexes
-26126747.index
-1870255140.index
-1677004467.index
-1911204728.index
-321046725.index
-2898161490.index
