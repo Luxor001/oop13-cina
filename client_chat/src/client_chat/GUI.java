@@ -7,11 +7,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -27,12 +30,14 @@ public class GUI extends JFrame implements KeyListener, ActionListener {
 	JButton enter = new JButton("Send");
 	// textarea for received message
 	JTextArea chat = new JTextArea();
-	JTextArea chat1 = new JTextArea();
 	// textarea for compose message
 	JTextArea text = new JTextArea();
-	JTextArea text1 = new JTextArea();
 	List<JTextArea> textList = new ArrayList<>();
 	List<JTextArea> chatList = new ArrayList<>();
+	List<JScrollPane> scrollList = new ArrayList<>();
+	String[] data = { "pippo", "pluto", "paperino" };
+	// create listview
+	JList<String> userList = new JList<>(data);
 
 	public GUI() {
 		this.setTitle("CryptoChat");
@@ -46,9 +51,8 @@ public class GUI extends JFrame implements KeyListener, ActionListener {
 	public void initPanel() {
 
 		// create panel
-		JPanel privateChat = new JPanel(new BorderLayout(10, 10));
+
 		JPanel south = new JPanel(new BorderLayout(10, 10));
-		JPanel south1 = new JPanel(new BorderLayout(10, 10));
 		JPanel panelMain = new JPanel(new BorderLayout(10, 10));
 		JPanel test = new JPanel(new FlowLayout());
 
@@ -62,32 +66,16 @@ public class GUI extends JFrame implements KeyListener, ActionListener {
 		chat.setLineWrap(true);
 		chat.setEditable(false);
 
-		text1.setLineWrap(true);
-		chat1.setLineWrap(true);
-		chat1.setEditable(false);
-
 		// create scrollbar to attach textarea
 		JScrollPane scroll = new JScrollPane(chat);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-
-		JScrollPane scroll1 = new JScrollPane(chat1);
-		scroll1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
 		// set dimension of textarea
 		text.setPreferredSize(new Dimension(text.getPreferredSize().width, text
 				.getPreferredSize().height * 3));
 
-		text1.setPreferredSize(new Dimension(text1.getPreferredSize().width,
-				text1.getPreferredSize().height * 3));
-
 		textList.add(text);
-		textList.add(text1);
 		chatList.add(chat);
-		chatList.add(chat1);
-
-		String[] data = { "pippo", "pluto", "paperino" };
-		// create listview
-		JList<String> userList = new JList<>(data);
 
 		// set dimension
 		userList.setPreferredSize(new Dimension(
@@ -96,25 +84,73 @@ public class GUI extends JFrame implements KeyListener, ActionListener {
 
 		south.add(text, BorderLayout.CENTER);
 
-		south1.add(text1, BorderLayout.CENTER);
-
-		privateChat.add(scroll1, BorderLayout.CENTER);
-		privateChat.add(south1, BorderLayout.SOUTH);
-
 		panelMain.add(scroll, BorderLayout.CENTER);
 		panelMain.add(south, BorderLayout.SOUTH);
 		panelMain.add(new JPanel().add(userList), BorderLayout.EAST);
 
 		// aggiungo dei tab
 		tabView.addTab("Main", panelMain);
-		tabView.addTab("Chat privata", privateChat);
 
-		// this key work with command alt+N
-		tabView.setMnemonicAt(1, KeyEvent.VK_2);
-		tabView.setMnemonicAt(0, KeyEvent.VK_1);
+		scrollList.add(scroll);
 
+		userList.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+
+					for (int i = 0; i < tabView.getTabCount(); i++) {
+						if (tabView.getTitleAt(i).equals(
+								userList.getSelectedValue())) {
+							tabView.setSelectedIndex(i);
+							return;
+						}
+					}
+					JTextArea textTmp = new JTextArea();
+					JTextArea chatTmp = new JTextArea();
+					textTmp.setLineWrap(true);
+					chatTmp.setLineWrap(true);
+					chatTmp.setEditable(false);
+
+					// create scrollbar to attach textarea
+					JScrollPane scrollTmp = new JScrollPane(chatTmp);
+					scrollTmp
+							.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+					// set dimension of textarea
+					textTmp.setPreferredSize(new Dimension(text
+							.getPreferredSize().width, textTmp
+							.getPreferredSize().height * 3));
+
+					chatList.add(chatTmp);
+					textList.add(textTmp);
+
+					scrollList.add(scrollTmp);
+
+					JPanel southTmp = new JPanel(new BorderLayout(10, 10));
+					southTmp.add(textList.get(textList.size() - 1),
+							BorderLayout.CENTER);
+
+					JPanel privato = new JPanel(new BorderLayout(10, 10));
+					privato.add(scrollList.get(textList.size() - 1),
+							BorderLayout.CENTER);
+					privato.add(southTmp, BorderLayout.SOUTH);
+
+					textTmp.addKeyListener(GUI.this);
+					tabView.addTab(userList.getSelectedValue(), privato);
+					tabView.setSelectedIndex(tabView.getTabCount() - 1);
+					JPanel tab = new JPanel();
+
+					tab.setOpaque(false);
+					tab.add(new JLabel(userList.getSelectedValue()));
+					JButton close = new JButton("x");
+					close.setOpaque(false);
+					// close.setBorderPainted(false);
+					close.setContentAreaFilled(false);
+					close.addActionListener(GUI.this);
+					tab.add(close);
+					tabView.setTabComponentAt(tabView.getTabCount() - 1, tab);
+				}
+			}
+		});
 		text.addKeyListener(this);
-		text1.addKeyListener(this);
 
 		enter.addActionListener(this);
 
@@ -132,10 +168,7 @@ public class GUI extends JFrame implements KeyListener, ActionListener {
 			chatList.get(index).append(textList.get(index).getText() + "\n");
 			textList.get(index).setText("");
 			textList.get(index).requestFocus();
-			/*
-			 * chat.append(text.getText() + "\n"); text.setText("");
-			 * text.requestFocus();
-			 */
+
 		}
 	}
 
@@ -144,11 +177,29 @@ public class GUI extends JFrame implements KeyListener, ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 
-		int index = tabView.getSelectedIndex();
+		if (e.getActionCommand().equals("Send")) {
+			int index = tabView.getSelectedIndex();
 
-		chatList.get(index).append(textList.get(index).getText() + "\n");
-		textList.get(index).setText("");
-		textList.get(index).requestFocus();
+			chatList.get(index).append(textList.get(index).getText() + "\n");
+			textList.get(index).setText("");
+			textList.get(index).requestFocus();
+		}
+
+		if (e.getActionCommand().equals("x")) {
+			JButton button = (JButton) e.getSource();
+			for (int i = 1; i < tabView.getTabCount(); i++) {
+				JPanel panel = (JPanel) tabView.getTabComponentAt(i);
+				JButton button1 = (JButton) panel.getComponent(1);
+				if (button.equals(button1)) {
+					tabView.remove(i);
+					scrollList.remove(i);
+					chatList.remove(i);
+					textList.remove(i);
+					return;
+				}
+
+			}
+		}
 	}
 
 	public static void main(String[] Args) {
