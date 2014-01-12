@@ -24,12 +24,12 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 
 	   String Type= jsonObject.getString("Type");
 	   String Message= jsonObject.getString("Message");
-	   ArrayList<Param> addlParams = JsonArrayToParam(jsonObject
+	   Param addlParams = JsonArrayToParam(jsonObject
 				.getJsonArray("addParams"));
 	
 	   
 		ChatMessage message = new ChatMessage(Message,
-				ChatMessage.Type.INITIALIZE, addlParams); /* WE NEED TO FIX TYPE RECOGNIZATION */  
+				ChatMessage.Type.valueOf(Type), addlParams);
 	    return message;
 
 	  }
@@ -55,20 +55,26 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 	    System.out.println("MessageDecoder - destroy method called");
 	  }
 
-	  private static ArrayList<Param> JsonArrayToParam(JsonArray jsonArray) {
-			ArrayList<Param> additionalParams = new ArrayList<Param>();
+	  private static Param JsonArrayToParam(JsonArray jsonArray) {
+			Param additionalParams = new ChatMessage().new Param();
 			if (jsonArray.size() != 0) //if it's not empty
 				for (int i = 0; i < jsonArray.size(); i++){ //cycle all elements.
 					JsonObject currObject = jsonArray.getJsonObject(i);
-				
-					String[] keys=currObject.keySet().toArray(new String[0]);
-					for(String currKey:keys){
-						String value=currObject.getString(currKey);
-						additionalParams.add(new ChatMessage().new Param(
-								currKey,value));
+					
+					if(currObject.containsKey("Nickname"))
+						additionalParams.setNickname(currObject.getString("Nickname"));
+
+					if(currObject.containsKey("Visibility"))
+						additionalParams.SetVisibility(Boolean.getBoolean
+							((currObject.getString("Visibility"))));			
+					
+					if(currObject.containsKey("usersList")){			
+						JsonArray array=currObject.getJsonArray("usersList");					
+						for(int i2=0;i < array.size();i++){
+							additionalParams.appendUser(array.getString(i2));
+						}
 					}
 				}
-
 			return additionalParams;
 		  }
 	}

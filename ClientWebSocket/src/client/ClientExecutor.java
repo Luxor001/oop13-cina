@@ -66,9 +66,9 @@ public class ClientExecutor {
 		
 		ClientSession = session;	
 		ChatMessage Message=new ChatMessage("hello", Type.INITIALIZE); 
-		Message.appendAdditionalParams("Nickname", "Lux");
-		Message.appendAdditionalParams("Visibility", "Visibile");
-		SendMex(Message);
+		Message.getAdditionalParams().setNickname("Lux");
+		Message.getAdditionalParams().SetVisibility(true);
+		SendMex(Message); /* send my request to the server of connection */
 		
 	}
 	
@@ -77,14 +77,19 @@ public class ClientExecutor {
 	 * Method run at the receiving of a message from the server
 	 * 
 	 */	 
+	@SuppressWarnings("unchecked")
 	@OnMessage
 	public void onMessage(ChatMessage message, Session session) { 	
 		
-		Listmodel.addElement("## SERVER SAYS: \n Message:" /*obiviously, only for testing purposes*/
+		if(message.getType() == Type.USERLIST){
+			
+			Listmodel.addElement("USERLIST MESSAGE TYPE, USERS:"+message.getAdditionalParams().getUsersList().get(0)+
+					"\n"+message.getAdditionalParams().getUsersList().get(1));
+		}
+		Listmodel.addElement("\n\n## SERVER SAYS: \n Message:" /*obiviously, only for testing purposes*/
 				+ message.getMessage() + "\n Type:" + message.getType()
 				+ "\n Additional Params:"
-				+ message.getAdditionalParams().get(0).getKey() + " "
-				+ message.getAdditionalParams().get(0).getValue());
+				);
 	}
 
 	

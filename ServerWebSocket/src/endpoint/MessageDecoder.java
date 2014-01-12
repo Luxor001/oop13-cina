@@ -13,6 +13,8 @@ import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
+import org.codehaus.jackson.JsonParser;
+
 import endpoint.ChatMessage.Param;
 
 
@@ -25,15 +27,15 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 	    JsonObject jsonObject = Json
 	        .createReader(new StringReader(jsonMessage)).readObject();
 
-	   String Type= jsonObject.getString("Type"); //gets the type of the request sent by the user
-	   String Message= jsonObject.getString("Message");	  //gets the textual message.
-		ArrayList<Param> addlParams = JsonArrayToParam(jsonObject
-				.getJsonArray("addParams"));	// gets any other params need to be sent
-	
-	   
+	   String Type= jsonObject.getString("Type"); //gets type of the request sent by the user
+		String Message = jsonObject.getString("Message"); // gets the textual message.
+		Param addlParams = JsonArrayToParam(jsonObject
+				.getJsonArray("addParams")); // gets any other params need to be sent
+
 		ChatMessage message = new ChatMessage(Message,
-				ChatMessage.Type.INITIALIZE, addlParams); /* WE NEED TO FIX TYPE RECOGNIZATION */
-	    return message;
+				ChatMessage.Type.valueOf(Type), addlParams);
+		
+		return message;
 
 	  }
 
@@ -60,20 +62,26 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 
 	  /*Specular to MessageEncoder encoding part.See it for reference*/
 	  
-	  private static ArrayList<Param> JsonArrayToParam(JsonArray jsonArray) {
-		ArrayList<Param> additionalParams = new ArrayList<Param>();
+	  private static Param JsonArrayToParam(JsonArray jsonArray) {
+		Param additionalParams = new ChatMessage().new Param();
 		if (jsonArray.size() != 0) //if it's not empty
 			for (int i = 0; i < jsonArray.size(); i++){ //cycle all elements.
 				JsonObject currObject = jsonArray.getJsonObject(i);
-			
-				String[] keys=currObject.keySet().toArray(new String[0]);
-				for(String currKey:keys){
-					String value=currObject.getString(currKey);
-					additionalParams.add(new ChatMessage().new Param(
-							currKey,value));
+				
+				if(currObject.containsKey("Nickname"))
+					additionalParams.setNickname(currObject.getString("Nickname"));
+
+				if(currObject.containsKey("Visibility"))
+					additionalParams.SetVisibility(Boolean.getBoolean
+						((currObject.getString("Visibility"))));			
+				
+				if(currObject.containsKey("usersList")){
+					JsonArray array=currObject.getJsonArray("usersList");					
+					for(int i2=0;i < array.size();i++){
+						additionalParams.appendUser(array.getString(i2));
+					}
 				}
 			}
-
 		return additionalParams;
 	  }
   }
