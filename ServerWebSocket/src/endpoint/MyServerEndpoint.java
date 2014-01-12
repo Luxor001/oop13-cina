@@ -48,9 +48,9 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	public void onOpen(Session newSession) throws IOException, EncodeException { // ## METODO CHIAMATO QUANDO UN CLIENT SI CONNETTE ##
 				
 		clientSessions.add(newSession);
-		ChatMessage Message=new ChatMessage("PROVA", Type.INITIALIZE);
+	/*	ChatMessage Message=new ChatMessage("PROVA", Type.INITIALIZE);
 		Message.appendAdditionalParams("Nickname", "Lux");
-		SendMex(Message, newSession);
+		SendMex(Message, newSession);*/
 	}
 	
 	@OnClose
@@ -63,37 +63,26 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	public void onMessage(ChatMessage message, Session client) throws IOException,
 			EncodeException {
 
-		if(message.getType() == ChatMessage.Type.INITIALIZE)
-			System.out.println("#### ADDING NEW USER ####");
-		
-		// send data to all connected clients (including caller)
-		for (Session clientSession : clientSessions) {
-//			if (message.equals("Open Sesame")) {
-//
-			//JsonObjectBuilder builder;
+		if(message.getType() == ChatMessage.Type.INITIALIZE){ /*connection request from client*/
+			String UserNickname=message.getAdditionalParams().getNickname();
+			Boolean UserVisibility=message.getAdditionalParams().getVisibility();
 			
 			
-			//				JsonObjectBuilder builder = Json.createObjectBuilder();
-//				builder.add("person",
-//						Json.createObjectBuilder().add("firstName", "Michael")
-//								.add("lastName", "Jo"));
-//				JsonObject result = builder.build();
-//				// StringWriter sw = new StringWriter();
-//				// try(JsonWriter writer = Json.createWriter(sw))
-//				// {
-//				// writer.writeObject(result);
-//				// }
-//				//
-//				message = result.toString();
-//
+			if(UserVisibility.equals(true)){ /*alerts other clients of new user*/
+				ChatMessage newmessage;
+				newmessage=new ChatMessage("new user", Type.NEWUSER);
+				newmessage.getAdditionalParams().setNickname(UserNickname);
+				SendGlobalMex(newmessage);				
+			}
 			
-//			}
+			/* send users list to the new client*/
+			ChatMessage messagetoclient=new ChatMessage("Users List",Type.USERLIST);
+			messagetoclient.getAdditionalParams().appendUser("Tizio");
+			messagetoclient.getAdditionalParams().appendUser("Caio");
+			messagetoclient.getAdditionalParams().appendUser("Sempronio");
 			
-		
-			//clientSession.getBasicRemote().sendText(message);
-			System.out.print("OnMessageServer:"+message);
-
-		}
+			SendMex(messagetoclient, client);			
+		}		
 	}
 
 	
@@ -120,8 +109,15 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 		
 	}
 	
-	 public void SendMex(ChatMessage Mex,Session currsession) throws IOException, EncodeException{    
+	 public void SendMex(ChatMessage Mex,Session currsession) 
+			 throws IOException, EncodeException{    
 	    	currsession.getBasicRemote().sendObject(Mex);
-	    }
+	}
+	 
+	 public void SendGlobalMex(ChatMessage Mex) throws IOException, EncodeException{
+		 for (Session clientSession : clientSessions) {
+			 SendMex(Mex,clientSession);		 
+		 }
+	 }
 	
 }

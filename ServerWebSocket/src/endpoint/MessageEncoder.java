@@ -25,9 +25,8 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
     JsonObject jsonObject = Json.createObjectBuilder()
         .add("Type", message.getType().toString())
         .add("Message", message.getMessage())
-        .add("addParams",ParamToJsonArray(message.getAdditionalParams()))
-        .build();
-    
+        .add("addParams",ParamToJsonArray(message))
+        .build();    
   
     return jsonObject.toString();
 
@@ -44,18 +43,26 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
     System.out.println("MessageEncoder - destroy method called");
   }
   
-  private static JsonArray ParamToJsonArray(ArrayList<ChatMessage.Param> paramlist){
-	    /*builder: helper to create a jsonarray*/
+  private static JsonArray ParamToJsonArray(ChatMessage message){
+	     
+	    ChatMessage.Param param=message.getAdditionalParams();
 		JsonArrayBuilder builder = Json.createArrayBuilder(); 
+		
+		/*if it's a "users list" request, forget about other params and fill the list of users*/
+		if(message.getType() == ChatMessage.Type.USERLIST){	
+			JsonArrayBuilder listbuilder=Json.createArrayBuilder();
+			for(String cUser:message.getAdditionalParams().getUsersList())
+				listbuilder.add(cUser);
 
-		if (paramlist.size() != 0) //if there are no params, don't mind about
-			for (Param actualParam : paramlist) {
-				/*foreach param, create a Param object with a key and a value*/
-				builder.add(Json.createObjectBuilder().add(
-						actualParam.getKey(), actualParam.getValue()));
-			}
-
+			builder.add(Json.createObjectBuilder().add("usersList",listbuilder.build()));
+			return builder.build();
+		}
+		
+		builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
+		builder.add(Json.createObjectBuilder().add("Visibility",param.getVisibility().toString()));
+				
 		JsonArray jsonArray = builder.build(); //build the resultant Json Array
+		
 		return jsonArray;	  
   }
 

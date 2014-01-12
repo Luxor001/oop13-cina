@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 /* Class that describes the actual messages sent from (and to) the users
  * The below class is then converted in json format by MessageEncoder.java class
- * 
+ * Please note that this class is equal to the server correspective.
  */
 public class ChatMessage {
 	  
@@ -22,10 +22,13 @@ public class ChatMessage {
 	enum Type {
 		INITIALIZE,		/* Used to Registry a new user to the channel */
 		TEXT,			/* Duh. */
-		REQUEST			/* Used to make special requests. Needs implementation */ 
+		REQUEST,		/* Used to make special requests. Needs implementation */ 
+		NEWUSER,		/* Needed to tell there's a new boy in town */
+		USERDISCONNECTED,
+		USERLIST
 	}
 
-	ArrayList<Param> additionalParams;
+	private Param additionalParams=new Param();
 	private Type messageType;
     private String message;
  
@@ -35,10 +38,10 @@ public class ChatMessage {
     public ChatMessage(String message, Type MessageType){
     	this.message=message;
     	this.messageType=MessageType;
-    	this.additionalParams=new ArrayList<>();
+    	this.additionalParams=new Param();
     }
     
-    public ChatMessage(String message, Type MessageType,ArrayList<Param> additionalParams){
+    public ChatMessage(String message, Type MessageType,Param additionalParams){
     	this.message=message;
     	this.messageType=MessageType;
     	this.additionalParams=additionalParams;
@@ -52,12 +55,10 @@ public class ChatMessage {
     	return messageType;
     }
  
-    public ArrayList<Param> getAdditionalParams() {
+    public Param getAdditionalParams() {
     	return additionalParams;
     }
-    public void appendAdditionalParams(String key,String value){
-    	additionalParams.add(new Param(key, value));
-    }
+ 
     /**
      * Return message
      * @return the message
@@ -75,23 +76,38 @@ public class ChatMessage {
     }
     
 
-    /* Before you start screaming on why i created this class,please,read
-     * the doc at the beginning of this class							*/    
-	public class Param {
-
-		String key;
-		String value;
-
-		public Param(String key, String value) {
-			this.key = key;
-			this.value = value;
+    
+    
+    /* This inner class exist to encapsulate all the optional parameters of a message
+     * for e.g. the users list sent by a "User List" request, or a nickname notification 
+     * on connection. It has been created to get a smaller size of data packets sent:
+     * in fact, the Param class is completely optional and not necessarily needed.*/    
+    public class Param {
+    	private String nickname;
+    	private Boolean visibility;
+    	private ArrayList<String> usersList=new ArrayList<String>();
+		public Param(){
+			
 		}
 		
-		public String getKey(){
-			return key;
+		public void setNickname(String Nick){
+			nickname=Nick;
 		}
-		public String getValue(){
-			return value;
-		}		
+		public String getNickname(){
+			return nickname;
+		}
+		
+		public void SetVisibility(Boolean visible){
+			visibility=visible;;
+		}
+		public Boolean getVisibility(){
+			return visibility;
+		}
+		public ArrayList<String> getUsersList(){
+			return usersList;
+		}
+		public void appendUser(String UserNickname){
+			usersList.add(UserNickname);
+		}
 	}
 }

@@ -2,10 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="lib" path="/home/lux/glassfish4/glassfish/lib/appserv-rt.jar"/>
 	<classpathentry kind="lib" path="/home/lux/glassfish4/glassfish/lib/gf-client.jar"/>
-	<classpathentry kind="lib" path="/home/lux/glassfish4/glassfish/lib/gf-client-l10n.jar"/>
 	<classpathentry kind="lib" path="/home/lux/glassfish4/glassfish/lib/javaee.jar"/>
 	<classpathentry kind="lib" path="/home/lux/glassfish4/glassfish/lib/jndi-properties.jar"/>
 	<classpathentry kind="lib" path="/home/lux/glassfish4/glassfish/modules/tyrus-client.jar"/>
