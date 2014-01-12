@@ -41,7 +41,6 @@ public class GUI extends JFrame implements KeyListener, ActionListener {
 
 	public GUI() {
 		this.setTitle("CryptoChat");
-
 		this.setSize(600, 400);
 		this.initPanel();
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
