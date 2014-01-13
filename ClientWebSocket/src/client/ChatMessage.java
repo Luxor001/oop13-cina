@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 
 
+
 /*
  * @(#)ChatMessage.java        1.0 02/12/2013
  *
@@ -27,8 +28,11 @@ public class ChatMessage {
 		USERDISCONNECTED,
 		USERLIST
 	}
+	public enum RequestType{
+		
+	}
 
-	private Param additionalParams=new Param();
+	private Param additionalParams;//=new Param();
 	private Type messageType;
     private String message;
  
@@ -38,13 +42,13 @@ public class ChatMessage {
     public ChatMessage(String message, Type MessageType){
     	this.message=message;
     	this.messageType=MessageType;
-    	this.additionalParams=new Param();
+    //	this.additionalParams=new Param();
     }
     
     public ChatMessage(String message, Type MessageType,Param additionalParams){
     	this.message=message;
     	this.messageType=MessageType;
-    	this.additionalParams=additionalParams;
+    //	this.additionalParams=additionalParams;
     }
     
     
@@ -56,7 +60,14 @@ public class ChatMessage {
     }
  
     public Param getAdditionalParams() {
+    	additionalParams=new Param();
     	return additionalParams;
+    } 
+    public boolean isParamSet() {
+    	if(additionalParams.equals(null))
+    		return false;
+    	else
+    		return true;
     }
  
     /**

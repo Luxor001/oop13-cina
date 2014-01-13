@@ -10,17 +10,21 @@ import java.awt.BorderLayout;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
+import javax.enterprise.inject.New;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
 import javax.websocket.DeploymentException;
@@ -68,7 +72,9 @@ public class ClientExecutor {
 		ChatMessage Message=new ChatMessage("hello", Type.INITIALIZE); 
 		Message.getAdditionalParams().setNickname("Lux");
 		Message.getAdditionalParams().SetVisibility(true);
-		SendMex(Message); /* send my request to the server of connection */
+		SendMex(Message); /* send my request of connection to the server */
+		
+		
 		
 	}
 	
@@ -86,20 +92,24 @@ public class ClientExecutor {
 			Listmodel.addElement("USERLIST MESSAGE TYPE, USERS:"+message.getAdditionalParams().getUsersList().get(0)+
 					"\n"+message.getAdditionalParams().getUsersList().get(1));
 		}
-		Listmodel.addElement("\n\n## SERVER SAYS: \n Message:" /*obiviously, only for testing purposes*/
-				+ message.getMessage() + "\n Type:" + message.getType()
-				+ "\n Additional Params:"
-				);
+		
+		if(message.getType() == Type.TEXT){
+			Listmodel.addElement(message.getAdditionalParams().getNickname()+
+					" : "+ message.getMessage());
+		}
+		
 	}
 
 	
 	/**
 	 * Method run during the closing attempt of connection of the Client
+	 * @throws EncodeException 
+	 * @throws IOException 
 	 * 
 	 */	 
 	@OnClose
-	public void onClose(Session session, CloseReason closeReason) { 		
-		latch.countDown();		
+	public void onClose(Session session, CloseReason closeReason) throws IOException, EncodeException { 	
+		latch.countDown();
 	}
 	    
 	
@@ -118,6 +128,7 @@ public class ClientExecutor {
 		}
 		catch(Exception e){e.printStackTrace();
 		}
+		
 		/* Attemp connection to web service */
 		try {
 			Listmodel.addElement("Trying to connect..");
@@ -150,6 +161,8 @@ public class ClientExecutor {
 	    	frame.setTitle("CLIENT");
 	    	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    	frame.setSize(600,1000);
+	    	frame.addWindowListener(new CustomWindowAdapter(frame));
+	    	
 	    	
 	    	JPanel topPanel = new JPanel();
 			topPanel.setLayout( new BorderLayout() );
@@ -194,16 +207,26 @@ public class ClientExecutor {
 			});
 	    	
 	    	frame.setVisible(true);	    	
+	    	
+	    	
 	    }
-	    	    
-	    /*
-	    @OnMessage 
-	    public String onMessage(String message, Session session) { //method run at the receiving of a message from the server
 
-	    	Listmodel.addElement("SERVER SAYS:"+message);
-	    	return "";
-	        // same as above
-	    }
-	 */
+	    /*needed to intercept the action of closing window*/
+		class CustomWindowAdapter extends WindowAdapter {
+
+			JFrame window = null;
+
+			CustomWindowAdapter(JFrame window) {
+				this.window = window;
+			}
+
+			// implement windowClosing method
+			public void windowClosing(WindowEvent e) {
+				try {ClientSession.close();} /*tells the server we're going out*/
+				catch (IOException e1) {e1.printStackTrace();}
+				
+				System.exit(0);
+			}
+		}
 	    
 }
