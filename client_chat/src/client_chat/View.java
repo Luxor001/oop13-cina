@@ -41,6 +41,7 @@ public class View extends JFrame implements ViewInterface {
 			"paperino" });
 
 	public View() {
+
 		super(TITLE);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setSize(WIDTH, HEIGTH);
@@ -94,6 +95,7 @@ public class View extends JFrame implements ViewInterface {
 			chatList.get(index).append(message + "\n");
 			textList.get(index).setText("");
 			textList.get(index).requestFocus();
+			controller.commandSendMessage(message);
 		}
 	}
 
@@ -131,6 +133,7 @@ public class View extends JFrame implements ViewInterface {
 		chatTmp.setLineWrap(true);
 		chatTmp.setEditable(false);
 
+		controller.commandCreateTab(chatTmp);
 		chatList.add(chatTmp);
 		textList.add(this.getMyText());
 
@@ -162,7 +165,8 @@ public class View extends JFrame implements ViewInterface {
 		userList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
-					controller.commandCreateTab();
+					createTab();
+					// controller.commandCreateTab();
 				}
 			}
 		});
@@ -174,7 +178,8 @@ public class View extends JFrame implements ViewInterface {
 			public void actionPerformed(ActionEvent e) {
 
 				if (e.getActionCommand().equals("Send")) {
-					controller.commandSendMessage();
+					sendMessage();
+					// controller.commandSendMessage("ciao");
 				}
 
 				if (e.getActionCommand().equals("x")) {
@@ -193,7 +198,8 @@ public class View extends JFrame implements ViewInterface {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					e.consume(); // ignore the key pressed
-					controller.commandSendMessage();
+					sendMessage();
+					// controller.commandSendMessage("ciao");
 				}
 			}
 
@@ -210,7 +216,7 @@ public class View extends JFrame implements ViewInterface {
 
 		JScrollPane scroll = new JScrollPane(chat);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-
+		scroll.setAutoscrolls(true);
 		return scroll;
 	}
 
@@ -223,4 +229,5 @@ public class View extends JFrame implements ViewInterface {
 		text.addKeyListener(this.getKeyListener());
 		return text;
 	}
+
 }
