@@ -3,7 +3,6 @@ package client_chat;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.KeyManagementException;
@@ -13,6 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -20,12 +21,13 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.swing.JTextArea;
 
 /*N.B. queste sono classi di prova, create per verificare la fattibilità del progetto,
  per questo motivo sono presenti indirizzi ip,porte,percorsi assoluti inseriti in modo manuale
  dal programmatore*/
 
-public class client implements Runnable {
+public class Client implements Runnable {
 	SSLSocketFactory sslSocketFactory = null;
 	SSLSocket sslSocket = null;
 	ObjectOutputStream OOS = null;
@@ -33,8 +35,9 @@ public class client implements Runnable {
 	BufferedReader br = null;
 	Thread t = null;
 	String str = "";
+	List<JTextArea> chat = new ArrayList<>();
 
-	public client() throws IOException, ClassNotFoundException {
+	public Client() throws IOException, ClassNotFoundException {
 
 		String path = "I:\\java\\eclipse\\client\\keystore.jks";
 		char[] passphrase = "changeit".toCharArray();
@@ -63,12 +66,12 @@ public class client implements Runnable {
 
 			tmf = TrustManagerFactory.getInstance("SunX509");
 			tmf.init(serverPub);
+
 			context = SSLContext.getInstance("SSL");
 			trustManagers = tmf.getTrustManagers();
 			context.init(clientKeyManager.getKeyManagers(), trustManagers,
 					SecureRandom.getInstance("SHA1PRNG"));
 			sslSocketFactory = context.getSocketFactory();
-
 		} catch (KeyStoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -78,8 +81,7 @@ public class client implements Runnable {
 		} catch (CertificateException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (KeyManagementException e) {
-			// TODO Auto-generated catch block
+		} catch (KeyManagementException e) { // TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnrecoverableKeyException e) {
 			// TODO Auto-generated catch block
@@ -99,39 +101,44 @@ public class client implements Runnable {
 		// mess ->
 		OOS = new ObjectOutputStream(sslSocket.getOutputStream());
 		OIS = new ObjectInputStream(sslSocket.getInputStream());
-		// -------------------------------------------------------------------------->
-		// questo stream rimane in ascolto della tastiera
-		br = new BufferedReader(new InputStreamReader(System.in));
 
 		t = new Thread(this);
 		t.start();
 
-		while (sslSocket.isConnected()) {
-			// leggo quello che mi arriva dal server
-			while ((str = (String) OIS.readObject()) != null) {
-				System.out.println("Server: " + str);
-			}
-		}
 	}
 
 	public void run() {
-		while (sslSocket.isConnected()) {
-			try {
-				// leggo tutto quello che viene premuto sulla tastiera
-				while ((str = br.readLine()) != null) {
 
-					OOS.writeObject(str);
-					OOS.flush();
+		while (sslSocket.isConnected()) {
+			// leggo quello che mi arriva dal server
+			try {
+				while ((str = (String) OIS.readObject()) != null) {
+					chat.get(0).append("Server : " + str + "\n");
 				}
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (IOException e) {
-				System.out
-						.println("** Il server potrebbe essersi disconnesso! **");
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
 
-	public static void main(String[] Args) throws IOException,
-			ClassNotFoundException {
-		new client();
+	public void sendMessage(String message) {
+		if (sslSocket.isConnected()) {
+			try {
+				OOS.writeObject(message);
+				OOS.flush();
+			} catch (IOException e) {
+				System.out
+						.println("** Il client potrebbe essersi disconnesso! **");
+			}
+		}
+
+	}
+
+	public void addChat(JTextArea chat) {
+		this.chat.add(chat);
 	}
 }

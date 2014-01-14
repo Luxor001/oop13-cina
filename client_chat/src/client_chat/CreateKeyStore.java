@@ -30,6 +30,7 @@ public class CreateKeyStore {
 			stdout.write(("keytool -export -alias serverkey -storepass password "
 					+ "-file C:\\certificato.cer -keystore C:\\chiave.jks\n")
 					.getBytes());
+
 			stdout.write("echo on\n".getBytes());
 
 			stdout.close();
@@ -44,6 +45,7 @@ public class CreateKeyStore {
 
 		new CreateKeyStore();
 		try {
+			System.out.println(System.getProperty("java.home"));
 			// eseguo il file .bat
 			Runtime.getRuntime().exec("certificato.bat");
 		} catch (IOException e) {
