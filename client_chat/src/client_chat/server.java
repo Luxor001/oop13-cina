@@ -41,7 +41,7 @@ public class Server implements Runnable {
 
 			KeyStore serverKeys = KeyStore.getInstance("JKS");
 			serverKeys.load(new FileInputStream(
-					"I:\\java\\eclipse\\server\\keystore.jks"), "password"
+					"E:\\java\\eclipse\\server\\keystore.jks"), "password"
 					.toCharArray());
 			KeyManagerFactory serverKeyManager = KeyManagerFactory
 					.getInstance("SunX509");
@@ -50,7 +50,7 @@ public class Server implements Runnable {
 
 			KeyStore clientPub = KeyStore.getInstance("JKS");
 			clientPub.load(new FileInputStream(
-					"I:\\java\\eclipse\\client\\keystore.jks"), "changeit"
+					"E:\\java\\eclipse\\client\\keystore.jks"), "changeit"
 					.toCharArray());
 			TrustManagerFactory trustManager = TrustManagerFactory
 					.getInstance("SunX509");
