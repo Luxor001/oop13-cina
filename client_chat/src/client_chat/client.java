@@ -39,7 +39,7 @@ public class Client implements Runnable {
 
 	public Client() throws IOException, ClassNotFoundException {
 
-		String path = "I:\\java\\eclipse\\client\\keystore.jks";
+		String path = "E:\\java\\eclipse\\client\\keystore.jks";
 		char[] passphrase = "changeit".toCharArray();
 		KeyStore keystore;
 		TrustManagerFactory tmf;
@@ -61,7 +61,7 @@ public class Client implements Runnable {
 			KeyStore serverPub = KeyStore.getInstance("jks");
 			// successivamente verrà inviata dal webserver
 			serverPub.load(new FileInputStream(
-					"I:\\java\\eclipse\\server\\keystore.jks"), "password"
+					"E:\\java\\eclipse\\server\\keystore.jks"), "password"
 					.toCharArray());
 
 			tmf = TrustManagerFactory.getInstance("SunX509");
@@ -89,8 +89,8 @@ public class Client implements Runnable {
 		}
 
 		// stabilisco la connessione con il server
-		sslSocket = (SSLSocket) sslSocketFactory.createSocket("192.168.1.100",
-				9999);
+		sslSocket = (SSLSocket) sslSocketFactory.createSocket("192.168.1.101",
+				9998);
 		sslSocket.startHandshake();
 
 		System.out.println("** Sono connesso con il server **");

@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.text.DefaultCaret;
 
 public class View extends JFrame implements ViewInterface {
 
@@ -58,6 +59,9 @@ public class View extends JFrame implements ViewInterface {
 		JPanel south = new JPanel();
 		JTextArea chat = new JTextArea();
 
+		DefaultCaret caret = (DefaultCaret) chat.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
 		// add tabview to form
 		this.getContentPane().add(tabView);
 
@@ -86,7 +90,7 @@ public class View extends JFrame implements ViewInterface {
 		tabView.addTab("Main", mainPanel);
 	}
 
-	public void sendMessage() {
+	public String sendMessage() {
 
 		// get the selected tab
 		int index = tabView.getSelectedIndex();
@@ -95,8 +99,10 @@ public class View extends JFrame implements ViewInterface {
 			chatList.get(index).append(message + "\n");
 			textList.get(index).setText("");
 			textList.get(index).requestFocus();
-			controller.commandSendMessage(message);
+
 		}
+
+		return message;
 	}
 
 	public void closeTab(ActionEvent e) {
@@ -116,12 +122,12 @@ public class View extends JFrame implements ViewInterface {
 		}
 	}
 
-	public void createTab() {
+	public JTextArea createTab() {
 
 		for (int i = 0; i < tabView.getTabCount(); i++) {
 			if (tabView.getTitleAt(i).equals(userList.getSelectedValue())) {
 				tabView.setSelectedIndex(i);
-				return;
+				return null;
 			}
 		}
 
@@ -130,10 +136,11 @@ public class View extends JFrame implements ViewInterface {
 		JPanel main = new JPanel(new BorderLayout(10, 10));
 		JPanel tab = new JPanel();
 
+		DefaultCaret caret = (DefaultCaret) chatTmp.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		chatTmp.setLineWrap(true);
 		chatTmp.setEditable(false);
 
-		controller.commandCreateTab(chatTmp);
 		chatList.add(chatTmp);
 		textList.add(this.getMyText());
 
@@ -157,6 +164,8 @@ public class View extends JFrame implements ViewInterface {
 		close.addActionListener(this.getActionListener());
 		tab.add(close);
 		tabView.setTabComponentAt(tabView.getTabCount() - 1, tab);
+
+		return chatTmp;
 	}
 
 	private void setAction() {
@@ -165,8 +174,7 @@ public class View extends JFrame implements ViewInterface {
 		userList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
-					createTab();
-					// controller.commandCreateTab();
+					controller.commandCreateTab();
 				}
 			}
 		});
@@ -178,8 +186,7 @@ public class View extends JFrame implements ViewInterface {
 			public void actionPerformed(ActionEvent e) {
 
 				if (e.getActionCommand().equals("Send")) {
-					sendMessage();
-					// controller.commandSendMessage("ciao");
+					controller.commandSendMessage();
 				}
 
 				if (e.getActionCommand().equals("x")) {
@@ -198,8 +205,7 @@ public class View extends JFrame implements ViewInterface {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					e.consume(); // ignore the key pressed
-					sendMessage();
-					// controller.commandSendMessage("ciao");
+					controller.commandSendMessage();
 				}
 			}
 
