@@ -7,8 +7,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.KeyStore;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -16,7 +14,6 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
-import javax.swing.JTextArea;
 
 /*N.B. queste sono classi di prova, create per verificare la fattibilità del progetto,
  per questo motivo sono presenti indirizzi ip,porte,percorsi assoluti inseriti in modo manuale
@@ -32,16 +29,17 @@ public class Server implements Runnable {
 	BufferedReader br = null;
 	Thread t = null;
 	String str = null;
+	ViewObserver controller;
 
-	List<JTextArea> chat = new ArrayList<>();
+	public Server(ViewObserver controller) throws IOException,
+			ClassNotFoundException {
 
-	public Server() throws IOException, ClassNotFoundException {
-
+		this.controller = controller;
 		try {
 
 			KeyStore serverKeys = KeyStore.getInstance("JKS");
 			serverKeys.load(new FileInputStream(
-					"E:\\java\\eclipse\\server\\keystore.jks"), "password"
+					"I:\\java\\eclipse\\server\\keystore.jks"), "password"
 					.toCharArray());
 			KeyManagerFactory serverKeyManager = KeyManagerFactory
 					.getInstance("SunX509");
@@ -50,7 +48,7 @@ public class Server implements Runnable {
 
 			KeyStore clientPub = KeyStore.getInstance("JKS");
 			clientPub.load(new FileInputStream(
-					"E:\\java\\eclipse\\client\\keystore.jks"), "changeit"
+					"I:\\java\\eclipse\\client\\keystore.jks"), "changeit"
 					.toCharArray());
 			TrustManagerFactory trustManager = TrustManagerFactory
 					.getInstance("SunX509");
@@ -60,11 +58,7 @@ public class Server implements Runnable {
 			SSLContext ssl = SSLContext.getInstance("SSL");
 			ssl.init(serverKeyManager.getKeyManagers(), null,
 					SecureRandom.getInstance("SHA1PRNG"));
-			/*
-			 * ssl.init(serverKeyManager.getKeyManagers(),
-			 * trustManager.getTrustManagers(),
-			 * SecureRandom.getInstance("SHA1PRNG"));
-			 */
+
 			sslServerSocketFactory = ssl.getServerSocketFactory();
 
 		} catch (Exception e) {
@@ -87,7 +81,6 @@ public class Server implements Runnable {
 		try {
 			sslSocket = (SSLSocket) sslServerSocket.accept();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -101,7 +94,6 @@ public class Server implements Runnable {
 			OOS = new ObjectOutputStream(sslSocket.getOutputStream());
 			OIS = new ObjectInputStream(sslSocket.getInputStream());
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -109,14 +101,16 @@ public class Server implements Runnable {
 			// leggo quello che mi arriva dal client
 			try {
 				while ((str = (String) OIS.readObject()) != null) {
-					chat.get(0).append("Client : " + str + "\n");
-					// System.out.println("Client: " + str);
+
+					String stringa = "Client : " + str;
+					controller.commandReceiveMessage(stringa, "Client");
+
+					// chat.get(0).append("Client : " + str + "\n");
+
 				}
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -135,10 +129,9 @@ public class Server implements Runnable {
 
 	}
 
-	public void addChat(JTextArea chat) {
-		this.chat.add(chat);
-	}
-
+	/*
+	 * public void addChat(JTextArea chat) { this.chat.add(chat); }
+	 */
 	public boolean containIp(String ip) {
 		if (sslSocket != null) {
 			return sslSocket.getInetAddress().toString().equals(ip);

@@ -5,10 +5,10 @@ public class Application {
 	public static void main(String[] args) {
 
 		Controller c = new Controller();
-		Model m = new Model();
 		View v = new View();
-		c.setModel(m);
+		Model m = new Model();
 		c.setView(v);
+		c.setModel(m);
 
 	}
 }

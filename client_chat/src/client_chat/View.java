@@ -99,7 +99,6 @@ public class View extends JFrame implements ViewInterface {
 			chatList.get(index).append(message + "\n");
 			textList.get(index).setText("");
 			textList.get(index).requestFocus();
-
 		}
 
 		return message;
@@ -122,10 +121,11 @@ public class View extends JFrame implements ViewInterface {
 		}
 	}
 
-	public JTextArea createTab() {
+	public JTextArea createTab(String title) {
 
 		for (int i = 0; i < tabView.getTabCount(); i++) {
-			if (tabView.getTitleAt(i).equals(userList.getSelectedValue())) {
+			if (tabView.getTitleAt(i).equals(
+			/* userList.getSelectedValue() */title)) {
 				tabView.setSelectedIndex(i);
 				return null;
 			}
@@ -152,11 +152,11 @@ public class View extends JFrame implements ViewInterface {
 		main.add(scrollList.get(textList.size() - 1), BorderLayout.CENTER);
 		main.add(textPanelTmp, BorderLayout.SOUTH);
 
-		tabView.addTab(userList.getSelectedValue(), main);
+		tabView.addTab(/* userList.getSelectedValue() */title, main);
 		tabView.setSelectedIndex(tabView.getTabCount() - 1);
 
 		tab.setOpaque(false);
-		tab.add(new JLabel(userList.getSelectedValue()));
+		tab.add(new JLabel(/* userList.getSelectedValue() */title));
 		JButton close = new JButton("x");
 		close.setOpaque(false);
 
@@ -166,6 +166,18 @@ public class View extends JFrame implements ViewInterface {
 		tabView.setTabComponentAt(tabView.getTabCount() - 1, tab);
 
 		return chatTmp;
+	}
+
+	public void showMessage(String message, String title) {
+		for (int i = 0; i < tabView.getTabCount(); i++) {
+			if (tabView.getTitleAt(i).equals(title)) {
+				tabView.getComponentAt(i);
+				chatList.get(i).append(message + "\n");
+				return;
+			}
+		}
+
+		createTab(title).append(message);
 	}
 
 	private void setAction() {
@@ -234,6 +246,10 @@ public class View extends JFrame implements ViewInterface {
 
 		text.addKeyListener(this.getKeyListener());
 		return text;
+	}
+
+	public String getTitle() {
+		return userList.getSelectedValue();
 	}
 
 }

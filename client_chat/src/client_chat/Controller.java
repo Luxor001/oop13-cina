@@ -17,12 +17,11 @@ public class Controller implements ViewObserver {
 
 	public void setModel(ModelInterface model) {
 		this.model = model;
+		this.model.attachViewObserver(this);
 	}
 
 	public void commandSendMessage() {
-
 		this.model.sendMessage((this.view.sendMessage()));
-
 	}
 
 	public void commandCloseTab(ActionEvent e) {
@@ -30,7 +29,12 @@ public class Controller implements ViewObserver {
 	}
 
 	public void commandCreateTab() {
-		this.model.connectToServer(view.createTab());
+		this.model.connectToServer(view.createTab(view.getTitle()));
+	}
+
+	public void commandReceiveMessage(String message, String title) {
+
+		this.view.showMessage(message, title);
 	}
 
 }

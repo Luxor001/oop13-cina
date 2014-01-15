@@ -10,5 +10,6 @@ public interface ViewObserver {
 
 	void commandCreateTab(/* JTextArea chat */);
 
+	void commandReceiveMessage(String message, String title);
 	// void commandShowMessage();
 }

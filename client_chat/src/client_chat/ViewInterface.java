@@ -12,5 +12,9 @@ public interface ViewInterface {
 
 	void closeTab(ActionEvent e);
 
-	JTextArea createTab();
+	String getTitle();
+
+	void showMessage(String message, String title);
+
+	JTextArea createTab(String title);
 }
