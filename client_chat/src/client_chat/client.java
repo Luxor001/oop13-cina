@@ -12,8 +12,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -35,11 +33,11 @@ public class Client implements Runnable {
 	BufferedReader br = null;
 	Thread t = null;
 	String str = "";
-	List<JTextArea> chat = new ArrayList<>();
+	JTextArea chat;
 
 	public Client() throws IOException, ClassNotFoundException {
 
-		String path = "E:\\java\\eclipse\\client\\keystore.jks";
+		String path = "I:\\java\\eclipse\\client\\keystore.jks";
 		char[] passphrase = "changeit".toCharArray();
 		KeyStore keystore;
 		TrustManagerFactory tmf;
@@ -61,7 +59,7 @@ public class Client implements Runnable {
 			KeyStore serverPub = KeyStore.getInstance("jks");
 			// successivamente verrà inviata dal webserver
 			serverPub.load(new FileInputStream(
-					"E:\\java\\eclipse\\server\\keystore.jks"), "password"
+					"I:\\java\\eclipse\\server\\keystore.jks"), "password"
 					.toCharArray());
 
 			tmf = TrustManagerFactory.getInstance("SunX509");
@@ -89,8 +87,8 @@ public class Client implements Runnable {
 		}
 
 		// stabilisco la connessione con il server
-		sslSocket = (SSLSocket) sslSocketFactory.createSocket("192.168.1.101",
-				9998);
+		sslSocket = (SSLSocket) sslSocketFactory.createSocket("82.57.179.140",
+				9999);
 		sslSocket.startHandshake();
 
 		System.out.println("** Sono connesso con il server **");
@@ -113,7 +111,7 @@ public class Client implements Runnable {
 			// leggo quello che mi arriva dal server
 			try {
 				while ((str = (String) OIS.readObject()) != null) {
-					chat.get(0).append("Server : " + str + "\n");
+					chat.append("Server : " + str);
 				}
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
@@ -139,6 +137,6 @@ public class Client implements Runnable {
 	}
 
 	public void addChat(JTextArea chat) {
-		this.chat.add(chat);
+		this.chat = chat;
 	}
 }

@@ -4,7 +4,7 @@ import javax.swing.JTextArea;
 
 public interface ModelInterface {
 
-	void showMessage();
+	void attachViewObserver(ViewObserver controller);
 
 	void sendMessage(String message);
 
