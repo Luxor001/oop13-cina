@@ -56,7 +56,7 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 	  }
 
 	  private static Param JsonArrayToParam(JsonArray jsonArray) {
-			Param additionalParams = new ChatMessage().new Param();
+			Param additionalParams = new ChatMessage.Param();
 			if (jsonArray.size() != 0) //if it's not empty
 				for (int i = 0; i < jsonArray.size(); i++){ //cycle all elements.
 					JsonObject currObject = jsonArray.getJsonObject(i);

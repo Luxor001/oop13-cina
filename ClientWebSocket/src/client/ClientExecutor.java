@@ -7,7 +7,6 @@ package client;
  */
 
 import java.awt.BorderLayout;
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
@@ -16,15 +15,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.CountDownLatch;
-import java.util.logging.Logger;
 
-import javax.enterprise.inject.New;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
 import javax.websocket.DeploymentException;

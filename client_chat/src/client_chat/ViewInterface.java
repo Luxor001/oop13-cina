@@ -8,7 +8,7 @@ public interface ViewInterface {
 
 	void attachViewObserver(ViewObserver controller);
 
-	String sendMessage();
+	public String sendMessage();
 
 	void closeTab(ActionEvent e);
 
@@ -17,4 +17,6 @@ public interface ViewInterface {
 	void showMessage(String message, String title);
 
 	JTextArea createTab(String title);
+
+	void writeText(String msg,int tab);
 }

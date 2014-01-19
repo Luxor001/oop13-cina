@@ -22,7 +22,7 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 
 
 	  @Override
-	  public ChatMessage decode(String jsonMessage) throws DecodeException {
+	  public ChatMessage decode(String jsonMessage){
 
 	    JsonObject jsonObject = Json
 	        .createReader(new StringReader(jsonMessage)).readObject();
@@ -33,8 +33,15 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 				.getJsonArray("addParams")); // gets any other params need to be sent
 
 		ChatMessage message = new ChatMessage(Message,
-				ChatMessage.Type.valueOf(Type), addlParams);
+				ChatMessage.Type.valueOf(Type));
 		
+		try{
+
+			message.setAdditionalParams(addlParams);
+		}
+		catch(Exception E){
+			E.printStackTrace();
+		}
 		return message;
 
 	  }
@@ -63,7 +70,7 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 	  /*Specular to MessageEncoder encoding part.See it for reference*/
 	  
 	  private static Param JsonArrayToParam(JsonArray jsonArray) {
-		Param additionalParams = new ChatMessage().new Param();
+		Param additionalParams = new ChatMessage.Param();
 		if (jsonArray.size() != 0) //if it's not empty
 			for (int i = 0; i < jsonArray.size(); i++){ //cycle all elements.
 				JsonObject currObject = jsonArray.getJsonObject(i);

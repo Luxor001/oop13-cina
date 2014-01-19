@@ -21,11 +21,11 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.swing.JTextArea;
 
-/*N.B. queste sono classi di prova, create per verificare la fattibilità del progetto,
+/*N.B. queste sono classi di prova, create per verificare la fattibilitï¿½ del progetto,
  per questo motivo sono presenti indirizzi ip,porte,percorsi assoluti inseriti in modo manuale
  dal programmatore*/
 
-public class Client implements Runnable {
+public class client implements Runnable {
 	SSLSocketFactory sslSocketFactory = null;
 	SSLSocket sslSocket = null;
 	ObjectOutputStream OOS = null;
@@ -35,9 +35,9 @@ public class Client implements Runnable {
 	String str = "";
 	JTextArea chat;
 
-	public Client() throws IOException, ClassNotFoundException {
+	public client() throws IOException, ClassNotFoundException {
 
-		String path = "I:\\java\\eclipse\\client\\keystore.jks";
+		String path = "/home/lux/Scaricati/keystore/client/keystore.jks";
 		char[] passphrase = "changeit".toCharArray();
 		KeyStore keystore;
 		TrustManagerFactory tmf;
@@ -57,9 +57,9 @@ public class Client implements Runnable {
 
 			// ottengo la chiave pubblica
 			KeyStore serverPub = KeyStore.getInstance("jks");
-			// successivamente verrà inviata dal webserver
+			// successivamente verrï¿½ inviata dal webserver
 			serverPub.load(new FileInputStream(
-					"I:\\java\\eclipse\\server\\keystore.jks"), "password"
+					"/home/lux/Scaricati/keystore/server/keystore.jks"), "password"
 					.toCharArray());
 
 			tmf = TrustManagerFactory.getInstance("SunX509");
