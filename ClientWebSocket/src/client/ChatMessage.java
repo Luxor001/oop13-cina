@@ -28,9 +28,7 @@ public class ChatMessage {
 		USERDISCONNECTED,
 		USERLIST
 	}
-	public enum RequestType{
-		
-	}
+	
 
 	private Param additionalParams;//=new Param();
 	private Type messageType;
@@ -89,14 +87,19 @@ public class ChatMessage {
 
     
     
-    /* This inner class exist to encapsulate all the optional parameters of a message
+    /* This nested class exist to encapsulate all the optional parameters of a message
      * for e.g. the users list sent by a "User List" request, or a nickname notification 
      * on connection. It has been created to get a smaller size of data packets sent:
      * in fact, the Param class is completely optional and not necessarily needed.*/    
-    public class Param {
+    public static class Param {
     	private String nickname;
     	private Boolean visibility;
     	private ArrayList<String> usersList=new ArrayList<String>();
+    	
+    	public enum RequestType{
+    		
+    	}
+    	
 		public Param(){
 			
 		}

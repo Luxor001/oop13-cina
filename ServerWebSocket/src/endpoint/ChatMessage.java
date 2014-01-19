@@ -3,6 +3,7 @@ package endpoint;
 import java.util.ArrayList;
 
 
+
 public class ChatMessage {
 	  
 	public enum Type {
@@ -13,11 +14,9 @@ public class ChatMessage {
 		USERDISCONNECTED,
 		USERLIST
 	}
-	public enum RequestType{
-		
-	}
 
-	private Param additionalParams;//=new Param();
+
+	private Param additionalParams;
 	private Type messageType;
     private String message;
     
@@ -26,13 +25,13 @@ public class ChatMessage {
     public ChatMessage(String message, Type MessageType){
     	this.message=message;
     	this.messageType=MessageType;
-    //	this.additionalParams=new Param();
+    	this.additionalParams=new ChatMessage.Param();
     }
     
-    public ChatMessage(String message, Type MessageType,Param additionalParams){
+    public ChatMessage(String message, Type MessageType,Param additionalParam){
     	this.message=message;
-    	this.messageType=MessageType;
-    //	this.additionalParams=additionalParams;
+    	this.messageType=MessageType;    	
+    	this.additionalParams=additionalParam;    	
     }
   
     public void setType(Type MessageType) {
@@ -42,9 +41,14 @@ public class ChatMessage {
     	return messageType;
     }
     public Param getAdditionalParams() {
-    	additionalParams=new Param();
+    	//additionalParams=new Param();
     	return additionalParams;
     } 
+    
+    public void setAdditionalParams(Param params){
+    	additionalParams=new endpoint.ChatMessage.Param();
+    	this.additionalParams=params;
+    }
     public boolean isParamSet() {
     	if(additionalParams.equals(null))
     		return false;
@@ -71,11 +75,11 @@ public class ChatMessage {
     
     /* Before you start screaming on why i created this class,please,read
      * the doc at the beginning of this class							*/    
-	public class Param {
+	public static class Param {
 		private String nickname;
 		private Boolean visibility;
 		private ArrayList<String> usersList=new ArrayList<String>();
-		
+			
 		public Param(){
 			
 		}

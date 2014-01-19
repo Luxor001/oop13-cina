@@ -69,10 +69,9 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			}
 			
 			/* send users list to the new client*/
-			ChatMessage messagetoclient=new ChatMessage("Users List",Type.USERLIST);
-			for(User cUser:UsersList)
+			ChatMessage messagetoclient=new ChatMessage("Users List",Type.USERLIST); 
+			for(User cUser:UsersList) //ESCLUDERE INVISIBILI!
 				messagetoclient.getAdditionalParams().appendUser(cUser.GetNickname());
-			
 			SendMex(messagetoclient, clientsession);			
 			
 			UsersList.add(new User(UserNickname,State.VISIBLE, clientsession));			

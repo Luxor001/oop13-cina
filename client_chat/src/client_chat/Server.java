@@ -15,7 +15,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 
-/*N.B. queste sono classi di prova, create per verificare la fattibilità del progetto,
+/*N.B. queste sono classi di prova, create per verificare la fattibilitï¿½ del progetto,
  per questo motivo sono presenti indirizzi ip,porte,percorsi assoluti inseriti in modo manuale
  dal programmatore*/
 
@@ -39,7 +39,7 @@ public class Server implements Runnable {
 
 			KeyStore serverKeys = KeyStore.getInstance("JKS");
 			serverKeys.load(new FileInputStream(
-					"I:\\java\\eclipse\\server\\keystore.jks"), "password"
+					"/home/lux/Scaricati/keystore/server/keystore.jks"), "password"
 					.toCharArray());
 			KeyManagerFactory serverKeyManager = KeyManagerFactory
 					.getInstance("SunX509");
@@ -48,7 +48,7 @@ public class Server implements Runnable {
 
 			KeyStore clientPub = KeyStore.getInstance("JKS");
 			clientPub.load(new FileInputStream(
-					"I:\\java\\eclipse\\client\\keystore.jks"), "changeit"
+					"/home/lux/Scaricati/keystore/client/keystore.jks"), "changeit"
 					.toCharArray());
 			TrustManagerFactory trustManager = TrustManagerFactory
 					.getInstance("SunX509");
@@ -84,7 +84,7 @@ public class Server implements Runnable {
 			e1.printStackTrace();
 		}
 
-		System.out.println("** Un client si è connesso **");
+		System.out.println("** Un client si ï¿½ connesso **");
 		System.out.println("IP: " + sslSocket.getInetAddress());
 		System.out.println("Porta: " + sslSocket.getPort());
 		// inizializzo gli stream che mi permetteranno di inviare e ricevere

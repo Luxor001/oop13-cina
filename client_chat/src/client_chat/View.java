@@ -103,6 +103,17 @@ public class View extends JFrame implements ViewInterface {
 
 		return message;
 	}
+	
+	public void writeText(String msg,int tab) {
+
+		// get the selected tab
+		int index = tabView.getSelectedIndex();
+		if (!msg.equals("")) {
+			chatList.get(index).append(msg + "\n");
+			textList.get(index).setText("");
+			textList.get(index).requestFocus();
+		}
+	}
 
 	public void closeTab(ActionEvent e) {
 

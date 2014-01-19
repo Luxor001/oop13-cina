@@ -9,7 +9,7 @@ import javax.swing.JTextArea;
 public class Model implements ModelInterface/* , Runnable */{
 
 	// List<Thread> clientThread = new ArrayList<>();
-	List<Client> client = new ArrayList<>();
+	List<client> client = new ArrayList<>();
 	Server server;
 
 	public Model() {
@@ -33,7 +33,7 @@ public class Model implements ModelInterface/* , Runnable */{
 		if (chat != null) {
 
 			try {
-				client.add(new Client());
+				client.add(new client());
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -59,4 +59,6 @@ public class Model implements ModelInterface/* , Runnable */{
 	 * try { client.add(new Client()); } catch (ClassNotFoundException e) {
 	 * e.printStackTrace(); } catch (IOException e) { e.printStackTrace(); } }
 	 */
+	
+	
 }
