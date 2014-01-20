@@ -39,8 +39,8 @@ public class Server implements Runnable {
 
 			KeyStore serverKeys = KeyStore.getInstance("JKS");
 			serverKeys.load(new FileInputStream(
-					"/home/lux/Scaricati/keystore/server/keystore.jks"), "password"
-					.toCharArray());
+					"/home/lux/Scaricati/keystore/server/keystore.jks"),
+					"password".toCharArray());
 			KeyManagerFactory serverKeyManager = KeyManagerFactory
 					.getInstance("SunX509");
 
@@ -48,8 +48,8 @@ public class Server implements Runnable {
 
 			KeyStore clientPub = KeyStore.getInstance("JKS");
 			clientPub.load(new FileInputStream(
-					"/home/lux/Scaricati/keystore/client/keystore.jks"), "changeit"
-					.toCharArray());
+					"/home/lux/Scaricati/keystore/client/keystore.jks"),
+					"changeit".toCharArray());
 			TrustManagerFactory trustManager = TrustManagerFactory
 					.getInstance("SunX509");
 			trustManager.init(clientPub);
@@ -102,7 +102,7 @@ public class Server implements Runnable {
 			try {
 				while ((str = (String) OIS.readObject()) != null) {
 
-					String stringa = "Client : " + str;
+					String stringa = "Client : " + str + "\n";
 					controller.commandReceiveMessage(stringa, "Client");
 
 					// chat.get(0).append("Client : " + str + "\n");

@@ -18,5 +18,7 @@ public interface ViewInterface {
 
 	JTextArea createTab(String title);
 
-	void writeText(String msg,int tab);
+	void writeText(String msg, int tab);
+
+	int getTabIndex();
 }

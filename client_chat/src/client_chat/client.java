@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -25,7 +26,7 @@ import javax.swing.JTextArea;
  per questo motivo sono presenti indirizzi ip,porte,percorsi assoluti inseriti in modo manuale
  dal programmatore*/
 
-public class client implements Runnable {
+public class Client implements Runnable {
 	SSLSocketFactory sslSocketFactory = null;
 	SSLSocket sslSocket = null;
 	ObjectOutputStream OOS = null;
@@ -34,8 +35,9 @@ public class client implements Runnable {
 	Thread t = null;
 	String str = "";
 	JTextArea chat;
+	String ip;
 
-	public client() throws IOException, ClassNotFoundException {
+	public Client(String ip) throws IOException, ClassNotFoundException {
 
 		String path = "/home/lux/Scaricati/keystore/client/keystore.jks";
 		char[] passphrase = "changeit".toCharArray();
@@ -43,6 +45,7 @@ public class client implements Runnable {
 		TrustManagerFactory tmf;
 		SSLContext context;
 		TrustManager[] trustManagers;
+		this.ip = ip;
 
 		try {
 			// indico il tipo della chiave
@@ -59,8 +62,8 @@ public class client implements Runnable {
 			KeyStore serverPub = KeyStore.getInstance("jks");
 			// successivamente verr� inviata dal webserver
 			serverPub.load(new FileInputStream(
-					"/home/lux/Scaricati/keystore/server/keystore.jks"), "password"
-					.toCharArray());
+					"/home/lux/Scaricati/keystore/server/keystore.jks"),
+					"password".toCharArray());
 
 			tmf = TrustManagerFactory.getInstance("SunX509");
 			tmf.init(serverPub);
@@ -86,20 +89,6 @@ public class client implements Runnable {
 			e.printStackTrace();
 		}
 
-		// stabilisco la connessione con il server
-		sslSocket = (SSLSocket) sslSocketFactory.createSocket("82.57.179.140",
-				9999);
-		sslSocket.startHandshake();
-
-		System.out.println("** Sono connesso con il server **");
-		System.out.println("IP: " + sslSocket.getInetAddress());
-		System.out.println("Porta: " + sslSocket.getPort());
-
-		// inizializzo gli stream che mi permetteranno di inviare e ricevere i
-		// mess ->
-		OOS = new ObjectOutputStream(sslSocket.getOutputStream());
-		OIS = new ObjectInputStream(sslSocket.getInputStream());
-
 		t = new Thread(this);
 		t.start();
 
@@ -107,11 +96,38 @@ public class client implements Runnable {
 
 	public void run() {
 
+		// stabilisco la connessione con il server
+		try {
+			sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, 9999);
+			sslSocket.startHandshake();
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		System.out.println("** Sono connesso con il server **");
+		System.out.println("IP: " + sslSocket.getInetAddress());
+		System.out.println("Porta: " + sslSocket.getPort());
+
+		// inizializzo gli stream che mi permetteranno di inviare e ricevere i
+		// mess ->
+
+		try {
+			OOS = new ObjectOutputStream(sslSocket.getOutputStream());
+			OIS = new ObjectInputStream(sslSocket.getInputStream());
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		while (sslSocket.isConnected()) {
 			// leggo quello che mi arriva dal server
 			try {
 				while ((str = (String) OIS.readObject()) != null) {
-					chat.append("Server : " + str);
+					chat.append("Server : " + str + "\n");
 				}
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
