@@ -9,30 +9,14 @@ import java.net.URISyntaxException;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JFrame;
-import javax.websocket.ClientEndpoint;
-import javax.websocket.CloseReason;
-import javax.websocket.DeploymentException;
-import javax.websocket.EncodeException;
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
 
-import org.glassfish.tyrus.client.ClientManager;
-
-import client_chat.ChatMessage.Type;
-
-
-@ClientEndpoint(
-		  encoders = { MessageEncoder.class }, 
-		  decoders = { MessageDecoder.class }
-	)
+@ClientEndpoint(encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
 public class Controller implements ViewObserver {
 
 	private ViewInterface view;
 	private ModelInterface model;
 
-	public Controller(){
+	public Controller() {
 	}
 
 	public void setView(ViewInterface view) {
@@ -47,7 +31,8 @@ public class Controller implements ViewObserver {
 	}
 
 	public void commandSendMessage() {
-		this.model.sendMessage((this.view.sendMessage()));
+		this.model.sendMessage((this.view.sendMessage()),
+				this.view.getTabIndex());
 	}
 
 	public void commandCloseTab(ActionEvent e) {
@@ -62,11 +47,7 @@ public class Controller implements ViewObserver {
 
 		this.view.showMessage(message, title);
 	}
-	
-	
-	
-	
-	
+
 	private static CountDownLatch latch;
 	static Session ClientSession;
 
@@ -77,11 +58,11 @@ public class Controller implements ViewObserver {
 	 */
 	@OnOpen
 	public void onOpen(Session session) throws IOException, EncodeException {
-		//view.writeText("Connected to Channel : \"Main\"",0);
+		// view.writeText("Connected to Channel : \"Main\"",0);
 		System.out.println("Connected to WebServer!");
-		
+
 		System.out.println("Sending my INITIALIZE message..");
-		
+
 		ClientSession = session;
 		ChatMessage Message = new ChatMessage("hello", Type.INITIALIZE);
 		Message.getAdditionalParams().setNickname("Lux");
@@ -101,11 +82,15 @@ public class Controller implements ViewObserver {
 
 		if (message.getType() == Type.USERLIST) {
 
-			System.out.println("Server has responded! Number of current clients: "+(message.getAdditionalParams().getUsersList().size()+1));
-/*			System.out.println("USERLIST MESSAGE TYPE, USERS:"
-					+ message.getAdditionalParams().getUsersList().get(0)
-					+ "\n"
-					+ message.getAdditionalParams().getUsersList().get(1));*/
+			System.out
+					.println("Server has responded! Number of current clients: "
+							+ (message.getAdditionalParams().getUsersList()
+									.size() + 1));
+			/*
+			 * System.out.println("USERLIST MESSAGE TYPE, USERS:" +
+			 * message.getAdditionalParams().getUsersList().get(0) + "\n" +
+			 * message.getAdditionalParams().getUsersList().get(1));
+			 */
 		}
 
 		if (message.getType() == Type.TEXT) {
@@ -134,7 +119,7 @@ public class Controller implements ViewObserver {
 	 * @throws IOException
 	 * 
 	 */
-	public void Start() throws IOException {
+	public void start() throws IOException {
 
 		latch = new CountDownLatch(1);
 		ClientManager client = null;
@@ -146,7 +131,7 @@ public class Controller implements ViewObserver {
 
 		/* Attemp connection to web service */
 		try {
-			//view.writeText("Attempt to connect..",0);
+			// view.writeText("Attempt to connect..",0);
 			System.out.println("Attempt connection to webserver...");
 			client.connectToServer(Controller.class, new URI(
 					"ws://localhost:8080/ServerWebSocket/websocket"));

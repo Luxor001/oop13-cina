@@ -6,24 +6,24 @@ import java.util.List;
 
 import javax.swing.JTextArea;
 
-public class Model implements ModelInterface/* , Runnable */{
+public class Model implements ModelInterface {
 
-	// List<Thread> clientThread = new ArrayList<>();
-	List<client> client = new ArrayList<>();
+	List<Client> client = new ArrayList<>();
 	Server server;
+	int cont = 0;
 
 	public Model() {
 
 	}
 
-	public void sendMessage(String message) {
+	public void sendMessage(String message, int index) {
 
 		if (message != "") {
 			// check if i'm the server in this chat or the client
-			if (server.containIp("/82.57.179.140")) {
+			if (server.containIp("/158.148.28.231")) {
 				server.sendMessage(message);
 			} else {
-				client.get(0).sendMessage(message);
+				client.get(index - 1).sendMessage(message);
 			}
 		}
 	}
@@ -33,13 +33,19 @@ public class Model implements ModelInterface/* , Runnable */{
 		if (chat != null) {
 
 			try {
-				client.add(new client());
+				if (cont == 0) {
+					client.add(new Client("localhost"));
+				} else {
+					client.add(new Client("localhost"));
+				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			client.get(client.size() - 1).addChat(chat);
+
+			cont++;
 		}
 	}
 
@@ -53,12 +59,5 @@ public class Model implements ModelInterface/* , Runnable */{
 			e.printStackTrace();
 		}
 	}
-	/*
-	 * public void run() {
-	 * 
-	 * try { client.add(new Client()); } catch (ClassNotFoundException e) {
-	 * e.printStackTrace(); } catch (IOException e) { e.printStackTrace(); } }
-	 */
-	
-	
+
 }

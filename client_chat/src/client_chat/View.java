@@ -93,7 +93,7 @@ public class View extends JFrame implements ViewInterface {
 	public String sendMessage() {
 
 		// get the selected tab
-		int index = tabView.getSelectedIndex();
+		int index = getTabIndex();
 		String message = textList.get(index).getText();
 		if (!message.equals("")) {
 			chatList.get(index).append(message + "\n");
@@ -103,11 +103,11 @@ public class View extends JFrame implements ViewInterface {
 
 		return message;
 	}
-	
-	public void writeText(String msg,int tab) {
+
+	public void writeText(String msg, int tab) {
 
 		// get the selected tab
-		int index = tabView.getSelectedIndex();
+		int index = getTabIndex();
 		if (!msg.equals("")) {
 			chatList.get(index).append(msg + "\n");
 			textList.get(index).setText("");
@@ -135,8 +135,7 @@ public class View extends JFrame implements ViewInterface {
 	public JTextArea createTab(String title) {
 
 		for (int i = 0; i < tabView.getTabCount(); i++) {
-			if (tabView.getTitleAt(i).equals(
-			/* userList.getSelectedValue() */title)) {
+			if (tabView.getTitleAt(i).equals(title)) {
 				tabView.setSelectedIndex(i);
 				return null;
 			}
@@ -163,11 +162,11 @@ public class View extends JFrame implements ViewInterface {
 		main.add(scrollList.get(textList.size() - 1), BorderLayout.CENTER);
 		main.add(textPanelTmp, BorderLayout.SOUTH);
 
-		tabView.addTab(/* userList.getSelectedValue() */title, main);
+		tabView.addTab(title, main);
 		tabView.setSelectedIndex(tabView.getTabCount() - 1);
 
 		tab.setOpaque(false);
-		tab.add(new JLabel(/* userList.getSelectedValue() */title));
+		tab.add(new JLabel(title));
 		JButton close = new JButton("x");
 		close.setOpaque(false);
 
@@ -182,7 +181,7 @@ public class View extends JFrame implements ViewInterface {
 	public void showMessage(String message, String title) {
 		for (int i = 0; i < tabView.getTabCount(); i++) {
 			if (tabView.getTitleAt(i).equals(title)) {
-				tabView.getComponentAt(i);
+				// tabView.getComponentAt(i);
 				chatList.get(i).append(message + "\n");
 				return;
 			}
@@ -263,4 +262,7 @@ public class View extends JFrame implements ViewInterface {
 		return userList.getSelectedValue();
 	}
 
+	public int getTabIndex() {
+		return tabView.getSelectedIndex();
+	}
 }

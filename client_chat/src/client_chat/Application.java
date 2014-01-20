@@ -12,6 +12,6 @@ public class Application {
 		c.setView(v);
 		c.setModel(m);
 
-		c.Start(); /*connects to webserver*/
+		c.start(); /* connects to webserver */
 	}
 }
