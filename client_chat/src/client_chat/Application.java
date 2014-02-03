@@ -12,6 +12,8 @@ public class Application {
 		c.setView(v);
 		c.setModel(m);
 
-		c.start(); /* connects to webserver */
+		WebsocketHandler.setController(c);
+		m.Start(); /*connects to webserver*/
+		
 	}
 }

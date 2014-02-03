@@ -21,4 +21,6 @@ public interface ViewInterface {
 	void writeText(String msg, int tab);
 
 	int getTabIndex();
+	
+	public void showMessageMain(String Message);
 }
