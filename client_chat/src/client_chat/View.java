@@ -190,6 +190,10 @@ public class View extends JFrame implements ViewInterface {
 		createTab(title).append(message);
 	}
 
+	public void showMessageMain(String Message){
+		chatList.get(0).append("\n"+Message);
+	}
+
 	private void setAction() {
 		enter.addActionListener(getActionListener());
 
