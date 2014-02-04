@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.websocket.DeploymentException;
 
@@ -57,17 +58,17 @@ public class Model implements ModelInterface {
 
 	public void attachViewObserver(ViewObserver controller) {
 		// server will be created at start of programm and pending some clients
-		try {
+		/*try {
 			server = new Server(controller);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	private static CountDownLatch latch;
-	public void Start() throws IOException {
+	public int AttemptConnection() throws IOException {
 
 		latch = new CountDownLatch(1);
 		ClientManager client = null;
@@ -81,16 +82,23 @@ public class Model implements ModelInterface {
 		try {
 			//view.writeText("Attempt to connect..",0);
 			
-			this.server.controller.showMessageMain("Attempting connection to channel..");
+			//this.server.controller.showMessageMain("Attempting connection to channel..");
 			client.connectToServer(WebsocketHandler.class, new URI(
 					"ws://localhost:8080/ServerWebSocket/websocket"));
 			latch.await();
 
 		} catch (DeploymentException | URISyntaxException
-				| InterruptedException e) {
-			throw new RuntimeException(e);
-
+				| InterruptedException e) {			
+			
+			if(e.getClass().isAssignableFrom(DeploymentException.class)){
+				return -1;
+			}
+			if(e.getClass().isAssignableFrom(URISyntaxException.class)){
+				return -2;
+			}
 		}
+		
+		return 1;
 	}
 
 

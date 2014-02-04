@@ -23,4 +23,7 @@ public interface ViewInterface {
 	int getTabIndex();
 	
 	public void showMessageMain(String Message);
+	
+	public int buildChoiceMessageBox(String Message, String title, Object[] options,
+			int IconType);
 }
