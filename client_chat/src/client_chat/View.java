@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -269,4 +270,16 @@ public class View extends JFrame implements ViewInterface {
 	public int getTabIndex() {
 		return tabView.getSelectedIndex();
 	}
+	
+	public int buildChoiceMessageBox(String Message,String title, Object[] options,
+			int IconType){
+		//Object[] options = { "Yes, please", "No way!" };
+		int n = JOptionPane.showOptionDialog(this,
+				Message, title,
+				JOptionPane.YES_NO_OPTION, IconType, null, options,null);
+		
+		return n;
+		
+	}
+	
 }
