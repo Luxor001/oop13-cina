@@ -21,18 +21,19 @@ public class Application {
 		connectionResult result;
 		int userchoice = 0;
 		result = m.AttemptConnection(); /* connects to webserver */
-		
+
 		while (result == connectionResult.TIMEOUT && userchoice == 0) {
 
 			userchoice = v.buildChoiceMessageBox(
 					"Chat Channel is not responding," + "\nconnection failed",
 					"Connection Failed", new Object[] { "Reconnect",
 							"Quit to Main" }, JOptionPane.ERROR_MESSAGE);
-			
-			if(userchoice == 0) /* retry */
+
+			if (userchoice == 0) /* retry */
 				result = m.AttemptConnection();
-			if(userchoice == 1);
-				/* splashscreen, needs to be implemented */
+			if (userchoice == 1)
+				;
+			/* splashscreen, needs to be implemented */
 		}
 
 	}

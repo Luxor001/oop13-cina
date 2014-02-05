@@ -37,15 +37,18 @@ public class Client implements Runnable {
 	JTextArea chat;
 	String ip;
 
-	public Client(String ip) throws IOException, ClassNotFoundException {
+	public Client(String ip, JTextArea chat) throws IOException,
+			ClassNotFoundException {
 
-		String path = "/home/lux/Scaricati/keystore/client/keystore.jks";
+		String path = "ClientKey.jks";
 		char[] passphrase = "changeit".toCharArray();
 		KeyStore keystore;
 		TrustManagerFactory tmf;
 		SSLContext context;
 		TrustManager[] trustManagers;
+
 		this.ip = ip;
+		this.chat = chat;
 
 		try {
 			// indico il tipo della chiave
@@ -61,8 +64,7 @@ public class Client implements Runnable {
 			// ottengo la chiave pubblica
 			KeyStore serverPub = KeyStore.getInstance("jks");
 			// successivamente verr� inviata dal webserver
-			serverPub.load(new FileInputStream(
-					"/home/lux/Scaricati/keystore/server/keystore.jks"),
+			serverPub.load(new FileInputStream("ServerKey.jks"),
 					"password".toCharArray());
 
 			tmf = TrustManagerFactory.getInstance("SunX509");
@@ -152,7 +154,4 @@ public class Client implements Runnable {
 
 	}
 
-	public void addChat(JTextArea chat) {
-		this.chat = chat;
-	}
 }
