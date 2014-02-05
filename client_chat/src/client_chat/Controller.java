@@ -3,13 +3,12 @@ package client_chat;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 
-
 public class Controller implements ViewObserver {
 
 	private ViewInterface view;
 	private ModelInterface model;
 
-	public Controller(){
+	public Controller() {
 	}
 
 	public void setView(ViewInterface view) {
@@ -33,15 +32,16 @@ public class Controller implements ViewObserver {
 	}
 
 	public void commandCreateTab() {
-		this.model.connectToServer(view.createTab(view.getTitle()));
+		this.model.connectToServer(this.view.getTabIndex(),
+				view.createTab(view.getTitle()));
 	}
 
 	public void commandReceiveMessage(String message, String title) {
 		this.view.showMessage(message, title);
 	}
-	
-	public void showMessageMain(String Message){
+
+	public void showMessageMain(String Message) {
 		this.view.showMessageMain(Message);
 	}
-	
+
 }

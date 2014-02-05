@@ -6,7 +6,7 @@ public interface ModelInterface {
 
 	void attachViewObserver(ViewObserver controller);
 
-	void sendMessage(String message,int index);
+	void sendMessage(String message, int index);
 
-	void connectToServer(JTextArea chat);
+	void connectToServer(int index, JTextArea chat);
 }
