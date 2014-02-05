@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.websocket.DeploymentException;
 
@@ -15,6 +14,11 @@ import org.glassfish.tyrus.client.ClientManager;
 
 public class Model implements ModelInterface {
 
+	public enum connectionResult{
+		OK,
+		TIMEOUT,
+		BAD_URI
+	}
 	List<Client> client = new ArrayList<>();
 	Server server;
 	int cont = 0;
@@ -68,7 +72,7 @@ public class Model implements ModelInterface {
 	}
 	
 	private static CountDownLatch latch;
-	public int AttemptConnection() throws IOException {
+	public connectionResult AttemptConnection() throws IOException {
 
 		latch = new CountDownLatch(1);
 		ClientManager client = null;
@@ -91,14 +95,14 @@ public class Model implements ModelInterface {
 				| InterruptedException e) {			
 			
 			if(e.getClass().isAssignableFrom(DeploymentException.class)){
-				return -1;
+				return connectionResult.TIMEOUT;
 			}
 			if(e.getClass().isAssignableFrom(URISyntaxException.class)){
-				return -2;
+				return connectionResult.BAD_URI;
 			}
 		}
 		
-		return 1;
+		return connectionResult.OK;
 	}
 
 

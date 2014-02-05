@@ -2,8 +2,9 @@ package client_chat;
 
 import java.io.IOException;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
+import client_chat.Model.connectionResult;
 
 public class Application {
 
@@ -16,17 +17,23 @@ public class Application {
 		c.setModel(m);
 
 		WebsocketHandler.setController(c);
-		int result=m.AttemptConnection(); /*connects to webserver*/
+
+		connectionResult result;
+		int userchoice = 0;
+		result = m.AttemptConnection(); /* connects to webserver */
 		
-		if(result == -1){
-			int choice=v.buildChoiceMessageBox("Chat Channel is not responding,\nconnection failed","Connection Failed",
-					new Object[]{"Reconnect", "Quit to Main"},
-					JOptionPane.ERROR_MESSAGE);
+		while (result == connectionResult.TIMEOUT && userchoice == 0) {
+
+			userchoice = v.buildChoiceMessageBox(
+					"Chat Channel is not responding," + "\nconnection failed",
+					"Connection Failed", new Object[] { "Reconnect",
+							"Quit to Main" }, JOptionPane.ERROR_MESSAGE);
 			
-			if(choice == 0){
-				System.out.println("Recconect");
-				/*Attempt reconnection*/
-			}
+			if(userchoice == 0) /* retry */
+				result = m.AttemptConnection();
+			if(userchoice == 1);
+				/* splashscreen, needs to be implemented */
 		}
+
 	}
 }

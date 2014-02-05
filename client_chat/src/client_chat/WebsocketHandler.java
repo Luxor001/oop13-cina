@@ -2,7 +2,6 @@ package client_chat;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.ConstructorProperties;
 import java.io.IOException;
 
 import javax.swing.JFrame;
