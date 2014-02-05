@@ -1,10 +1,7 @@
 package client_chat;
 
-import java.awt.JobAttributes;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-
-import javax.swing.JOptionPane;
 
 
 public class Controller implements ViewObserver {
