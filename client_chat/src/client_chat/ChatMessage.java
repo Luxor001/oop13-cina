@@ -24,7 +24,7 @@ public class ChatMessage {
 		INITIALIZE,		/* Used to Registry a new user to the channel */
 		TEXT,			/* Duh. */
 		REQUEST,		/* Used to make special requests. Needs implementation */ 
-		NEWUSER,		/* Needed to tell there's a new boy in town */
+		NEWUSER,		/* Needed to tell to server there's a new boy in town */
 		USERDISCONNECTED,
 		USERLIST
 	}
@@ -33,14 +33,13 @@ public class ChatMessage {
 	private Param additionalParams;// =new Param();
 	private Type messageType;
     private String message;
- 
+    private String senderNickname;
     
     public ChatMessage(){
     }
     public ChatMessage(String message, Type MessageType){
     	this.message=message;
     	this.messageType=MessageType;
-    	this.additionalParams=new Param();
     }
     
     public ChatMessage(String message, Type MessageType,Param additionalParams){
@@ -57,7 +56,8 @@ public class ChatMessage {
     }
  
     public Param getAdditionalParams() {
-    	//additionalParams=new Param();
+    	if(additionalParams == null)
+    		additionalParams=new Param();
     	return additionalParams;
     } 
     
@@ -65,7 +65,7 @@ public class ChatMessage {
     	this.additionalParams=params;
     }
     public boolean isParamSet() {
-    	if(additionalParams.equals(null))
+    	if(additionalParams == null)
     		return false;
     	else
     		return true;
@@ -104,6 +104,7 @@ public class ChatMessage {
 			
 		}
 		
+		/* ricoradrsi di specificare che il nickname in questi parametri addizionali è usato SOLO per il primo avvio. Dopo la faccenda dei nickname sarà gestita SOLO dal webserver: sarà lui a inserirlo, per un motivo di sicurezza. */
 		public void setNickname(String Nick){
 			nickname=Nick;
 		}

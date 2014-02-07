@@ -89,9 +89,10 @@ public class Model implements ModelInterface {
 	}
 
 	private static CountDownLatch latch;
-
+	public WebsocketHandler sockethandler;
 	public connectionResult AttemptConnection() throws IOException {
 
+		
 		latch = new CountDownLatch(1);
 		ClientManager client = null;
 		try {
@@ -99,15 +100,20 @@ public class Model implements ModelInterface {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
+		sockethandler=new WebsocketHandler();
 		/* Attemp connection to web service */
 		try {
-			// view.writeText("Attempt to connect..",0);
-
-			// this.server.controller.showMessageMain("Attempting connection to channel..");
+			
+			
+			this.server.controller.showMessageMain("Attempting connection to channel..");
+			client.connectToServer(sockethandler,null, new URI(
+					"ws://localhost:8080/ServerWebSocket/websocket"));
+			
+			/*
 			client.connectToServer(WebsocketHandler.class, new URI(
 					"ws://localhost:8080/ServerWebSocket/websocket"));
-			latch.await();
+			*/latch.await();
 
 		} catch (DeploymentException | URISyntaxException
 				| InterruptedException e) {
@@ -164,5 +170,11 @@ public class Model implements ModelInterface {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	/*this method is needed to be referenced by the controller.*/
+	@Override
+	public WebsocketHandler getSocketHandler() {		
+		return sockethandler;
 	}
 }
