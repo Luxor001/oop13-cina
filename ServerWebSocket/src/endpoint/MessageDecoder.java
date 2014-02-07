@@ -69,7 +69,8 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 
 	  /*Specular to MessageEncoder encoding part.See it for reference*/
 	  
-	  private static Param JsonArrayToParam(JsonArray jsonArray) {
+	  @SuppressWarnings("unused")
+	private static Param JsonArrayToParam(JsonArray jsonArray) {
 		Param additionalParams = new ChatMessage.Param();
 		if (jsonArray.size() != 0) //if it's not empty
 			for (int i = 0; i < jsonArray.size(); i++){ //cycle all elements.
@@ -78,9 +79,17 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 				if(currObject.containsKey("Nickname"))
 					additionalParams.setNickname(currObject.getString("Nickname"));
 
-				if(currObject.containsKey("Visibility"))
-					additionalParams.SetVisibility(Boolean.getBoolean
-						((currObject.getString("Visibility"))));			
+	
+
+				/*http://toadbalancing.blogspot.it/2005/10/java-api-pitfalls-booleangetbooleanstr.html
+				take your time to read it, and DONT EVER FOR GOD SAKE
+				use Boolean.getBoolean(), i wasted 2 hours on it*/
+				if(currObject.containsKey("Visibility")){
+					additionalParams.SetVisibility(Boolean.valueOf(
+							((currObject.getString("Visibility")))));	
+				}
+			
+							
 				
 				if(currObject.containsKey("usersList")){
 					JsonArray array=currObject.getJsonArray("usersList");					
