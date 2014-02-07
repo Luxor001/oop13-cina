@@ -29,8 +29,6 @@ import endpoint.User.State;
 )
 public class MyServerEndpoint implements ServletContextListener{ //http://mjtoolbox.wordpress.com/2013/06/20/websocket-chat-application-using-jee-7-with-glassfish-4-0/
 
-	
-	
 	private static final Set<Session> clientSessions = Collections
 			.synchronizedSet(new HashSet<Session>());	
 	private ArrayList<User> UsersList=new ArrayList<User>();

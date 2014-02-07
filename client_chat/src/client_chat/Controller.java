@@ -3,6 +3,8 @@ package client_chat;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 
+import client_chat.ChatMessage.Type;
+
 public class Controller implements ViewObserver {
 
 	private ViewInterface view;
@@ -22,9 +24,21 @@ public class Controller implements ViewObserver {
 
 	}
 
-	public void commandSendMessage() {
-		this.model.sendMessage((this.view.sendMessage()),
+	public void commandSendMessage(){
+
+		if(this.view.getTabIndex() == 0){/*if user wants to send a message on general chat*/
+			try {
+				this.model.getSocketHandler().SendMex(
+						new ChatMessage("Messaggio",Type.TEXT));
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+			}
+		}
+		else{ /*instead user wants to write on a private chat..*/
+			this.model.sendMessage((this.view.sendMessage()),
 				+this.view.getTabIndex());
+		}
 	}
 
 	public void commandCloseTab(ActionEvent e) {
