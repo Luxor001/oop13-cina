@@ -33,10 +33,7 @@ public class WebsocketHandler {
 	public void onOpen(Session session) throws IOException, EncodeException {
 		//view.writeText("Connected to Channel : \"Main\"",0);
 
-		controller.showMessageMain("Connected!");
-		//controller.showMessageMain("Connected to WebServer!");
-		//System.out.println("Connected to WebServer!");
-		
+		controller.showMessageMain("Connected!");		
 		System.out.println("Sending my INITIALIZE message..");
 		
 		ClientSession = session;
@@ -56,8 +53,9 @@ public class WebsocketHandler {
 	public void onMessage(ChatMessage message, Session session) {
 
 		if (message.getType() == Type.USERLIST) {
-
-			System.out.println("Server has responded! Number of current clients: "+(message.getAdditionalParams().getUsersList().size()+1));
+			
+			System.out.println("Server has responded! Number of current clients except me: "+
+			(message.getAdditionalParams().getUsersList().size()));
 /*			System.out.println("USERLIST MESSAGE TYPE, USERS:"
 					+ message.getAdditionalParams().getUsersList().get(0)
 					+ "\n"
@@ -65,8 +63,13 @@ public class WebsocketHandler {
 		}
 
 		if (message.getType() == Type.TEXT) {
-			System.out.println(message.getAdditionalParams().getNickname()
-					+ " : " + message.getMessage());
+			
+			controller.showMessageMain(message.getAdditionalParams().getNickname()+
+					" : " + message.getMessage());
+		}
+		
+		if(message.getType() == Type.NEWUSER){
+	
 		}
 
 	}
@@ -84,18 +87,12 @@ public class WebsocketHandler {
 			//latch.countDown();
 	}
 
-	/**
-	 * Method run by the entry-point of the application.
-	 * 
-	 * @throws IOException
-	 * 
-	 */
-	
 
 	public void SendMex(ChatMessage Mex) throws IOException, EncodeException {
 		ClientSession.getBasicRemote().sendObject(Mex);
 	}
 
+	
 	/* needed to intercept the action of closing window */
 	class CustomWindowAdapter extends WindowAdapter {
 

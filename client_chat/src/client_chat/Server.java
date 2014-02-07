@@ -63,17 +63,17 @@ public class Server implements Runnable {
 			e.printStackTrace();
 		}
 		// creo il server
-		sslServerSocket = (SSLServerSocket) sslServerSocketFactory
+	/*	sslServerSocket = (SSLServerSocket) sslServerSocketFactory
 				.createServerSocket(9999);
 		sslServerSocket.setNeedClientAuth(false);
-
+*/
 		t = new Thread(this);
 		t.start();
 
 	}
 
 	public void run() {
-
+/*
 		System.out.println("In attesa di client...");
 
 		try {
@@ -111,7 +111,7 @@ public class Server implements Runnable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 	}
 
 	public void sendMessage(String message) {
