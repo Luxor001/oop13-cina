@@ -26,4 +26,8 @@ public interface ViewInterface {
 	
 	public int buildChoiceMessageBox(String Message, String title, Object[] options,
 			int IconType);
+	
+	public void appendUser(String user);
+	
+	public boolean removeUser(String user);
 }

@@ -8,9 +8,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -22,6 +26,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.DefaultCaret;
+import javax.websocket.EncodeException;
 
 public class View extends JFrame implements ViewInterface {
 
@@ -39,9 +44,8 @@ public class View extends JFrame implements ViewInterface {
 	List<JTextArea> chatList = new ArrayList<>();
 	List<JScrollPane> scrollList = new ArrayList<>();
 	// create listview
-	JList<String> userList = new JList<>(new String[] { "pippo", "pluto",
-			"paperino" });
-
+	JList<String> usersJList; /*it's not parametized, but oracle's official docs use so.*/
+	DefaultListModel<String>  usersList=new DefaultListModel<String>();
 	public View() {
 
 		super(TITLE);
@@ -59,7 +63,7 @@ public class View extends JFrame implements ViewInterface {
 		JPanel textPanel = new JPanel(new BorderLayout(HGAP, VGAP));
 		JPanel south = new JPanel();
 		JTextArea chat = new JTextArea();
-
+		this.addWindowListener(new CustomWindowAdapter(this));
 		DefaultCaret caret = (DefaultCaret) chat.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
@@ -69,9 +73,14 @@ public class View extends JFrame implements ViewInterface {
 		chat.setLineWrap(true);
 		chat.setEditable(false);
 
+		usersList.addElement("Pippo");
+		usersList.addElement("Pluto");
+		usersList.addElement("Paperino");
+		usersJList=new JList<String>(usersList);
+		
 		// set dimension of userList
-		userList.setPreferredSize(new Dimension(
-				userList.getPreferredSize().width * 2, userList
+		usersJList.setPreferredSize(new Dimension(
+				usersJList.getPreferredSize().width * 2, usersJList
 						.getPreferredSize().height));
 
 		// add to the list a custom TextArea
@@ -86,7 +95,7 @@ public class View extends JFrame implements ViewInterface {
 		textPanel.add(textList.get(0), BorderLayout.CENTER);
 		mainPanel.add(scrollList.get(0), BorderLayout.CENTER);
 		mainPanel.add(textPanel, BorderLayout.SOUTH);
-		mainPanel.add(new JPanel().add(userList), BorderLayout.EAST);
+		mainPanel.add(new JPanel().add(usersJList), BorderLayout.EAST);
 
 		tabView.addTab("Main", mainPanel);
 	}
@@ -198,7 +207,7 @@ public class View extends JFrame implements ViewInterface {
 	private void setAction() {
 		enter.addActionListener(getActionListener());
 
-		userList.addMouseListener(new MouseAdapter() {
+		usersJList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					controller.commandCreateTab();
@@ -264,7 +273,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	public String getTitle() {
-		return userList.getSelectedValue();
+		return usersJList.getSelectedValue();
 	}
 
 	public int getTabIndex() {
@@ -278,8 +287,38 @@ public class View extends JFrame implements ViewInterface {
 				Message, title,
 				JOptionPane.YES_NO_OPTION, IconType, null, options,null);
 		
-		return n;
-		
+		return n;		
 	}
 	
+	public void appendUser(String user){
+		usersList.addElement(user);
+	}
+	public boolean removeUser(String user){
+		boolean found=false;
+		for(int i=0; i < usersList.size();i++){
+			if(usersList.get(i).equals(user)){
+				usersList.remove(i);
+				found=true;
+			}
+		}		
+		return found;		
+	}
+
+    /*needed to intercept the action of closing window*/
+	class CustomWindowAdapter extends WindowAdapter {
+
+		JFrame window = null;
+
+		CustomWindowAdapter(JFrame window) {
+			this.window = window;
+		}
+
+		// implement windowClosing method
+		public void windowClosing(WindowEvent e) {
+			try {
+				controller.notifyClosing();
+			} catch (Exception e1) {}
+			System.exit(0);
+		}
+	}
 }

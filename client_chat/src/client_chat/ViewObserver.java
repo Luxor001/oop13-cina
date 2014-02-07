@@ -16,4 +16,6 @@ public interface ViewObserver {
 	void commandReceiveMessage(String message, String title);
 	// void commandShowMessage();
 	public void showMessageMain(String Message);
+	
+	public void notifyClosing() throws IOException, EncodeException;
 }

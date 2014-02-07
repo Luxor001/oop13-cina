@@ -3,6 +3,8 @@ package client_chat;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 
+import javax.websocket.EncodeException;
+
 import client_chat.ChatMessage.Type;
 
 public class Controller implements ViewObserver {
@@ -57,5 +59,16 @@ public class Controller implements ViewObserver {
 	public void showMessageMain(String Message) {
 		this.view.showMessageMain(Message);
 	}
-
+	
+	public void appendUser(String user){
+		this.view.appendUser(user);
+	}
+	
+	public boolean removeUser(String user){		
+		return this.removeUser(user);		
+	}
+	
+	public void notifyClosing() throws IOException, EncodeException{
+		this.model.getSocketHandler().SendMex(new ChatMessage("Closing",Type.DISCONNECTING));
+	}
 }
