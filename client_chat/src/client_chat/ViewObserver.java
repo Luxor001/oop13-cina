@@ -1,6 +1,9 @@
 package client_chat;
 
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+
+import javax.websocket.EncodeException;
 
 public interface ViewObserver {
 
