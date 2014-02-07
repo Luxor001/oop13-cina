@@ -25,7 +25,6 @@ public class ChatMessage {
     public ChatMessage(String message, Type MessageType){
     	this.message=message;
     	this.messageType=MessageType;
-    	this.additionalParams=new ChatMessage.Param();
     }
     
     public ChatMessage(String message, Type MessageType,Param additionalParam){
@@ -40,8 +39,11 @@ public class ChatMessage {
     public Type getType() {
     	return messageType;
     }
+
+
     public Param getAdditionalParams() {
-    	//additionalParams=new Param();
+    	if(additionalParams == null)
+    		additionalParams=new Param();
     	return additionalParams;
     } 
     
@@ -50,7 +52,7 @@ public class ChatMessage {
     	this.additionalParams=params;
     }
     public boolean isParamSet() {
-    	if(additionalParams.equals(null))
+    	if(additionalParams == null)
     		return false;
     	else
     		return true;
@@ -92,7 +94,7 @@ public class ChatMessage {
 		}
 		
 		public void SetVisibility(Boolean visible){
-			visibility=visible;;
+			visibility=visible;
 		}
 		public Boolean getVisibility(){
 			return visibility;

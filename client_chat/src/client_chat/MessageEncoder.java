@@ -15,12 +15,18 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 
   @Override
   public String encode(ChatMessage message) throws EncodeException {
-
-    JsonObject jsonObject = Json.createObjectBuilder()
-        .add("Type", message.getType().toString())
-        .add("Message", message.getMessage())
-        .add("addParams",ParamToJsonArray(message))
-        .build();
+	  JsonObject jsonObject;
+	  if(message.isParamSet())
+	     jsonObject = Json.createObjectBuilder()
+	        .add("Type", message.getType().toString())
+	        .add("Message", message.getMessage())
+	        .add("addParams",ParamToJsonArray(message))
+	        .build();
+	  else
+		  jsonObject = Json.createObjectBuilder()
+	        .add("Type", message.getType().toString())
+	        .add("Message", message.getMessage())
+	        .build();
 	
     return jsonObject.toString();
 
@@ -49,12 +55,14 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 			builder.add(Json.createObjectBuilder().add("usersList",
 					listbuilder.build()));
 			return builder.build();
+		}		
+		if(message.getType() == ChatMessage.Type.USERLIST){
+			builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
+			return builder.build();
 		}
-
-		builder.add(Json.createObjectBuilder().add("Nickname",
-				param.getNickname()));
-		builder.add(Json.createObjectBuilder().add("Visibility",
-				param.getVisibility().toString()));
+		
+		builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
+		builder.add(Json.createObjectBuilder().add("Visibility",param.getVisibility().toString()));
 
 		JsonArray jsonArray = builder.build(); // build the resultant Json Array
 

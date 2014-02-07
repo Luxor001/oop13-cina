@@ -31,7 +31,8 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 
 	private static final Set<Session> clientSessions = Collections
 			.synchronizedSet(new HashSet<Session>());	
-	private ArrayList<User> UsersList=new ArrayList<User>();
+	
+	private static final ArrayList<User> UsersList=new ArrayList<User>();
 	
 	
 	@OnOpen
@@ -65,15 +66,29 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 				newmessage.getAdditionalParams().setNickname(UserNickname);
 				SendGlobalMex(newmessage);				
 			}
+
 			
-			/* send users list to the new client*/
-			ChatMessage messagetoclient=new ChatMessage("Users List",Type.USERLIST); 
-			for(User cUser:UsersList) //ESCLUDERE INVISIBILI!
-				messagetoclient.getAdditionalParams().appendUser(cUser.GetNickname());
-			SendMex(messagetoclient, clientsession);			
+			int a=UsersList.size();
+			/* send users list to the new client */
+			if (UsersList.size() != 0) {
+				ChatMessage messagetoclient = new ChatMessage("Users List",
+						Type.USERLIST);
+				for (User cUser : UsersList) {
+					if (cUser.GetState() == State.VISIBLE) {
+						messagetoclient.getAdditionalParams().appendUser(
+								cUser.GetNickname());
+					}
+				}
+				SendMex(messagetoclient, clientsession);
+			}
 			
-			UsersList.add(new User(UserNickname,State.VISIBLE, clientsession));			
+			
+			if(UserVisibility)
+				UsersList.add(new User(UserNickname,State.VISIBLE, clientsession));
+			else
+				UsersList.add(new User(UserNickname,State.INVISIBLE, clientsession));			
 		}
+		
 		
 		if(message.getType() == Type.USERLIST){
 			ChatMessage messagetoclient=new ChatMessage("Users List",Type.USERLIST);
@@ -102,7 +117,6 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	@Override
 	public void contextInitialized(ServletContextEvent sce) { //Launched at the web app starting time.
         System.out.println("#### Inizializing Server for first launch.. ####");
-		UsersList=new ArrayList<User>();
         System.out.println("#### Initialized.. ####");		
 	}  
 	

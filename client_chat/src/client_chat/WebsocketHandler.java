@@ -54,8 +54,8 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.USERLIST) {
 			
-			System.out.println("Server has responded! Number of current clients: "+
-			(message.getAdditionalParams().getUsersList().size()+1));
+			System.out.println("Server has responded! Number of current clients except me: "+
+			(message.getAdditionalParams().getUsersList().size()));
 /*			System.out.println("USERLIST MESSAGE TYPE, USERS:"
 					+ message.getAdditionalParams().getUsersList().get(0)
 					+ "\n"
@@ -66,6 +66,10 @@ public class WebsocketHandler {
 			
 			controller.showMessageMain(message.getAdditionalParams().getNickname()+
 					" : " + message.getMessage());
+		}
+		
+		if(message.getType() == Type.NEWUSER){
+	
 		}
 
 	}

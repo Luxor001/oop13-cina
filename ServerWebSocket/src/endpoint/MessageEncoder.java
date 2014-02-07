@@ -1,36 +1,33 @@
 package endpoint;
 
-import java.util.ArrayList;
-
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.json.JsonValue;
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
-import org.codehaus.jackson.JsonParser;
-
-import endpoint.ChatMessage.Param;
-
 public class MessageEncoder implements Encoder.Text<ChatMessage> {
 
-  @Override
-  public String encode(ChatMessage message) throws EncodeException {
+	  @Override
+	  public String encode(ChatMessage message) throws EncodeException {
+		  JsonObject jsonObject;
+		  if(message.isParamSet())
+		     jsonObject = Json.createObjectBuilder()
+		        .add("Type", message.getType().toString())
+		        .add("Message", message.getMessage())
+		        .add("addParams",ParamToJsonArray(message))
+		        .build();
+		  else
+			  jsonObject = Json.createObjectBuilder()
+		        .add("Type", message.getType().toString())
+		        .add("Message", message.getMessage())
+		        .build();
+		
+	    return jsonObject.toString();
 
-	  
-    JsonObject jsonObject = Json.createObjectBuilder()
-        .add("Type", message.getType().toString())
-        .add("Message", message.getMessage())
-        .add("addParams",ParamToJsonArray(message))
-        .build();    
-  
-    return jsonObject.toString();
-
-  }
+	  }
 
   @Override
   public void init(EndpointConfig ec) {
@@ -58,9 +55,13 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 			return builder.build();
 		}
 		
+		if(message.getType() == ChatMessage.Type.NEWUSER){
+			builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
+			return builder.build();
+		}
+
 		builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
-		builder.add(Json.createObjectBuilder().add("Visibility",param.getVisibility().toString()));
-				
+		builder.add(Json.createObjectBuilder().add("Visibility",param.getVisibility().toString()));				
 		JsonArray jsonArray = builder.build(); //build the resultant Json Array
 		
 		return jsonArray;	  
