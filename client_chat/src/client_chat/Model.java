@@ -109,7 +109,6 @@ public class Model implements ModelInterface {
 			this.server.controller.showMessageMain("Attempting connection to channel..");
 			client.connectToServer(sockethandler,null, new URI(
 					"ws://localhost:8080/ServerWebSocket/websocket"));
-			
 			/*
 			client.connectToServer(WebsocketHandler.class, new URI(
 					"ws://localhost:8080/ServerWebSocket/websocket"));

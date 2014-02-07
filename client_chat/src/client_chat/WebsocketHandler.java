@@ -41,7 +41,7 @@ public class WebsocketHandler {
 		Message.getAdditionalParams().setNickname("Lux");
 		Message.getAdditionalParams().SetVisibility(true);
 		SendMex(Message); /* send my request of connection to the server */
-
+		
 		System.out.println("Sent!");
 	}
 
@@ -56,6 +56,10 @@ public class WebsocketHandler {
 			
 			System.out.println("Server has responded! Number of current clients except me: "+
 			(message.getAdditionalParams().getUsersList().size()));
+			
+			for(String user:message.getAdditionalParams().getUsersList())
+				controller.appendUser(user);
+			
 /*			System.out.println("USERLIST MESSAGE TYPE, USERS:"
 					+ message.getAdditionalParams().getUsersList().get(0)
 					+ "\n"
@@ -70,6 +74,7 @@ public class WebsocketHandler {
 		
 		if(message.getType() == Type.NEWUSER){
 	
+			controller.appendUser(message.getAdditionalParams().getNickname());
 		}
 
 	}
@@ -84,7 +89,8 @@ public class WebsocketHandler {
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason)
 			throws IOException, EncodeException {
-			//latch.countDown();
+		System.out.println("Connection dropped, you might be kicked from the server");
+		//latch.countDown();
 	}
 
 

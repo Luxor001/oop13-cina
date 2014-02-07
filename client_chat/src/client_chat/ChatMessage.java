@@ -26,7 +26,8 @@ public class ChatMessage {
 		REQUEST,		/* Used to make special requests. Needs implementation */ 
 		NEWUSER,		/* Needed to tell to server there's a new boy in town */
 		USERDISCONNECTED,
-		USERLIST
+		USERLIST,
+		DISCONNECTING
 	}
 	
 
