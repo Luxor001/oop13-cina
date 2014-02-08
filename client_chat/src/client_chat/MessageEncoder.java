@@ -56,13 +56,19 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 					listbuilder.build()));
 			return builder.build();
 		}		
-		if(message.getType() == ChatMessage.Type.USERLIST){
+		if(message.getType() == ChatMessage.Type.NEWUSER ||
+				message.getType() == ChatMessage.Type.USERDISCONNECTED){
 			builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
 			return builder.build();
 		}
 		
-		builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
+		if(message.getType() == ChatMessage.Type.TEXT){
+			builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
+			return builder.build();
+		}
+		
 		builder.add(Json.createObjectBuilder().add("Visibility",param.getVisibility().toString()));
+		builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
 
 		JsonArray jsonArray = builder.build(); // build the resultant Json Array
 

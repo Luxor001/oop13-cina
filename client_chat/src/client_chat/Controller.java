@@ -31,7 +31,7 @@ public class Controller implements ViewObserver {
 		if(this.view.getTabIndex() == 0){/*if user wants to send a message on general chat*/
 			try {
 				this.model.getSocketHandler().SendMex(
-						new ChatMessage("Messaggio",Type.TEXT));
+						new ChatMessage(this.view.sendMessage(),Type.TEXT));
 			} catch (Exception e) {
 				
 				e.printStackTrace();

@@ -16,6 +16,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.eclipse.persistence.sessions.server.ClientSession;
+
 import endpoint.ChatMessage.Param;
 import endpoint.ChatMessage.Type;
 import endpoint.User.State;
@@ -111,8 +113,12 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			SendGlobalMex(cmessage);
 			
 		}
-		if(message.getType() == Type.TEXT)
-			SendGlobalMex(message);
+		if(message.getType() == Type.TEXT){
+			Param addp=new Param();
+			addp.setNickname(SearchUser(clientsession).GetNickname());
+			message.setAdditionalParams(addp);
+			SendGlobalMex(message,clientsession);
+		}
 	}
 
 	
@@ -147,6 +153,13 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	 public void SendGlobalMex(ChatMessage Mex) throws IOException, EncodeException{
 		 for (User cUser: UsersList) {
 			 SendMex(Mex,cUser.GetSession());		 
+		 }
+	 }
+	 
+	 public void SendGlobalMex(ChatMessage Mex,Session exclude) throws IOException, EncodeException{
+		 for (User cUser: UsersList) {
+			 if(!cUser.GetSession().equals(exclude) && cUser.GetState() == State.VISIBLE)
+				 SendMex(Mex,cUser.GetSession());		 
 		 }
 	 }
 	 
