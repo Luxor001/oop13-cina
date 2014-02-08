@@ -5,10 +5,8 @@ import java.io.StringReader;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
-
 
 import client_chat.ChatMessage.Param;
 
@@ -17,20 +15,24 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 
 
 	  @Override
-	  public ChatMessage decode(String jsonMessage) throws DecodeException {
+	  public ChatMessage decode(String jsonMessage){
 
 	    JsonObject jsonObject = Json
 	        .createReader(new StringReader(jsonMessage)).readObject();
 
-	   String Type= jsonObject.getString("Type");
-	   String Message= jsonObject.getString("Message");
-	   Param addlParams = JsonArrayToParam(jsonObject
-				.getJsonArray("addParams"));
-	
-	   
+	   String Type= jsonObject.getString("Type"); //gets type of the request sent by the user
+		String Message = jsonObject.getString("Message"); // gets the textual message.
+		
+
 		ChatMessage message = new ChatMessage(Message,
-				ChatMessage.Type.valueOf(Type), addlParams);
-	    return message;
+				ChatMessage.Type.valueOf(Type));
+		
+		if (jsonObject.containsKey("addParams")) {
+			Param addlParams = JsonArrayToParam(jsonObject
+					.getJsonArray("addParams")); // gets any other params need to be sent
+			message.setAdditionalParams(addlParams);
+		}
+		return message;
 
 	  }
 

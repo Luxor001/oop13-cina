@@ -55,10 +55,12 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 			return builder.build();
 		}
 		
-		if(message.getType() == ChatMessage.Type.NEWUSER){
+		if(message.getType() == ChatMessage.Type.NEWUSER ||
+				message.getType() == ChatMessage.Type.USERDISCONNECTED){
 			builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
 			return builder.build();
 		}
+		
 
 		builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
 		builder.add(Json.createObjectBuilder().add("Visibility",param.getVisibility().toString()));				

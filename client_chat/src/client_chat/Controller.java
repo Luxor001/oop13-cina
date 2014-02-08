@@ -65,7 +65,7 @@ public class Controller implements ViewObserver {
 	}
 	
 	public boolean removeUser(String user){		
-		return this.removeUser(user);		
+		return this.view.removeUser(user);
 	}
 	
 	public void notifyClosing() throws IOException, EncodeException{

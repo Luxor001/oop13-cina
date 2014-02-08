@@ -12,7 +12,8 @@ public class ChatMessage {
 		REQUEST,
 		NEWUSER,
 		USERDISCONNECTED,
-		USERLIST
+		USERLIST,
+		DISCONNECTING
 	}
 
 

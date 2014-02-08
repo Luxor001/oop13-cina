@@ -76,6 +76,11 @@ public class WebsocketHandler {
 	
 			controller.appendUser(message.getAdditionalParams().getNickname());
 		}
+		
+		if(message.getType() == Type.USERDISCONNECTED){
+			
+			controller.removeUser(message.getAdditionalParams().getNickname());
+		}
 
 	}
 
