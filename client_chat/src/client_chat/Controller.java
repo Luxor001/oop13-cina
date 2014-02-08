@@ -26,21 +26,24 @@ public class Controller implements ViewObserver {
 
 	}
 
-	public void commandSendMessage(){
+	public void commandSendMessage() {
 
-		if(this.view.getTabIndex() == 0){/*if user wants to send a message on general chat*/
+		if (this.view.getTabIndex() == 0) {/*
+											 * if user wants to send a message
+											 * on general chat
+											 */
 			try {
 				this.model.getSocketHandler().SendMex(
-						new ChatMessage(this.view.sendMessage(),Type.TEXT));
+						new ChatMessage(this.view.sendMessage(), Type.TEXT));
 			} catch (Exception e) {
-				
+
 				e.printStackTrace();
 			}
-		}
-		else{ /*instead user wants to write on a private chat..*/
+		} else { /* instead user wants to write on a private chat.. */
 			this.model.sendMessage((this.view.sendMessage()),
-				+this.view.getTabIndex());
+					+this.view.getTabIndex(), this.view.getTabName());
 		}
+
 	}
 
 	public void commandCloseTab(ActionEvent e) {
@@ -48,8 +51,8 @@ public class Controller implements ViewObserver {
 	}
 
 	public void commandCreateTab() {
-		this.model.connectToServer(this.view.getTabIndex(),
-				view.createTab(view.getTitle()));
+		this.model.connectToServer(view.createTab(view.getTitle()),
+				this.view.getTabIndex());
 	}
 
 	public void commandReceiveMessage(String message, String title) {
@@ -59,16 +62,20 @@ public class Controller implements ViewObserver {
 	public void showMessageMain(String Message) {
 		this.view.showMessageMain(Message);
 	}
-	
-	public void appendUser(String user){
+
+	public void appendUser(String user) {
 		this.view.appendUser(user);
 	}
-	
-	public boolean removeUser(String user){		
+
+	public boolean removeUser(String user) {
 		return this.view.removeUser(user);
 	}
-	
-	public void notifyClosing() throws IOException, EncodeException{
-		this.model.getSocketHandler().SendMex(new ChatMessage("Closing",Type.DISCONNECTING));
+
+	public void notifyClosing() throws IOException, EncodeException {
+
+		this.model.getSocketHandler().SendMex(
+				new ChatMessage("Closing", Type.DISCONNECTING));
+
 	}
+
 }

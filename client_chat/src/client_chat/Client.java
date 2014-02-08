@@ -54,7 +54,7 @@ public class Client implements Runnable {
 			// indico il tipo della chiave
 			keystore = KeyStore.getInstance("jks");
 			// carico la chiave
-			keystore.load(new FileInputStream(path), passphrase);
+			keystore.load(new FileInputStream(path), null);
 
 			// creo un'istanza che utilizza l'algoritmo "sunx509"
 			KeyManagerFactory clientKeyManager = KeyManagerFactory
@@ -64,8 +64,8 @@ public class Client implements Runnable {
 			// ottengo la chiave pubblica
 			KeyStore serverPub = KeyStore.getInstance("jks");
 			// successivamente verr� inviata dal webserver
-			serverPub.load(new FileInputStream("ServerKey.jks"),
-					"password".toCharArray());
+
+			serverPub.load(new FileInputStream("ServerKey.jks"), null);
 
 			tmf = TrustManagerFactory.getInstance("SunX509");
 			tmf.init(serverPub);
@@ -144,7 +144,9 @@ public class Client implements Runnable {
 	public void sendMessage(String message) {
 		if (sslSocket.isConnected()) {
 			try {
-				OOS.writeObject(message);
+
+				String newMessage = "Pluto : " + message;
+				OOS.writeObject(newMessage);
 				OOS.flush();
 			} catch (IOException e) {
 				System.out

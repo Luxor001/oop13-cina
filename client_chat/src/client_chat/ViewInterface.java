@@ -8,7 +8,7 @@ public interface ViewInterface {
 
 	void attachViewObserver(ViewObserver controller);
 
-	public String sendMessage();
+	String sendMessage();
 
 	void closeTab(ActionEvent e);
 
@@ -21,13 +21,15 @@ public interface ViewInterface {
 	void writeText(String msg, int tab);
 
 	int getTabIndex();
-	
-	public void showMessageMain(String Message);
-	
-	public int buildChoiceMessageBox(String Message, String title, Object[] options,
+
+	void showMessageMain(String Message);
+
+	int buildChoiceMessageBox(String Message, String title, Object[] options,
 			int IconType);
-	
-	public void appendUser(String user);
-	
-	public boolean removeUser(String user);
+
+	String getTabName();
+
+	void appendUser(String user);
+
+	boolean removeUser(String user);
 }

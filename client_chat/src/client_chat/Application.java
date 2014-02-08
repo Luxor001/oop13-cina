@@ -31,7 +31,8 @@ public class Application {
 
 			if (userchoice == 0) /* retry */
 				result = m.AttemptConnection();
-			if (userchoice == 1);
+			if (userchoice == 1)
+				;
 			/* splashscreen, needs to be implemented */
 		}
 
