@@ -22,61 +22,45 @@ public class Model implements ModelInterface {
 	}
 
 	Map<Integer, Client> client = new HashMap<>();
-	// List<Client> client = new ArrayList<>();
+	Map<String, String> clientConnectToServer = new HashMap<>();
 	Server server;
-	int cont = 0;
 
-	public Model() {
+	public void sendMessage(String message, int index, String name) {
 
-	}
-
-	public void sendMessage(String message, int index) {
-
+		clientConnectToServer.put("Pippo", "/192.168.1.101");
+		clientConnectToServer.put("Pluto", "/192.168.1.104");
 		if (message != "") {
-			// check if i'm the server in this chat or the client
-			// if (server.containIp("/158.148.28.231")) {
-			// server.sendMessage(message);
-			// } else {
-			// client.get(index).sendMessage(message);
-			// }
 			if (client.containsKey(index)) {
 				client.get(index).sendMessage(message);
 			} else {
-				server.sendMessage(message);
+				server.sendMessage(message, clientConnectToServer.get(name));
 			}
 		}
 	}
 
-	public void connectToServer(int index, JTextArea chat) {
-
-		if (chat != null) {
-
-			try {
-				if (cont == 0) {
-					client.put(index, new Client("localhost", chat));
-				} else {
-					client.put(index, new Client("localhost", chat));
-				}
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			cont++;
-		}
-	}
-
-	public void attachViewObserver(ViewObserver controller) {
-		// server will be created at start of programm and pending some clients
-
-		if (!new File("ServerKey.jks").exists()) {
-			createKeyStore("Server", "ServerKey", "password");
-
-		}
+	public void connectToServer(JTextArea chat, int index) {
 
 		if (!new File("ClientKey.jks").exists()) {
 			createKeyStore("Client", "ClientKey", "changeit");
 		}
+
+		try {
+			client.put(index, new Client("192.168.1.101", chat));
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void attachViewObserver(ViewObserver controller) {
+
+		if (!new File("ServerKey.jks").exists()) {
+			createKeyStore("Server", "ServerKey", "password");
+		}
+
+		// server will be created at start of programm and pending some clients
 
 		try {
 			server = new Server(controller);
@@ -90,9 +74,9 @@ public class Model implements ModelInterface {
 
 	private static CountDownLatch latch;
 	public WebsocketHandler sockethandler;
+
 	public connectionResult AttemptConnection() throws IOException {
 
-		
 		latch = new CountDownLatch(1);
 		ClientManager client = null;
 		try {
@@ -100,19 +84,17 @@ public class Model implements ModelInterface {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		sockethandler=new WebsocketHandler();
+
+		sockethandler = new WebsocketHandler();
 		/* Attemp connection to web service */
 		try {
-			
-			
-			this.server.controller.showMessageMain("Attempting connection to channel..");
-			client.connectToServer(sockethandler,null, new URI(
+
+			client.connectToServer(sockethandler, null, new URI(
 					"ws://localhost:8080/ServerWebSocket/websocket"));
 			/*
-			client.connectToServer(WebsocketHandler.class, new URI(
-					"ws://localhost:8080/ServerWebSocket/websocket"));
-			*/latch.await();
+			 * client.connectToServer(WebsocketHandler.class, new URI(
+			 * "ws://localhost:8080/ServerWebSocket/websocket"));
+			 */latch.await();
 
 		} catch (DeploymentException | URISyntaxException
 				| InterruptedException e) {
@@ -132,17 +114,26 @@ public class Model implements ModelInterface {
 		try {
 
 			String path = System.getProperty("user.dir") + "\\" + name;
+			String nameCertificate;
 			// creo un file bat
-			FileOutputStream output = new FileOutputStream(name
-					+ "Certificate.bat");
-			DataOutputStream stdout = new DataOutputStream(output);
+			FileOutputStream output;
+			DataOutputStream stdout;
 
+			if (System.getProperty("os.name").contains("Windows")) {
+				nameCertificate = name + "Certificate.bat";
+			} else {
+				nameCertificate = name + "Certificate.sh";
+
+			}
+
+			output = new FileOutputStream(nameCertificate);
+			stdout = new DataOutputStream(output);
 			// codice per la creazione di un certificato
 			stdout.write("@echo off\n".getBytes());
 			stdout.write("cd ".getBytes());
 			stdout.write(System.getProperty("java.home").getBytes());
 			stdout.write("\n".getBytes());
-			stdout.write(("(echo francesco cozzolino & echo cozzo & echo cozzo & echo misano "
+			stdout.write(("(echo francesco cozzolino & echo cozzo & echo cozzo & echo misano adriatico "
 					+ "& echo rn & echo it & echo si) | keytool -genkey -alias "
 					+ alias
 					+ " -keyalg RSA"
@@ -160,20 +151,17 @@ public class Model implements ModelInterface {
 
 			stdout.close();
 
-			Runtime.getRuntime().exec(name + "Certificate.bat").waitFor();
+			Runtime.getRuntime().exec(nameCertificate).waitFor();
 
 		} catch (IOException e) {
 
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	/*this method is needed to be referenced by the controller.*/
-	@Override
-	public WebsocketHandler getSocketHandler() {		
+	public WebsocketHandler getSocketHandler() {
 		return sockethandler;
 	}
 }

@@ -10,7 +10,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +25,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.DefaultCaret;
-import javax.websocket.EncodeException;
 
 public class View extends JFrame implements ViewInterface {
 
@@ -44,8 +42,12 @@ public class View extends JFrame implements ViewInterface {
 	List<JTextArea> chatList = new ArrayList<>();
 	List<JScrollPane> scrollList = new ArrayList<>();
 	// create listview
-	JList<String> usersJList; /*it's not parametized, but oracle's official docs use so.*/
-	DefaultListModel<String>  usersList=new DefaultListModel<String>();
+	JList<String> usersJList; /*
+							 * it's not parametized, but oracle's official docs
+							 * use so.
+							 */
+	DefaultListModel<String> usersList = new DefaultListModel<String>();
+
 	public View() {
 
 		super(TITLE);
@@ -63,7 +65,7 @@ public class View extends JFrame implements ViewInterface {
 		JPanel textPanel = new JPanel(new BorderLayout(HGAP, VGAP));
 		JPanel south = new JPanel();
 		JTextArea chat = new JTextArea();
-		this.addWindowListener(new CustomWindowAdapter(this));
+
 		DefaultCaret caret = (DefaultCaret) chat.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
@@ -76,8 +78,8 @@ public class View extends JFrame implements ViewInterface {
 		usersList.addElement("Pippo");
 		usersList.addElement("Pluto");
 		usersList.addElement("Paperino");
-		usersJList=new JList<String>(usersList);
-		
+		usersJList = new JList<String>(usersList);
+
 		// set dimension of userList
 		usersJList.setPreferredSize(new Dimension(
 				usersJList.getPreferredSize().width * 2, usersJList
@@ -191,7 +193,6 @@ public class View extends JFrame implements ViewInterface {
 	public void showMessage(String message, String title) {
 		for (int i = 0; i < tabView.getTabCount(); i++) {
 			if (tabView.getTitleAt(i).equals(title)) {
-				// tabView.getComponentAt(i);
 				chatList.get(i).append(message + "\n");
 				return;
 			}
@@ -200,8 +201,8 @@ public class View extends JFrame implements ViewInterface {
 		createTab(title).append(message);
 	}
 
-	public void showMessageMain(String Message){
-		chatList.get(0).append("\n"+Message);
+	public void showMessageMain(String Message) {
+		chatList.get(0).append("\n" + Message);
 	}
 
 	private void setAction() {
@@ -276,35 +277,39 @@ public class View extends JFrame implements ViewInterface {
 		return usersJList.getSelectedValue();
 	}
 
+	public String getTabName() {
+		return tabView.getTitleAt(getTabIndex());
+	}
+
 	public int getTabIndex() {
 		return tabView.getSelectedIndex();
 	}
-	
-	public int buildChoiceMessageBox(String Message,String title, Object[] options,
-			int IconType){
-		//Object[] options = { "Yes, please", "No way!" };
-		int n = JOptionPane.showOptionDialog(this,
-				Message, title,
-				JOptionPane.YES_NO_OPTION, IconType, null, options,null);
-		
-		return n;		
-	}
-	
-	public void appendUser(String user){
-		usersList.addElement(user);
-	}
-	public boolean removeUser(String user){
-		boolean found=false;
-		for(int i=0; i < usersList.size();i++){
-			if(usersList.get(i).equals(user)){
-				usersList.remove(i);
-				found=true;
-			}
-		}		
-		return found;		
+
+	public int buildChoiceMessageBox(String Message, String title,
+			Object[] options, int IconType) {
+		// Object[] options = { "Yes, please", "No way!" };
+		int n = JOptionPane.showOptionDialog(this, Message, title,
+				JOptionPane.YES_NO_OPTION, IconType, null, options, null);
+
+		return n;
 	}
 
-    /*needed to intercept the action of closing window*/
+	public void appendUser(String user) {
+		usersList.addElement(user);
+	}
+
+	public boolean removeUser(String user) {
+		boolean found = false;
+		for (int i = 0; i < usersList.size(); i++) {
+			if (usersList.get(i).equals(user)) {
+				usersList.remove(i);
+				found = true;
+			}
+		}
+		return found;
+	}
+
+	/* needed to intercept the action of closing window */
 	class CustomWindowAdapter extends WindowAdapter {
 
 		JFrame window = null;
