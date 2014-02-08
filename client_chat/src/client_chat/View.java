@@ -317,7 +317,9 @@ public class View extends JFrame implements ViewInterface {
 		public void windowClosing(WindowEvent e) {
 			try {
 				controller.notifyClosing();
-			} catch (Exception e1) {}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 			System.exit(0);
 		}
 	}

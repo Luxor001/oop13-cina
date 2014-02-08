@@ -29,18 +29,16 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 
 	   String Type= jsonObject.getString("Type"); //gets type of the request sent by the user
 		String Message = jsonObject.getString("Message"); // gets the textual message.
-		Param addlParams = JsonArrayToParam(jsonObject
-				.getJsonArray("addParams")); // gets any other params need to be sent
+		
 
 		ChatMessage message = new ChatMessage(Message,
 				ChatMessage.Type.valueOf(Type));
 		
-		try{
+		if (jsonObject.containsKey("addParams")) {
+			Param addlParams = JsonArrayToParam(jsonObject
+					.getJsonArray("addParams")); // gets any other params need to be sent
 
 			message.setAdditionalParams(addlParams);
-		}
-		catch(Exception E){
-			E.printStackTrace();
 		}
 		return message;
 

@@ -16,6 +16,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import endpoint.ChatMessage.Param;
 import endpoint.ChatMessage.Type;
 import endpoint.User.State;
 
@@ -68,7 +69,6 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			}
 
 			
-			int a=UsersList.size();
 			/* send users list to the new client */
 			if (UsersList.size() != 0) {
 				ChatMessage messagetoclient = new ChatMessage("Users List",
@@ -98,6 +98,19 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			SendMex(messagetoclient, clientsession);						
 		}
 		
+		/*a user is disconnecting: need to tell it to other clients*/
+		if(message.getType() == Type.DISCONNECTING){ 
+			User disconnUser=SearchUser(clientsession);
+			removeUser(disconnUser);
+			
+			ChatMessage cmessage=new ChatMessage("disconnecting",Type.USERDISCONNECTED);
+			ChatMessage.Param addp=new Param();
+			addp.setNickname(disconnUser.GetNickname());
+			cmessage.setAdditionalParams(addp);
+			
+			SendGlobalMex(cmessage);
+			
+		}
 		if(message.getType() == Type.TEXT)
 			SendGlobalMex(message);
 	}
@@ -143,8 +156,14 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			 if(cUser.GetSession().equals(session))
 				 return cUser;
 		 }
-		 return null;
-		 
+		 return null;		 
+	 }
+	 
+	 public boolean removeUser(User usr){
+		 if(usr != null)
+			return UsersList.remove(usr);
+		 else
+			 return false;
 	 }
 	
 }
