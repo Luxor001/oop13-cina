@@ -1,9 +1,10 @@
 package endpoint;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContextEvent;
@@ -35,8 +36,8 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	private static final Set<Session> clientSessions = Collections
 			.synchronizedSet(new HashSet<Session>());	
 	
-	private static final ArrayList<User> UsersList=new ArrayList<User>();
-	
+	//private static final ArrayList<User> UsersList=new ArrayList<User>();
+	private static final Map<Session,User> UsersList=new HashMap<Session,User>();
 	
 	@OnOpen
 	public void onOpen(Session newSession) throws IOException, EncodeException { // ## METODO CHIAMATO QUANDO UN CLIENT SI CONNETTE ##
@@ -45,11 +46,12 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	/*	ChatMessage Message=new ChatMessage("PROVA", Type.INITIALIZE);
 		Message.appendAdditionalParams("Nickname", "Lux");
 		SendMex(Message, newSession);*/
+		
 	}
 	
 	@OnClose
 	public void onClose(Session clientsession) {
-		User user=SearchUser(clientsession);
+		User user=searchUser(clientsession);
 		if(user != null)
 			UsersList.remove(user);
 	}
@@ -67,42 +69,30 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 				ChatMessage newmessage;
 				newmessage=new ChatMessage("new user", Type.NEWUSER);
 				newmessage.getAdditionalParams().setNickname(UserNickname);
-				SendGlobalMex(newmessage);				
+				sendGlobalMex(newmessage);				
 			}
 
 			
 			/* send users list to the new client */
 			if (UsersList.size() != 0) {
-				ChatMessage messagetoclient = new ChatMessage("Users List",
-						Type.USERLIST);
-				for (User cUser : UsersList) {
-					if (cUser.GetState() == State.VISIBLE) {
-						messagetoclient.getAdditionalParams().appendUser(
-								cUser.GetNickname());
-					}
-				}
-				SendMex(messagetoclient, clientsession);
+				sendUserList(clientsession);				
 			}
 			
 			
 			if(UserVisibility)
-				UsersList.add(new User(UserNickname,State.VISIBLE, clientsession));
+				UsersList.put(clientsession,new User(UserNickname,State.VISIBLE, clientsession));
 			else
-				UsersList.add(new User(UserNickname,State.INVISIBLE, clientsession));			
+				UsersList.put(clientsession,new User(UserNickname,State.INVISIBLE, clientsession));			
 		}
 		
 		
 		if(message.getType() == Type.USERLIST){
-			ChatMessage messagetoclient=new ChatMessage("Users List",Type.USERLIST);
-			for(User cUser:UsersList)
-				messagetoclient.getAdditionalParams().appendUser(cUser.GetNickname());
-			
-			SendMex(messagetoclient, clientsession);						
+			sendUserList(clientsession);
 		}
 		
 		/*a user is disconnecting: need to tell it to other clients*/
 		if(message.getType() == Type.DISCONNECTING){ 
-			User disconnUser=SearchUser(clientsession);
+			User disconnUser=searchUser(clientsession);
 			removeUser(disconnUser);
 			
 			ChatMessage cmessage=new ChatMessage("disconnecting",Type.USERDISCONNECTED);
@@ -110,14 +100,14 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			addp.setNickname(disconnUser.GetNickname());
 			cmessage.setAdditionalParams(addp);
 			
-			SendGlobalMex(cmessage);
+			sendGlobalMex(cmessage);
 			
 		}
 		if(message.getType() == Type.TEXT){
 			Param addp=new Param();
-			addp.setNickname(SearchUser(clientsession).GetNickname());
+			addp.setNickname(searchUser(clientsession).GetNickname());
 			message.setAdditionalParams(addp);
-			SendGlobalMex(message,clientsession);
+			sendGlobalMex(message,clientsession);
 		}
 	}
 
@@ -145,38 +135,52 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 		
 	}
 	
-	 public void SendMex(ChatMessage Mex,Session clientsession) 
+	 public void sendMex(ChatMessage Mex,Session clientsession) 
 			 throws IOException, EncodeException{    
 		 	clientsession.getBasicRemote().sendObject(Mex);
 	}
 	 
-	 public void SendGlobalMex(ChatMessage Mex) throws IOException, EncodeException{
-		 for (User cUser: UsersList) {
-			 SendMex(Mex,cUser.GetSession());		 
+	 public void sendGlobalMex(ChatMessage Mex) throws IOException, EncodeException{
+		 for (User cUser:UsersList.values()) {
+			 sendMex(Mex,cUser.GetSession());		 
 		 }
 	 }
 	 
-	 public void SendGlobalMex(ChatMessage Mex,Session exclude) throws IOException, EncodeException{
-		 for (User cUser: UsersList) {
-			 if(!cUser.GetSession().equals(exclude) && cUser.GetState() == State.VISIBLE)
-				 SendMex(Mex,cUser.GetSession());		 
+	 public void sendGlobalMex(ChatMessage Mex,Session exclude) throws IOException, EncodeException{
+		 for (User cUser:UsersList.values()) {
+			 if(!cUser.GetSession().equals(exclude) && 
+					 cUser.GetState() == State.VISIBLE)
+				 sendMex(Mex,cUser.GetSession());		 
 		 }
 	 }
 	 
-	 public User SearchUser(Session session){
+	 public User searchUser(Session session){
 		 
-		 for(User cUser:UsersList){
-			 if(cUser.GetSession().equals(session))
-				 return cUser;
-		 }
+		 if(UsersList.containsKey(session))
+			 return UsersList.get(session);
 		 return null;		 
 	 }
 	 
 	 public boolean removeUser(User usr){
-		 if(usr != null)
-			return UsersList.remove(usr);
-		 else
-			 return false;
+		 
+			User result=UsersList.remove(usr);
+			if(result != null)
+				return true;
+			else
+				return false;			
+	 }
+	 
+	 public void sendUserList(Session target) throws IOException, EncodeException{
+		 
+		 ChatMessage messagetoclient = new ChatMessage("Users List",
+					Type.USERLIST);
+			for (User cUser : UsersList.values()) {
+				if (cUser.GetState() == State.VISIBLE) {
+					messagetoclient.getAdditionalParams().appendUser(
+							cUser.GetNickname());
+				}
+			}
+			sendMex(messagetoclient, target);
 	 }
 	
 }

@@ -72,6 +72,8 @@ public class View extends JFrame implements ViewInterface {
 		// add tabview to form
 		this.getContentPane().add(tabView);
 
+		/*add the adapter to intercept the exiting operation from the app*/
+		this.addWindowListener(new CustomWindowAdapter(this));		
 		chat.setLineWrap(true);
 		chat.setEditable(false);
 
