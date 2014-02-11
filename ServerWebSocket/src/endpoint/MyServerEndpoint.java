@@ -66,6 +66,7 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			Boolean UserVisibility=message.getAdditionalParams().getVisibility();
 						
 			if(UserVisibility.equals(true)){ /*alerts other clients of new user*/
+				
 				ChatMessage newmessage;
 				newmessage=new ChatMessage("new user", Type.NEWUSER);
 				newmessage.getAdditionalParams().setNickname(UserNickname);
@@ -109,6 +110,16 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			message.setAdditionalParams(addp);
 			sendGlobalMex(message,clientsession);
 		}
+		
+		if(message.getType() == Type.REQUESTPRIVATECHAT){
+			String SenderNickname=searchUser(clientsession).GetNickname();	/*Sender*/
+			User Targetusr=searchUser(message.getAdditionalParams().getNickname()); /*Target*/
+			
+			ChatMessage cmessage=new ChatMessage("respond",Type.REQUESTEDPRIVATECHAT);
+			cmessage.getAdditionalParams().setNickname(SenderNickname);
+			sendMex(cmessage, Targetusr.GetSession());
+		}
+			
 	}
 
 	
@@ -154,11 +165,17 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 		 }
 	 }
 	 
-	 public User searchUser(Session session){
-		 
+	 public User searchUser(Session session){		 
 		 if(UsersList.containsKey(session))
 			 return UsersList.get(session);
 		 return null;		 
+	 }
+	 public User searchUser(String Nick){
+		 for(User usr:UsersList.values()){
+			 if(usr.GetNickname().equals(Nick))
+				 return usr;
+		 }
+		 return null;
 	 }
 	 
 	 public boolean removeUser(User usr){

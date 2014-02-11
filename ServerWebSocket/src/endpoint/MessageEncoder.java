@@ -56,11 +56,11 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 		}
 		
 		if(message.getType() == ChatMessage.Type.NEWUSER ||
-				message.getType() == ChatMessage.Type.USERDISCONNECTED){
+				message.getType() == ChatMessage.Type.USERDISCONNECTED ||
+				message.getType() == ChatMessage.Type.REQUESTEDPRIVATECHAT){
 			builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
 			return builder.build();
-		}
-		
+		}		
 
 		builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
 		builder.add(Json.createObjectBuilder().add("Visibility",param.getVisibility().toString()));				

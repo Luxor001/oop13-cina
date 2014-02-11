@@ -30,9 +30,11 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 	   String Type= jsonObject.getString("Type"); //gets type of the request sent by the user
 		String Message = jsonObject.getString("Message"); // gets the textual message.
 		
-
+		
+		ChatMessage.Type t=ChatMessage.Type.valueOf(Type);
 		ChatMessage message = new ChatMessage(Message,
 				ChatMessage.Type.valueOf(Type));
+		
 		
 		if (jsonObject.containsKey("addParams")) {
 			Param addlParams = JsonArrayToParam(jsonObject

@@ -17,16 +17,18 @@ public class ChatMessage {
 
 	enum Type {
 		INITIALIZE, /* Used to Registry a new user to the channel */
-		TEXT, /* Duh. */
-		REQUEST, /* Used to make special requests. Needs implementation */
+		TEXT, /* Duh. */		 
 		NEWUSER, /* Needed to tell to server there's a new boy in town */
-		USERDISCONNECTED, USERLIST, DISCONNECTING
+		USERDISCONNECTED,
+		USERLIST,
+		DISCONNECTING,
+		REQUESTPRIVATECHAT,
+		REQUESTEDPRIVATECHAT
 	}
 
 	private Param additionalParams;// =new Param();
 	private Type messageType;
 	private String message;
-	private String senderNickname;
 
 	public ChatMessage() {
 	}
@@ -97,7 +99,7 @@ public class ChatMessage {
 		private String nickname;
 		private Boolean visibility;
 		private ArrayList<String> usersList = new ArrayList<String>();
-
+		
 		public Param() {
 
 		}
