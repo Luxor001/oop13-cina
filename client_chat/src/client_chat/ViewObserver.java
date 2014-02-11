@@ -19,4 +19,6 @@ public interface ViewObserver {
 	public void showMessageMain(String Message);
 
 	void notifyClosing() throws IOException, EncodeException;
+	
+	void notifyChatUser() throws IOException, EncodeException;
 }

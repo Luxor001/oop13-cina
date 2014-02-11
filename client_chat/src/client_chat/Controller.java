@@ -72,10 +72,15 @@ public class Controller implements ViewObserver {
 	}
 
 	public void notifyClosing() throws IOException, EncodeException {
-
 		this.model.getSocketHandler().SendMex(
 				new ChatMessage("Closing", Type.DISCONNECTING));
-
+	}
+	public void notifyChatUser() throws IOException, EncodeException{
+		ChatMessage message=new ChatMessage("Connect to",Type.REQUESTPRIVATECHAT);
+		ChatMessage.Param params=new ChatMessage.Param();
+		params.setNickname(view.getTitle());
+		message.setAdditionalParams(params);
+		this.model.getSocketHandler().SendMex(message);
 	}
 
 }

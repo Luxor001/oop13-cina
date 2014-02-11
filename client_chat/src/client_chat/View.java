@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.DefaultCaret;
+import javax.websocket.EncodeException;
 
 public class View extends JFrame implements ViewInterface {
 
@@ -213,7 +215,11 @@ public class View extends JFrame implements ViewInterface {
 		usersJList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
-					controller.commandCreateTab();
+					try {
+						controller.notifyChatUser();
+					} catch (Exception e1) {}
+					
+						controller.commandCreateTab();
 				}
 			}
 		});
