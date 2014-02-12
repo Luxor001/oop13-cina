@@ -46,16 +46,21 @@ public class Controller implements ViewObserver {
 
 	}
 
-	public void commandCloseTab(ActionEvent e) {
+	public synchronized void commandCloseTab(ActionEvent e) {
 		view.closeTab(e);
 	}
 
-	public void commandCreateTab() {
+	public synchronized void commandCreateTab() {
 		this.model.connectToServer(view.createTab(view.getTitle()),
-				this.view.getTabIndex());
+				this.view.getTabIndex(), "localhost");
 	}
 
-	public void commandReceiveMessage(String message, String title) {
+	public synchronized void commandCreateTab(String ip) {
+		this.model.connectToServer(view.createTab(view.getTitle()),
+				this.view.getTabIndex(), ip);
+	}
+
+	public synchronized void commandReceiveMessage(String message, String title) {
 		this.view.showMessage(message, title);
 	}
 
@@ -75,15 +80,16 @@ public class Controller implements ViewObserver {
 		this.model.getSocketHandler().SendMex(
 				new ChatMessage("Closing", Type.DISCONNECTING));
 	}
-	
+
 	public int buildChoiceMessageBox(String Message, String title,
-			Object[] options, int IconType){
+			Object[] options, int IconType) {
 		return view.buildChoiceMessageBox(Message, title, options, IconType);
 	}
-	
-	public void notifyChatUser() throws IOException, EncodeException{
-		ChatMessage message=new ChatMessage("Connect to",Type.REQUESTPRIVATECHAT);
-		ChatMessage.Param params=new ChatMessage.Param();
+
+	public void notifyChatUser() throws IOException, EncodeException {
+		ChatMessage message = new ChatMessage("Connect to",
+				Type.REQUESTPRIVATECHAT);
+		ChatMessage.Param params = new ChatMessage.Param();
 		params.setNickname(view.getTitle());
 		message.setAdditionalParams(params);
 		this.model.getSocketHandler().SendMex(message);

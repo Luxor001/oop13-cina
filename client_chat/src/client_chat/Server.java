@@ -17,19 +17,18 @@ import javax.net.ssl.SSLSocket;
 
 public class Server implements Runnable {
 
-	SSLServerSocket sslServerSocket;
-	SSLServerSocketFactory sslServerSocketFactory = null;
-
+	private SSLServerSocket sslServerSocket;
+	private SSLServerSocketFactory sslServerSocketFactory = null;
 	// list of clients connected to server
-	List<SSLSocket> sslSocket = new ArrayList<>();
-	List<ObjectOutputStream> oos = new ArrayList<>();
-	Message m;
-	String str = null;
+	private List<MessageFromClient> client = new ArrayList<>();
+	private ViewObserver controller;
+	private String nameServer = "Paperino";
 
 	public Server(ViewObserver controller) throws IOException,
 			ClassNotFoundException {
 
-		m = new Message(controller);
+		this.controller = controller;
+
 		try {
 
 			KeyStore serverKeys = KeyStore.getInstance("JKS");
@@ -54,7 +53,6 @@ public class Server implements Runnable {
 		sslServerSocket = (SSLServerSocket) sslServerSocketFactory
 				.createServerSocket(9999);
 		sslServerSocket.setNeedClientAuth(false);
-
 		new Thread(this).start();
 
 	}
@@ -66,18 +64,11 @@ public class Server implements Runnable {
 		while (true) {
 			try {
 
-				sslSocket.add((SSLSocket) sslServerSocket.accept());
-				System.out.println("** Un client si è connesso **");
-				System.out.println("IP: "
-						+ sslSocket.get(sslSocket.size() - 1).getInetAddress());
-				System.out.println("Porta: "
-						+ sslSocket.get(sslSocket.size() - 1).getPort());
+				client.add(new MessageFromClient((SSLSocket) sslServerSocket
+						.accept(), controller));
 
-				oos.add(new ObjectOutputStream(sslSocket.get(
-						sslSocket.size() - 1).getOutputStream()));
+				client.get(client.size() - 1).start();
 
-				new Thread(new MessageFromClient(
-						sslSocket.get(sslSocket.size() - 1), m)).start();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -85,66 +76,99 @@ public class Server implements Runnable {
 
 	}
 
-	public void sendMessage(String message, String ip) {
+	public boolean sendMessage(String message, String name) {
 
-		for (int i = 0; i < sslSocket.size(); i++) {
-			if (sslSocket.get(i).getInetAddress().toString().equals(ip)
-					&& sslSocket.get(i).isConnected()) {
-				try {
-					oos.get(i).writeObject(message);
-					oos.get(i).flush();
-					return;
-				} catch (IOException e) {
-					e.printStackTrace();
+		for (int i = 0; i < client.size(); i++) {
+			if (client.get(i).getNameClient().equals(name)) {
+				if (!client.get(i).isClosed() && client.get(i).isConnected()) {
+					try {
+						client.get(i).sendMessage(nameServer + " : " + message);
+						return true;
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				} else {
+					client.remove(i);
 				}
 
 			}
 		}
+
+		return false;
 	}
 
-	private static class MessageFromClient implements Runnable {
-		Message m;
-		ObjectInputStream ois = null;
-		SSLSocket sslSocket;
-		String str = null;
+	private static class MessageFromClient extends Thread {
+		private ViewObserver controller;
+		private ObjectInputStream ois = null;
+		private ObjectOutputStream oos = null;
+		private SSLSocket sslSocket;
+		private String str = null;
+		private String nameClient = null;
 
-		public MessageFromClient(SSLSocket sslSocket, Message m) {
-			this.m = m;
+		public MessageFromClient(SSLSocket sslSocket, ViewObserver controller) {
+			this.controller = controller;
 			this.sslSocket = sslSocket;
 			try {
 				ois = new ObjectInputStream(sslSocket.getInputStream());
+				oos = new ObjectOutputStream(sslSocket.getOutputStream());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
 		public void run() {
-			while (sslSocket.isConnected()) {
-				// leggo quello che mi arriva dal client
-				try {
-					while ((str = (String) ois.readObject()) != null) {
-						m.receiveMessage(str);
-					}
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+
+			System.out.println("** Un client si è connesso **");
+			System.out.println("IP: " + sslSocket.getInetAddress());
+			System.out.println("Porta: " + sslSocket.getPort());
+
+			try {
+				oos.writeObject("Paperino");
+				oos.flush();
+				nameClient = (String) ois.readObject();
+			} catch (IOException | ClassNotFoundException e1) {
+				e1.printStackTrace();
 			}
+
+			// leggo quells che mi arriva dal client
+			try {
+
+				while ((str = (String) ois.readObject()) != null) {
+
+					controller.commandReceiveMessage(nameClient + " : " + str,
+							nameClient);
+				}
+
+				oos.writeObject(null);
+				oos.close();
+				ois.close();
+
+				sslSocket.close();
+			} catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+
 		}
 
-	}
+		public void sendMessage(String message) throws IOException {
 
-	private static class Message {
-		ViewObserver controller;
+			oos.writeObject(message);
+			oos.flush();
 
-		public Message(ViewObserver controller) {
-			this.controller = controller;
 		}
 
-		private synchronized void receiveMessage(String stringa) {
-			controller.commandReceiveMessage(stringa, stringa.split(" :")[0]);
+		public String getNameClient() {
+			return nameClient;
 		}
+
+		public boolean isConnected() {
+			return sslSocket.isConnected();
+		}
+
+		public boolean isClosed() {
+			return sslSocket.isClosed();
+		}
+
 	}
 
 }

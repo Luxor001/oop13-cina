@@ -10,7 +10,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +25,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.DefaultCaret;
-import javax.websocket.EncodeException;
 
 public class View extends JFrame implements ViewInterface {
 
@@ -74,8 +72,8 @@ public class View extends JFrame implements ViewInterface {
 		// add tabview to form
 		this.getContentPane().add(tabView);
 
-		/*add the adapter to intercept the exiting operation from the app*/
-		this.addWindowListener(new CustomWindowAdapter(this));		
+		/* add the adapter to intercept the exiting operation from the app */
+		this.addWindowListener(new CustomWindowAdapter(this));
 		chat.setLineWrap(true);
 		chat.setEditable(false);
 
@@ -120,17 +118,6 @@ public class View extends JFrame implements ViewInterface {
 		return message;
 	}
 
-	public void writeText(String msg, int tab) {
-
-		// get the selected tab
-		int index = getTabIndex();
-		if (!msg.equals("")) {
-			chatList.get(index).append(msg + "\n");
-			textList.get(index).setText("");
-			textList.get(index).requestFocus();
-		}
-	}
-
 	public void closeTab(ActionEvent e) {
 
 		JButton button = (JButton) e.getSource();
@@ -150,12 +137,11 @@ public class View extends JFrame implements ViewInterface {
 
 	public JTextArea createTab(String title) {
 
-		for (int i = 0; i < tabView.getTabCount(); i++) {
-			if (tabView.getTitleAt(i).equals(title)) {
-				tabView.setSelectedIndex(i);
-				return null;
-			}
-		}
+		/*
+		 * for (int i = 0; i < tabView.getTabCount(); i++) { if
+		 * (tabView.getTitleAt(i).equals(title)) { tabView.setSelectedIndex(i);
+		 * return null; } }
+		 */
 
 		JTextArea chatTmp = new JTextArea();
 		JPanel textPanelTmp = new JPanel(new BorderLayout(10, 10));
@@ -195,14 +181,13 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	public void showMessage(String message, String title) {
-		for (int i = 0; i < tabView.getTabCount(); i++) {
-			if (tabView.getTitleAt(i).equals(title)) {
-				chatList.get(i).append(message + "\n");
-				return;
-			}
-		}
 
-		createTab(title).append(message);
+		int index = checkTab(title);
+		if (index != -1) {
+			chatList.get(index).append(message + "\n");
+		} else {
+			createTab(title).append(message + "\n");
+		}
 	}
 
 	public void showMessageMain(String Message) {
@@ -215,12 +200,19 @@ public class View extends JFrame implements ViewInterface {
 		usersJList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
-					try {
-						controller.notifyChatUser();
-					} catch (Exception e1) {}
-					
-						controller.commandCreateTab();
+					int index = checkTab(getTitle());
+					if (index == -1) {
+						try {
+							controller.notifyChatUser();
+						} catch (Exception e1) {
+						}
+
+						// controller.commandCreateTab();
+					} else {
+						tabView.setSelectedIndex(index);
+					}
 				}
+
 			}
 		});
 
@@ -293,6 +285,16 @@ public class View extends JFrame implements ViewInterface {
 		return tabView.getSelectedIndex();
 	}
 
+	public int checkTab(String title) {
+		for (int i = 0; i < tabView.getTabCount(); i++) {
+			if (tabView.getTitleAt(i).equals(title)) {
+
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	public int buildChoiceMessageBox(String Message, String title,
 			Object[] options, int IconType) {
 		// Object[] options = { "Yes, please", "No way!" };
@@ -336,4 +338,5 @@ public class View extends JFrame implements ViewInterface {
 			System.exit(0);
 		}
 	}
+
 }
