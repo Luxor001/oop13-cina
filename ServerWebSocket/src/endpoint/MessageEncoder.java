@@ -61,6 +61,20 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 			builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
 			return builder.build();
 		}		
+		
+		if (message.getType() == ChatMessage.Type.TEXT) {
+			builder.add(Json.createObjectBuilder().add("Nickname",
+					param.getNickname()));
+			return builder.build();
+		}
+		
+		if(message.getType() == ChatMessage.Type.YESPRIVATECHAT){
+			builder.add(Json.createObjectBuilder().add("Nickname",
+					param.getNickname()));
+			builder.add(Json.createObjectBuilder().add("ip", param.getIP()));
+			return builder.build();
+			
+		}
 
 		builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
 		builder.add(Json.createObjectBuilder().add("Visibility",param.getVisibility().toString()));				

@@ -21,4 +21,7 @@ public interface ViewObserver {
 	void notifyClosing() throws IOException, EncodeException;
 	
 	void notifyChatUser() throws IOException, EncodeException;
+	
+	public int buildChoiceMessageBox(String Message, String title,
+			Object[] options, int IconType);
 }

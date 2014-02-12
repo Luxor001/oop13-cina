@@ -24,7 +24,7 @@ public class Application {
 
 		while (result == connectionResult.TIMEOUT && userchoice == 0) {
 
-			userchoice = v.buildChoiceMessageBox(
+			userchoice = c.buildChoiceMessageBox(
 					"Chat Channel is not responding," + "\nconnection failed",
 					"Connection Failed", new Object[] { "Reconnect",
 							"Quit to Main" }, JOptionPane.ERROR_MESSAGE);

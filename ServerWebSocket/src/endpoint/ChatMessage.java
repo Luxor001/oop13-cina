@@ -14,7 +14,9 @@ public class ChatMessage {
 		USERLIST,
 		DISCONNECTING,
 		REQUESTPRIVATECHAT,
-		REQUESTEDPRIVATECHAT
+		REQUESTEDPRIVATECHAT,
+		YESPRIVATECHAT,
+		NOPRIVATECHAT
 	}
 
 
@@ -83,6 +85,7 @@ public class ChatMessage {
 		private String nickname;
 		private Boolean visibility;
 		private ArrayList<String> usersList=new ArrayList<String>();
+		private String ip;
 			
 		public Param(){
 			
@@ -91,21 +94,32 @@ public class ChatMessage {
 		public void setNickname(String Nick){
 			nickname=Nick;
 		}
-		public String getNickname(){
-			return nickname;
-		}
 		
 		public void SetVisibility(Boolean visible){
 			visibility=visible;
-		}
+		}		
+
+		public void setIP(String ip){
+			this.ip=ip;
+		}		
+		
+		
 		public Boolean getVisibility(){
 			return visibility;
 		}
 		public ArrayList<String> getUsersList(){
 			return usersList;
+		}			
+		
+		public String getIP(){
+			return ip;
+		}		
+
+		public String getNickname(){
+			return nickname;
 		}
 		public void appendUser(String UserNickname){
 			usersList.add(UserNickname);
-		}		
+		}	
 	}
 }

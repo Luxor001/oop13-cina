@@ -87,8 +87,7 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 				if(currObject.containsKey("Visibility")){
 					additionalParams.SetVisibility(Boolean.valueOf(
 							((currObject.getString("Visibility")))));	
-				}
-			
+				}			
 							
 				
 				if(currObject.containsKey("usersList")){
@@ -96,6 +95,10 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 					for(int i2=0;i < array.size();i++){
 						additionalParams.appendUser(array.getString(i2));
 					}
+				}
+				
+				if(currObject.containsKey("ip")){
+						additionalParams.setIP(currObject.getString("ip"));					
 				}
 			}
 		return additionalParams;

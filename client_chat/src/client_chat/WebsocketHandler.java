@@ -2,9 +2,15 @@ package client_chat;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.URL;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
 import javax.websocket.EncodeException;
@@ -13,13 +19,15 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
+import org.glassfish.grizzly.http.server.Request;
+
 import client_chat.ChatMessage.Type;
 
 @ClientEndpoint(encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
 public class WebsocketHandler {
 	static Session ClientSession;
 	private static Controller controller;
-
+	private static String DEBUG_NICKNAME="Lux"+Math.random();
 	/**
 	 * Method run at the successful connection beetween Client & Server
 	 * 
@@ -34,7 +42,7 @@ public class WebsocketHandler {
 
 		ClientSession = session;
 		ChatMessage Message = new ChatMessage("hello", Type.INITIALIZE);
-		Message.getAdditionalParams().setNickname("Lux");
+		Message.getAdditionalParams().setNickname(DEBUG_NICKNAME);
 		Message.getAdditionalParams().SetVisibility(true);
 		SendMex(Message); /* send my request of connection to the server */
 
@@ -43,10 +51,12 @@ public class WebsocketHandler {
 
 	/**
 	 * Method run at the receiving of a message from the server
+	 * @throws EncodeException 
+	 * @throws IOException 
 	 * 
 	 */
 	@OnMessage
-	public void onMessage(ChatMessage message, Session session) {
+	public void onMessage(ChatMessage message, Session session) throws IOException, EncodeException {
 
 		if (message.getType() == Type.USERLIST) {
 
@@ -81,6 +91,42 @@ public class WebsocketHandler {
 			controller.removeUser(message.getAdditionalParams().getNickname());
 		}
 
+		if (message.getType() == Type.REQUESTEDPRIVATECHAT) {
+
+			String surl="http://vallentinsource.com/globalip.php";
+			URL url=new URL(surl);
+			InputStreamReader inpstrmread=new InputStreamReader(url.openStream());
+			BufferedReader reader=new BufferedReader(inpstrmread);			
+			String ip=reader.readLine();
+			/*## GOT IP (store to private static variable?) ##*/
+			
+			System.out.println("MINE IP IS "+ip);
+			
+			//BISOGNA CONTROLLARE SE QUESTI JOPTIONPANE NON FERMANO IL THREAD.
+			String senderNick=message.getAdditionalParams().getNickname();
+			int choice=WebsocketHandler.controller.buildChoiceMessageBox("User "+senderNick+
+					"wants to have a private chat with you", "Private Chat",
+					new Object[]{"Yes","No Way!"},JOptionPane.WARNING_MESSAGE);			
+			
+			ChatMessage msg;
+			if(choice == 0){
+				msg=new ChatMessage("Yes",Type.YESPRIVATECHAT);
+				msg.getAdditionalParams().setNickname(senderNick);		
+				msg.getAdditionalParams().setIP(ip);
+				/*##START LISTENING SERVER##*/
+			}
+			else{
+				msg=new ChatMessage("No",Type.NOPRIVATECHAT);				
+			}
+			SendMex(msg);
+		}
+		
+		if(message.getType() == Type.YESPRIVATECHAT){
+			String iptoconnect=message.getAdditionalParams().getIP(); /*##IP TO CONNECT##*/
+			System.out.println("IP TO CONNECT:"+message.getAdditionalParams().getIP());
+			/*##CONNECT TO IP##*/
+			
+		}
 	}
 
 	/**
