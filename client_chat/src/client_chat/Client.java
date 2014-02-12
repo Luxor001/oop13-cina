@@ -33,6 +33,7 @@ public class Client implements Runnable {
 	private String str = "";
 	private JTextArea chat;
 	private String ip;
+	private String nameClient = System.getProperty("user.name");
 	private String nameServer = null;
 	private boolean resetTime = false;
 
@@ -113,7 +114,7 @@ public class Client implements Runnable {
 			oos = new ObjectOutputStream(sslSocket.getOutputStream());
 			ois = new ObjectInputStream(sslSocket.getInputStream());
 
-			oos.writeObject("Pluto");
+			oos.writeObject(nameClient);
 			oos.flush();
 			nameServer = (String) ois.readObject();
 		} catch (IOException | ClassNotFoundException e1) {

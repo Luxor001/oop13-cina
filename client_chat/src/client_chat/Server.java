@@ -22,7 +22,6 @@ public class Server implements Runnable {
 	// list of clients connected to server
 	private List<MessageFromClient> client = new ArrayList<>();
 	private ViewObserver controller;
-	private String nameServer = "Paperino";
 
 	public Server(ViewObserver controller) throws IOException,
 			ClassNotFoundException {
@@ -82,7 +81,7 @@ public class Server implements Runnable {
 			if (client.get(i).getNameClient().equals(name)) {
 				if (!client.get(i).isClosed() && client.get(i).isConnected()) {
 					try {
-						client.get(i).sendMessage(nameServer + " : " + message);
+						client.get(i).sendMessage(message);
 						return true;
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -103,6 +102,7 @@ public class Server implements Runnable {
 		private ObjectOutputStream oos = null;
 		private SSLSocket sslSocket;
 		private String str = null;
+		private String nameServer = System.getProperty("user.name");
 		private String nameClient = null;
 
 		public MessageFromClient(SSLSocket sslSocket, ViewObserver controller) {
@@ -123,7 +123,7 @@ public class Server implements Runnable {
 			System.out.println("Porta: " + sslSocket.getPort());
 
 			try {
-				oos.writeObject("Paperino");
+				oos.writeObject(nameServer);
 				oos.flush();
 				nameClient = (String) ois.readObject();
 			} catch (IOException | ClassNotFoundException e1) {
