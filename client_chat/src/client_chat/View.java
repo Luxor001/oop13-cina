@@ -207,7 +207,7 @@ public class View extends JFrame implements ViewInterface {
 						} catch (Exception e1) {
 						}
 
-						// controller.commandCreateTab();
+						controller.commandCreateTab();
 					} else {
 						tabView.setSelectedIndex(index);
 					}
