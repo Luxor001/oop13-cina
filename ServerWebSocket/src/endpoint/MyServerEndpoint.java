@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.http.HttpServletRequest;
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -16,8 +17,6 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
-
-import org.eclipse.persistence.sessions.server.ClientSession;
 
 import endpoint.ChatMessage.Param;
 import endpoint.ChatMessage.Type;
@@ -56,11 +55,11 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			UsersList.remove(user);
 	}
 
-	
 	@OnMessage
 	public void onMessage(ChatMessage message, Session clientsession) throws IOException,
 			EncodeException {
 
+//		String prova=req.getRemoteAddr();
 		if(message.getType() == ChatMessage.Type.INITIALIZE){ /*connection request from client*/
 			String UserNickname=message.getAdditionalParams().getNickname();
 			Boolean UserVisibility=message.getAdditionalParams().getVisibility();
@@ -118,6 +117,18 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			ChatMessage cmessage=new ChatMessage("respond",Type.REQUESTEDPRIVATECHAT);
 			cmessage.getAdditionalParams().setNickname(SenderNickname);
 			sendMex(cmessage, Targetusr.GetSession());
+		}
+		
+		if(message.getType() == Type.YESPRIVATECHAT){
+			
+			User agreedinguser=searchUser(clientsession); /*SENDER*/
+			User Targetusr=searchUser(message.getAdditionalParams().getNickname()); /*Target*/
+			
+			
+			ChatMessage cmessage=new ChatMessage("respond",Type.YESPRIVATECHAT);
+			cmessage.getAdditionalParams().setNickname(agreedinguser.GetNickname());
+			cmessage.getAdditionalParams().setIP(message.getAdditionalParams().getIP());
+			sendMex(cmessage,Targetusr.GetSession());
 		}
 			
 	}

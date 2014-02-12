@@ -75,6 +75,12 @@ public class Controller implements ViewObserver {
 		this.model.getSocketHandler().SendMex(
 				new ChatMessage("Closing", Type.DISCONNECTING));
 	}
+	
+	public int buildChoiceMessageBox(String Message, String title,
+			Object[] options, int IconType){
+		return view.buildChoiceMessageBox(Message, title, options, IconType);
+	}
+	
 	public void notifyChatUser() throws IOException, EncodeException{
 		ChatMessage message=new ChatMessage("Connect to",Type.REQUESTPRIVATECHAT);
 		ChatMessage.Param params=new ChatMessage.Param();

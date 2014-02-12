@@ -77,6 +77,11 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 						additionalParams.appendUser(array.getString(i2));
 					}
 				}
+
+				
+				if(currObject.containsKey("ip")){
+						additionalParams.setIP(currObject.getString("ip"));					
+				}
 			}
 		return additionalParams;
 	}
