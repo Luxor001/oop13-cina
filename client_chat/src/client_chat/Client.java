@@ -1,6 +1,5 @@
 package client_chat;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -27,15 +26,15 @@ import javax.swing.JTextArea;
  dal programmatore*/
 
 public class Client implements Runnable {
-	SSLSocketFactory sslSocketFactory = null;
-	SSLSocket sslSocket = null;
-	ObjectOutputStream OOS = null;
-	ObjectInputStream OIS = null;
-	BufferedReader br = null;
-	Thread t = null;
-	String str = "";
-	JTextArea chat;
-	String ip;
+	private SSLSocketFactory sslSocketFactory = null;
+	private SSLSocket sslSocket = null;
+	private ObjectOutputStream oos = null;
+	private ObjectInputStream ois = null;
+	private String str = "";
+	private JTextArea chat;
+	private String ip;
+	private String nameServer = null;
+	private boolean resetTime = false;
 
 	public Client(String ip, JTextArea chat) throws IOException,
 			ClassNotFoundException {
@@ -76,23 +75,18 @@ public class Client implements Runnable {
 					SecureRandom.getInstance("SHA1PRNG"));
 			sslSocketFactory = context.getSocketFactory();
 		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (KeyManagementException e) { // TODO Auto-generated catch block
+		} catch (KeyManagementException e) {
 			e.printStackTrace();
 		} catch (UnrecoverableKeyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		t = new Thread(this);
-		t.start();
+		new Thread(this).start();
 
 	}
 
@@ -103,10 +97,8 @@ public class Client implements Runnable {
 			sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, 9999);
 			sslSocket.startHandshake();
 		} catch (UnknownHostException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -118,36 +110,80 @@ public class Client implements Runnable {
 		// mess ->
 
 		try {
-			OOS = new ObjectOutputStream(sslSocket.getOutputStream());
-			OIS = new ObjectInputStream(sslSocket.getInputStream());
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
+			oos = new ObjectOutputStream(sslSocket.getOutputStream());
+			ois = new ObjectInputStream(sslSocket.getInputStream());
+
+			oos.writeObject("Pluto");
+			oos.flush();
+			nameServer = (String) ois.readObject();
+		} catch (IOException | ClassNotFoundException e1) {
 			e1.printStackTrace();
 		}
 
-		while (sslSocket.isConnected()) {
-			// leggo quello che mi arriva dal server
-			try {
-				while ((str = (String) OIS.readObject()) != null) {
-					chat.append("Server : " + str + "\n");
+		class Timer extends Thread {
+			private final static int TIMEOUT = 60000;
+			private int sleep = 1000;
+			private int currentTime = 0;
+			private boolean timeout = false;
+
+			public void run() {
+				while (!timeout) {
+					try {
+						Thread.sleep(sleep);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+
+					currentTime += sleep;
+
+					if (resetTime) {
+						resetTime = false;
+						currentTime = 0;
+					}
+					if (currentTime > TIMEOUT) {
+
+						try {
+							oos.writeObject(null);
+							oos.flush();
+
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+
+						timeout = true;
+					}
 				}
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+
+		}
+
+		new Timer().start();
+
+		// leggo quello che mi arriva dal server
+		try {
+			while ((str = (String) ois.readObject()) != null) {
+				chat.append(nameServer + " : " + str + "\n");
+				resetTime = true;
+			}
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		try {
+			oos.close();
+			ois.close();
+			sslSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
 	public void sendMessage(String message) {
-		if (sslSocket.isConnected()) {
+		if (sslSocket.isConnected() && !sslSocket.isClosed()) {
 			try {
 
-				String newMessage = "Pluto : " + message;
-				OOS.writeObject(newMessage);
-				OOS.flush();
+				resetTime = true;
+				oos.writeObject(message);
+				oos.flush();
 			} catch (IOException e) {
 				System.out
 						.println("** Il client potrebbe essersi disconnesso! **");

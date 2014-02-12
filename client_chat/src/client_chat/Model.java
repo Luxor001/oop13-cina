@@ -22,36 +22,34 @@ public class Model implements ModelInterface {
 	}
 
 	Map<Integer, Client> client = new HashMap<>();
-	Map<String, String> clientConnectToServer = new HashMap<>();
 	Server server;
 
 	public void sendMessage(String message, int index, String name) {
 
-		clientConnectToServer.put("Pippo", "/192.168.1.101");
-		clientConnectToServer.put("Pluto", "/192.168.1.104");
 		if (message != "") {
-			if (client.containsKey(index)) {
+
+			if (server != null) {
+				if (!server.sendMessage(message, name)) {
+					client.get(index).sendMessage(message);
+				}
+			} else
 				client.get(index).sendMessage(message);
-			} else {
-				server.sendMessage(message, clientConnectToServer.get(name));
-			}
 		}
 	}
 
-	public void connectToServer(JTextArea chat, int index) {
+	public void connectToServer(JTextArea chat, int index, String ip) {
 
 		if (!new File("ClientKey.jks").exists()) {
 			createKeyStore("Client", "ClientKey", "changeit");
 		}
 
 		try {
-			client.put(index, new Client("192.168.1.101", chat));
+			client.put(index, new Client(ip, chat));
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public void attachViewObserver(ViewObserver controller) {

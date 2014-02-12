@@ -11,17 +11,18 @@ public interface ViewObserver {
 
 	void commandCloseTab(ActionEvent e);
 
-	void commandCreateTab(/* JTextArea chat */);
+	void commandCreateTab();
+
+	void commandCreateTab(String ip);
 
 	void commandReceiveMessage(String message, String title);
 
-	// void commandShowMessage();
 	public void showMessageMain(String Message);
 
 	void notifyClosing() throws IOException, EncodeException;
-	
+
 	void notifyChatUser() throws IOException, EncodeException;
-	
+
 	public int buildChoiceMessageBox(String Message, String title,
 			Object[] options, int IconType);
 }
