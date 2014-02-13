@@ -191,7 +191,8 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	 
 	 public boolean removeUser(User usr){
 		 
-			User result=UsersList.remove(usr);
+		 	/*session is the key of the map*/
+			User result=UsersList.remove(usr.GetSession());
 			if(result != null)
 				return true;
 			else
