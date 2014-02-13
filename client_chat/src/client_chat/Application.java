@@ -17,10 +17,10 @@ public class Application {
 		c.setModel(m);
 
 		WebsocketHandler.setController(c);
-
 		connectionResult result;
 		int userchoice = 0;
-		result = m.AttemptConnection(); /* connects to webserver */
+		result = m.AttemptConnection();
+		/* connects to webserver */
 
 		while (result == connectionResult.TIMEOUT && userchoice == 0) {
 
@@ -28,7 +28,6 @@ public class Application {
 					"Chat Channel is not responding," + "\nconnection failed",
 					"Connection Failed", new Object[] { "Reconnect",
 							"Quit to Main" }, JOptionPane.ERROR_MESSAGE);
-
 			if (userchoice == 0) /* retry */
 				result = m.AttemptConnection();
 			if (userchoice == 1)
