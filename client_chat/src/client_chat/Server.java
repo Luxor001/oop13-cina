@@ -96,6 +96,23 @@ public class Server implements Runnable {
 		return false;
 	}
 
+	public void close() {
+		while (client.size() > 0) {
+			if (!client.get(client.size() - 1).isClosed()
+					&& client.get(client.size() - 1).isConnected()) {
+				try {
+					client.get(client.size() - 1).sendMessage(null);
+					client.remove(client.size() - 1);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+			} else {
+				client.remove(client.size() - 1);
+			}
+		}
+	}
+
 	private static class MessageFromClient extends Thread {
 		private ViewObserver controller;
 		private ObjectInputStream ois = null;
@@ -104,6 +121,7 @@ public class Server implements Runnable {
 		private String str = null;
 		private String nameServer = System.getProperty("user.name");
 		private String nameClient = null;
+		private boolean close = false;
 
 		public MessageFromClient(SSLSocket sslSocket, ViewObserver controller) {
 			this.controller = controller;
@@ -130,7 +148,7 @@ public class Server implements Runnable {
 				e1.printStackTrace();
 			}
 
-			// leggo quells che mi arriva dal client
+			// leggo quello che mi arriva dal client
 			try {
 
 				while ((str = (String) ois.readObject()) != null) {
@@ -138,10 +156,11 @@ public class Server implements Runnable {
 							nameClient);
 				}
 
-				oos.writeObject(null);
+				if (!close) {
+					sendMessage(null);
+				}
 				oos.close();
 				ois.close();
-
 				sslSocket.close();
 			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
@@ -149,11 +168,16 @@ public class Server implements Runnable {
 
 		}
 
-		public void sendMessage(String message) throws IOException {
+		public synchronized void sendMessage(String message) throws IOException {
 
-			oos.writeObject(message);
-			oos.flush();
+			if (!close) {
+				oos.writeObject(message);
+				oos.flush();
+			}
 
+			if (message == null) {
+				close = true;
+			}
 		}
 
 		public String getNameClient() {
