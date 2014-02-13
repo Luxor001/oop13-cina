@@ -2,6 +2,7 @@ package client_chat;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -183,6 +184,11 @@ public class View extends JFrame implements ViewInterface {
 	public void showMessage(String message, String title) {
 
 		int index = checkTab(title);
+
+		if (index != getTabIndex() && index != -1) {
+			Toolkit.getDefaultToolkit().beep();
+		}
+
 		if (index != -1) {
 			chatList.get(index).append(message + "\n");
 		} else {
@@ -202,12 +208,12 @@ public class View extends JFrame implements ViewInterface {
 				if (e.getClickCount() == 2) {
 					int index = checkTab(getTitle());
 					if (index == -1) {
-						try {
-							controller.notifyChatUser();
-						} catch (Exception e1) {
-						}
+						/*
+						 * try { controller.notifyChatUser(); } catch (Exception
+						 * e1) { }
+						 */
 
-						// controller.commandCreateTab();
+						controller.commandCreateTab();
 					} else {
 						tabView.setSelectedIndex(index);
 					}

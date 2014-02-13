@@ -135,7 +135,6 @@ public class Client implements Runnable {
 					try {
 						Thread.sleep(sleep);
 					} catch (InterruptedException e) {
-						e.printStackTrace();
 					}
 
 					currentTime += sleep;
@@ -144,33 +143,35 @@ public class Client implements Runnable {
 						resetTime = false;
 						currentTime = 0;
 					}
-					if (currentTime > TIMEOUT || stop == true) {
-
-						try {
-							oos.writeObject(null);
-							oos.flush();
-
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-
+					if (currentTime > TIMEOUT || stop) {
+						sendMessage(null);
 						timeout = true;
 					}
 				}
 			}
 
+			public boolean getStateTimeout() {
+				return timeout;
+			}
 		}
 
-		new Timer().start();
+		Timer t = new Timer();
+		t.start();
 
 		// leggo quello che mi arriva dal server
 		try {
 			while ((str = (String) ois.readObject()) != null) {
+
 				chat.append(nameServer + " : " + str + "\n");
 				resetTime = true;
 			}
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
+		}
+
+		if (!t.getStateTimeout()) {
+			t.interrupt();
+			sendMessage(null);
 		}
 		try {
 			oos.close();
@@ -182,16 +183,13 @@ public class Client implements Runnable {
 		}
 	}
 
-	public void sendMessage(String message) {
+	public synchronized void sendMessage(String message) {
 		if (sslSocket.isConnected() && !sslSocket.isClosed()) {
 			try {
-
 				resetTime = true;
 				oos.writeObject(message);
 				oos.flush();
 			} catch (IOException e) {
-				System.out
-						.println("** Il client potrebbe essersi disconnesso! **");
 			}
 		}
 

@@ -48,10 +48,12 @@ public class Model implements ModelInterface {
 			client.add(new Client(ip, chat));
 			// client.put(index, new Client(ip, chat));
 		} catch (ClassNotFoundException e) {
+
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	public void closeAll() {
@@ -60,7 +62,7 @@ public class Model implements ModelInterface {
 				c.close();
 		}
 
-		// server.close();
+		server.close();
 	}
 
 	public void attachViewObserver(ViewObserver controller) {
