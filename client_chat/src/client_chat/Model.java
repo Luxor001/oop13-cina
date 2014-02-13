@@ -6,8 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JTextArea;
@@ -21,7 +21,8 @@ public class Model implements ModelInterface {
 		OK, TIMEOUT, BAD_URI
 	}
 
-	Map<Integer, Client> client = new HashMap<>();
+	List<Client> client = new ArrayList<>();
+	// Map<Integer, Client> client = new HashMap<>();
 	Server server;
 
 	public void sendMessage(String message, int index, String name) {
@@ -30,10 +31,10 @@ public class Model implements ModelInterface {
 
 			if (server != null) {
 				if (!server.sendMessage(message, name)) {
-					client.get(index).sendMessage(message);
+					client.get(index - 1).sendMessage(message);
 				}
 			} else
-				client.get(index).sendMessage(message);
+				client.get(index - 1).sendMessage(message);
 		}
 	}
 
@@ -44,12 +45,22 @@ public class Model implements ModelInterface {
 		}
 
 		try {
-			client.put(index, new Client(ip, chat));
+			client.add(new Client(ip, chat));
+			// client.put(index, new Client(ip, chat));
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void closeAll() {
+		for (Client c : client) {
+			if (c != null)
+				c.close();
+		}
+
+		// server.close();
 	}
 
 	public void attachViewObserver(ViewObserver controller) {
@@ -88,7 +99,7 @@ public class Model implements ModelInterface {
 		try {
 
 			client.connectToServer(sockethandler, null, new URI(
-					"ws://localhost:8080/ServerWebSocket/websocket"));
+					"ws://82.57.179.244:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));

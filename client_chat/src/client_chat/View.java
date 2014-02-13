@@ -51,7 +51,7 @@ public class View extends JFrame implements ViewInterface {
 	public View() {
 
 		super(TITLE);
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		// this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setSize(WIDTH, HEIGTH);
 		this.buildGUI();
 		this.setAction();
@@ -207,7 +207,7 @@ public class View extends JFrame implements ViewInterface {
 						} catch (Exception e1) {
 						}
 
-						controller.commandCreateTab();
+						// controller.commandCreateTab();
 					} else {
 						tabView.setSelectedIndex(index);
 					}
@@ -285,7 +285,7 @@ public class View extends JFrame implements ViewInterface {
 		return tabView.getSelectedIndex();
 	}
 
-	public int checkTab(String title) {
+	private int checkTab(String title) {
 		for (int i = 0; i < tabView.getTabCount(); i++) {
 			if (tabView.getTitleAt(i).equals(title)) {
 
@@ -320,6 +320,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/* needed to intercept the action of closing window */
+
 	class CustomWindowAdapter extends WindowAdapter {
 
 		JFrame window = null;
@@ -330,11 +331,14 @@ public class View extends JFrame implements ViewInterface {
 
 		// implement windowClosing method
 		public void windowClosing(WindowEvent e) {
+			controller.commandCloseAll();
+
 			try {
 				controller.notifyClosing();
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
+
 			System.exit(0);
 		}
 	}

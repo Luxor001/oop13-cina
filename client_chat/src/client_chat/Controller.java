@@ -64,6 +64,11 @@ public class Controller implements ViewObserver {
 		this.view.showMessage(message, title);
 	}
 
+	public void commandCloseAll() {
+
+		this.model.closeAll();
+	}
+
 	public void showMessageMain(String Message) {
 		this.view.showMessageMain(Message);
 	}
