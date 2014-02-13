@@ -8,6 +8,8 @@ public interface ModelInterface {
 
 	void sendMessage(String message, int index, String name);
 
+	void closeAll();
+
 	void connectToServer(JTextArea chat, int index, String ip);
 
 	WebsocketHandler getSocketHandler();

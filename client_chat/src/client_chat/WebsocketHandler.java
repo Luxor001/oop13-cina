@@ -23,7 +23,9 @@ import client_chat.ChatMessage.Type;
 public class WebsocketHandler {
 	static Session ClientSession;
 	private static Controller controller;
-	private static String DEBUG_NICKNAME = "Lux" + Math.random();
+	private static String DEBUG_NICKNAME = System.getProperty("user.name");// "Lux"
+																			// +
+																			// Math.random();
 
 	/**
 	 * Method run at the successful connection beetween Client & Server

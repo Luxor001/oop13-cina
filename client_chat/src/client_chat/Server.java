@@ -134,7 +134,6 @@ public class Server implements Runnable {
 			try {
 
 				while ((str = (String) ois.readObject()) != null) {
-
 					controller.commandReceiveMessage(nameClient + " : " + str,
 							nameClient);
 				}

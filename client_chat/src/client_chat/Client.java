@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.concurrent.CountDownLatch;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -36,6 +37,8 @@ public class Client implements Runnable {
 	private String nameClient = System.getProperty("user.name");
 	private String nameServer = null;
 	private boolean resetTime = false;
+	private boolean stop = false;
+	private CountDownLatch latch = new CountDownLatch(1);
 
 	public Client(String ip, JTextArea chat) throws IOException,
 			ClassNotFoundException {
@@ -141,7 +144,7 @@ public class Client implements Runnable {
 						resetTime = false;
 						currentTime = 0;
 					}
-					if (currentTime > TIMEOUT) {
+					if (currentTime > TIMEOUT || stop == true) {
 
 						try {
 							oos.writeObject(null);
@@ -173,6 +176,7 @@ public class Client implements Runnable {
 			oos.close();
 			ois.close();
 			sslSocket.close();
+			latch.countDown();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -191,6 +195,15 @@ public class Client implements Runnable {
 			}
 		}
 
+	}
+
+	public void close() {
+		stop = true;
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

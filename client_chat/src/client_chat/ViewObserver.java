@@ -17,7 +17,9 @@ public interface ViewObserver {
 
 	void commandReceiveMessage(String message, String title);
 
-	public void showMessageMain(String Message);
+	void commandCloseAll();
+
+	void showMessageMain(String Message);
 
 	void notifyClosing() throws IOException, EncodeException;
 
