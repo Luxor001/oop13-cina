@@ -39,14 +39,12 @@ public class View extends JFrame implements ViewInterface {
 	// create Tabview
 	JTabbedPane tabView = new JTabbedPane();
 	JButton enter = new JButton("Send");
-	List<JTextArea> textList = new ArrayList<>();
+	List<JTextArea> textList = new ArrayList<>(); /*## NEED TO IMPLEMENT PRIVATE PROPERTY! ##*/
 	List<JTextArea> chatList = new ArrayList<>();
 	List<JScrollPane> scrollList = new ArrayList<>();
 	// create listview
-	JList<String> usersJList; /*
-							 * it's not parametized, but oracle's official docs
-							 * use so.
-							 */
+	JList<String> usersJList; /* it's not parametized, but oracle's official docs use so
+	*/
 	DefaultListModel<String> usersList = new DefaultListModel<String>();
 
 	public View() {
