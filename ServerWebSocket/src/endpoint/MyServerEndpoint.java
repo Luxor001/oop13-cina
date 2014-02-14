@@ -64,6 +64,12 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			String UserNickname=message.getAdditionalParams().getNickname();
 			Boolean UserVisibility=message.getAdditionalParams().getVisibility();
 						
+			
+			boolean nickavaible=checkAvailabilityNickname(UserNickname);
+			if(!nickavaible){
+				
+			}
+			
 			if(UserVisibility.equals(true)){ /*alerts other clients of new user*/
 				
 				ChatMessage newmessage;
@@ -210,6 +216,15 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 				}
 			}
 			sendMex(messagetoclient, target);
+	 }
+	 
+	 public boolean checkAvailabilityNickname(String Nick){
+		 boolean result=true;
+		for (User cUser : UsersList.values()) {
+			if (cUser.GetNickname().equals(Nick))
+				result=false;
+		}
+		return result;
 	 }
 	
 }

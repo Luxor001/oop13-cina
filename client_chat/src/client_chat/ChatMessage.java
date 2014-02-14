@@ -25,7 +25,8 @@ public class ChatMessage {
 		REQUESTPRIVATECHAT,
 		REQUESTEDPRIVATECHAT,
 		YESPRIVATECHAT,
-		NOPRIVATECHAT
+		NOPRIVATECHAT,
+		NICKNAMEUNAVAIABLE
 	}
 
 	private Param additionalParams;// =new Param();
