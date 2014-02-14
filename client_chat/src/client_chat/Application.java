@@ -2,16 +2,12 @@ package client_chat;
 
 import java.io.IOException;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
-import client_chat.Model.connectionResult;
-
 public class Application {
 
 	public static void main(String[] args) throws IOException {
 
-		new SplashScreen();
+		SplashScreen splash=new SplashScreen();
+		
 		/*
 		
 		Controller c = new Controller();

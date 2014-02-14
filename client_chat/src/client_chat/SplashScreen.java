@@ -3,6 +3,8 @@ package client_chat;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -15,10 +17,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
+import net.java.balloontip.BalloonTip;
+
 public class SplashScreen {
 
 	private JFrame frame;
 	private static String TITLE = "CryptoChat V. 1.0 PreciseFatCat";
+	private static String INVALID_NICKNAME_MESSAGE="Invalid Nickname.";/* \nPlease enter a non-empty" +
+			" nickname within 12 characters";*/
+	
 	private static Point frameSize=new Point(300,400);
 	private static JComboBox<String> cmb_channel;
 	private static DefaultComboBoxModel<String> channelist;
@@ -27,6 +34,7 @@ public class SplashScreen {
 	
 	private static JLabel lbl_nickname;
 	private static JTextArea txt_nickname;
+	private static JButton btn_login;
 	
 	private static int offsetcenter=30;
 	private static int centerscaling=120;
@@ -70,14 +78,12 @@ public class SplashScreen {
 		lbl_nickname.setSize(lbl_nickname.getPreferredSize());
 		lbl_nickname.setLocation(CenteredX(lbl_nickname),centerscaling);
 		centerscaling+=20;
-		txt_nickname=new JTextArea("Your nickname..");
-		txt_nickname.setSize(txt_nickname.getPreferredSize());
+		txt_nickname=new JTextArea();
+		txt_nickname.setSize(100,15);
 		txt_nickname.setSize(txt_nickname.getSize().width,txt_nickname.getSize().height+5);
 		txt_nickname.setLocation(CenteredX(txt_nickname), centerscaling);	
 		centerscaling+=20;
 		Border border = BorderFactory.createLineBorder(Color.BLACK);
-	/*	txt_nickname.setBorder(BorderFactory.createCompoundBorder(border, 
-		            BorderFactory.createEmptyBorder(10, 10, 10, 10)));*/
 		txt_nickname.setBorder(border);
 		pnl_main.add(lbl_nickname);
 		pnl_main.add(txt_nickname);
@@ -85,12 +91,27 @@ public class SplashScreen {
 
 		centerscaling+=20;
 		centerscaling+=20;
-		JButton btn_login=new JButton("Connect");
+		btn_login=new JButton("Connect");
 		btn_login.setSize(btn_login.getPreferredSize());
 		btn_login.setSize(btn_login.getSize().width+30,btn_login.getSize().height);
 		btn_login.setLocation(CenteredX(btn_login),centerscaling);
 		
 		pnl_main.add(btn_login);
+		
+		btn_login.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(txt_nickname.getText().equals("") || 
+						txt_nickname.getText().length() > 12){
+					 BalloonTip bln_invalidnick=new BalloonTip(txt_nickname,
+							 INVALID_NICKNAME_MESSAGE);
+					 bln_invalidnick.setVisible(true);
+					
+				}
+				
+			}
+		});
 		/*pnl_main.setLayout(new GridBagLayout());
 		GridBagConstraints cnst=new GridBagConstraints();
 		cnst.gridy=0;
@@ -120,4 +141,5 @@ public class SplashScreen {
 
 		return 0;
 	}
+	
 }
