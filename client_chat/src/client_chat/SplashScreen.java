@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -38,7 +39,9 @@ public class SplashScreen {
 	
 	private static int offsetcenter=30;
 	private static int centerscaling=120;
+	
 	public SplashScreen() {
+		
 		frame = new JFrame();
 		frame.setTitle(TITLE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);			
@@ -82,6 +85,7 @@ public class SplashScreen {
 		txt_nickname.setSize(100,15);
 		txt_nickname.setSize(txt_nickname.getSize().width,txt_nickname.getSize().height+5);
 		txt_nickname.setLocation(CenteredX(txt_nickname), centerscaling);	
+		txt_nickname.setText("DEBUG_NICK"+(Math.round(Math.random()*10)));
 		centerscaling+=20;
 		Border border = BorderFactory.createLineBorder(Color.BLACK);
 		txt_nickname.setBorder(border);
@@ -106,10 +110,15 @@ public class SplashScreen {
 						txt_nickname.getText().length() > 12){
 					 BalloonTip bln_invalidnick=new BalloonTip(txt_nickname,
 							 INVALID_NICKNAME_MESSAGE);
-					 bln_invalidnick.setVisible(true);
-					
+					 bln_invalidnick.setVisible(true);					
 				}
-				
+				else{
+					try {
+						Application.chat_initialization();
+					} catch (IOException e1) {	}
+					
+					
+				}				
 			}
 		});
 		/*pnl_main.setLayout(new GridBagLayout());
@@ -137,9 +146,8 @@ public class SplashScreen {
 		
 	}
 
-	public int showSplash() {
-
-		return 0;
+	public void disposeFrame(){
+		frame.dispose();
 	}
 	
 }
