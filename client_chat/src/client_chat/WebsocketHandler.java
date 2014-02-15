@@ -5,19 +5,26 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
+import javax.websocket.DeploymentException;
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
+import org.glassfish.tyrus.client.ClientManager;
+
 import client_chat.ChatMessage.Type;
+import client_chat.Model.connectionResult;
 
 @ClientEndpoint(encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
 public class WebsocketHandler {
@@ -31,11 +38,19 @@ public class WebsocketHandler {
 	 * Method run at the successful connection beetween Client & Server
 	 * 
 	 * @throws EncodeException
+	 * @throws InterruptedException 
 	 */
 	@OnOpen
-	public void onOpen(Session session) throws IOException, EncodeException {
+	public void onOpen(Session session) throws IOException, EncodeException, InterruptedException {
 		// view.writeText("Connected to Channel : \"Main\"",0);
-
+		
+		/*waiting for application class to draw the interface, or i will be unable to write
+		 * "Connected" and other funny things..*/
+		synchronized (WebsocketHandler.class) {
+			WebsocketHandler.class.wait();
+		}
+			
+			
 		controller.showMessageMain("Connected!");
 		System.out.println("Sending my INITIALIZE message..");
 
@@ -181,5 +196,39 @@ public class WebsocketHandler {
 
 	public static void setController(Controller c) {
 		controller = c;
+	}
+
+    private static CountDownLatch latch;
+	public synchronized connectionResult AttemptConnection() throws IOException {
+
+		latch = new CountDownLatch(1);
+		ClientManager client = null;
+		try {
+			client = ClientManager.createClient();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	//	sockethandler = new WebsocketHandler();
+		/* Attemp connection to web service */
+		try {
+			client.connectToServer(this, null, new URI(
+					"ws://localhost:8080/ServerWebSocket/websocket"));
+			/*
+			 * client.connectToServer(WebsocketHandler.class, new URI(
+			 * "ws://localhost:8080/ServerWebSocket/websocket"));
+			 */
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			if (e.getClass().isAssignableFrom(DeploymentException.class)) {
+				return connectionResult.TIMEOUT;
+			}
+			if (e.getClass().isAssignableFrom(URISyntaxException.class)) {
+				return connectionResult.BAD_URI;
+			}
+		}
+		return connectionResult.OK;
 	}
 }
