@@ -95,25 +95,20 @@ public class Server implements Runnable {
 		*/
 		//SEND FILE
 	    } catch (IOException e1) {
-		e1.printStackTrace();
 	    }
 	}
 
     }
 
-    public boolean sendMessage(String message, String name) {
+    public synchronized boolean sendMessage(String message, String name) {
 
 	for (int i = 0; i < client.size(); i++) {
-	    if (client.get(i).getNameClient().equals(name)) {
-		if (!client.get(i).isClosed() && client.get(i).isConnected()) {
-		    try {
-			client.get(i).sendMessage(message);
-			return true;
-		    } catch (IOException e) {
-			e.printStackTrace();
-		    }
-		} else {
-		    client.remove(i);
+	    if (!client.get(i).isClosed() && client.get(i).isConnected()) {
+		try {
+		    client.get(i).sendMessage(message);
+		    return true;
+		} catch (IOException e) {
+		    e.printStackTrace();
 		}
 
 	    }
@@ -122,19 +117,32 @@ public class Server implements Runnable {
 	return false;
     }
 
-    public void close() {
+    public synchronized void close() {
 	while (client.size() > 0) {
-	    if (!client.get(client.size() - 1).isClosed()
-		    && client.get(client.size() - 1).isConnected()) {
-		try {
-		    client.get(client.size() - 1).sendMessage(null);
-		    client.remove(client.size() - 1);
-		} catch (IOException e) {
-		    e.printStackTrace();
+	    try {
+		client.get(client.size() - 1).sendMessage(null);
+		client.remove(client.size() - 1);
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    }
+
+	}
+
+	try {
+	    sslServerSocket.close();
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+    }
+
+    public synchronized void closeClient(String name) {
+	for (int i = 0; i < client.size(); i++) {
+	    if (client.get(i).getNameClient().equals(name)) {
+		if (client.get(i).isClosed()) {
+		    client.remove(i);
+		    return;
 		}
 
-	    } else {
-		client.remove(client.size() - 1);
 	    }
 	}
     }
@@ -190,6 +198,7 @@ public class Server implements Runnable {
 		oos.close();
 		ois.close();
 		sslSocket.close();
+		controller.commandCloseClient(nameClient);
 	    } catch (IOException | ClassNotFoundException e) {
 		e.printStackTrace();
 	    }
