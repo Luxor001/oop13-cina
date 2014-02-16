@@ -4,13 +4,15 @@ import javax.swing.JTextArea;
 
 public interface ModelInterface {
 
-	void attachViewObserver(ViewObserver controller);
+    void attachViewObserver(ViewObserver controller);
 
-	void sendMessage(String message, int index, String name);
+    void sendMessage(String message, int index, String name);
 
-	void closeAll();
+    void closeAll();
 
-	void connectToServer(JTextArea chat, int index, String ip);
+    void closeClient(String name);
 
-	WebsocketHandler getSocketHandler();
+    void connectToServer(JTextArea chat, int index, String ip);
+
+    WebsocketHandler getSocketHandler();
 }

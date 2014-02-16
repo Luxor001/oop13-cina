@@ -21,7 +21,6 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.swing.JTextArea;
 
 /*N.B. queste sono classi di prova, create per verificare la fattibilit� del progetto,
  per questo motivo sono presenti indirizzi ip,porte,percorsi assoluti inseriti in modo manuale
@@ -33,7 +32,7 @@ public class Client implements Runnable {
     private ObjectOutputStream oos = null;
     private ObjectInputStream ois = null;
     private String str = "";
-    private JTextArea chat;
+    private ViewObserver controller;
     private String ip;
     private String nameClient = System.getProperty("user.name");
     private String nameServer = null;
@@ -47,7 +46,7 @@ public class Client implements Runnable {
     int bytesRead = 0, counter = 0;
     Object o = "test";
 
-    public Client(String ip, JTextArea chat) throws IOException,
+    public Client(String ip, ViewObserver controller) throws IOException,
 	    ClassNotFoundException {
 
 	String path = "ClientKey.jks";
@@ -58,7 +57,7 @@ public class Client implements Runnable {
 	TrustManager[] trustManagers;
 
 	this.ip = ip;
-	this.chat = chat;
+	this.controller = controller;
 
 	try {
 	    // indico il tipo della chiave
@@ -173,7 +172,8 @@ public class Client implements Runnable {
 
 	    //LOGOUT
 	    while ((str = (String) ois.readObject()) != null) {
-		chat.append(nameServer + " : " + str + "\n");
+		controller.commandReceiveMessage(nameServer + " : " + str,
+			nameServer);
 		resetTime = true;
 	    }
 	    //LOGOUT
@@ -245,6 +245,8 @@ public class Client implements Runnable {
 		oos.flush();
 	    } catch (IOException e) {
 	    }
+	} else {
+	    System.out.println("Timeout");
 	}
 
     }
@@ -256,6 +258,14 @@ public class Client implements Runnable {
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
 	}
+    }
+
+    public String getIp() {
+	return sslSocket.getInetAddress().toString();
+    }
+
+    public String getNameServer() {
+	return nameServer;
     }
 
 }
