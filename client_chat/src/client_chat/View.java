@@ -35,17 +35,23 @@ public class View extends JFrame implements ViewInterface {
 	final private static int HGAP = 10;
 	final private static int VGAP = 10;
 	private ViewObserver controller;
-	private boolean visibility=false;
-	
+
 	// create Tabview
 	JTabbedPane tabView = new JTabbedPane();
 	JButton enter = new JButton("Send");
-	List<JTextArea> textList = new ArrayList<>(); /* * ## NEED TO IMPLEMENT PRIVATE PROPERTY! ##	 */
+	List<JTextArea> textList = new ArrayList<>(); /*
+												 * ## NEED TO IMPLEMENT PRIVATE
+												 * PROPERTY! ##
+												 */
 	List<JTextArea> chatList = new ArrayList<>();
-	List<JScrollPane> scrollList = new ArrayList<>();// create listview
-	JList<String> usersJList; /* it's not parametized, but oracle's official docs use so */
+	List<JScrollPane> scrollList = new ArrayList<>();
+	// create listview
+	JList<String> usersJList; /*
+							 * it's not parametized, but oracle's official docs
+							 * use so
+							 */
 	DefaultListModel<String> usersList = new DefaultListModel<String>();
-    
+
 	public View() {
 
 		super(TITLE);
@@ -54,7 +60,7 @@ public class View extends JFrame implements ViewInterface {
 		this.buildGUI();
 		this.setAction();
 		this.setResizable(false);
-		this.setVisible(visibility);
+		this.setVisible(true);
 	}
 
 	private void buildGUI() {
@@ -133,13 +139,7 @@ public class View extends JFrame implements ViewInterface {
 		}
 	}
 
-	public JTextArea createTab(String title) {
-
-		/*
-		 * for (int i = 0; i < tabView.getTabCount(); i++) { if
-		 * (tabView.getTitleAt(i).equals(title)) { tabView.setSelectedIndex(i);
-		 * return null; } }
-		 */
+	public void createTab(String title) {
 
 		JTextArea chatTmp = new JTextArea();
 		JPanel textPanelTmp = new JPanel(new BorderLayout(10, 10));
@@ -175,7 +175,6 @@ public class View extends JFrame implements ViewInterface {
 		tab.add(close);
 		tabView.setTabComponentAt(tabView.getTabCount() - 1, tab);
 
-		return chatTmp;
 	}
 
 	public void showMessage(String message, String title) {
@@ -189,7 +188,8 @@ public class View extends JFrame implements ViewInterface {
 		if (index != -1) {
 			chatList.get(index).append(message + "\n");
 		} else {
-			createTab(title).append(message + "\n");
+			createTab(title);
+			chatList.get(chatList.size() - 1).append(message + "\n");
 		}
 	}
 
@@ -205,12 +205,13 @@ public class View extends JFrame implements ViewInterface {
 				if (e.getClickCount() == 2) {
 					int index = checkTab(getTitle());
 					if (index == -1) {
-						/*
-						 * try { controller.notifyChatUser(); } catch (Exception
-						 * e1) { }
-						 */
 
-						controller.commandCreateTab();
+						try {
+							controller.notifyChatUser();
+						} catch (Exception e1) {
+						}
+
+						// controller.commandCreateTab();
 					} else {
 						tabView.setSelectedIndex(index);
 					}
@@ -345,4 +346,5 @@ public class View extends JFrame implements ViewInterface {
 			System.exit(0);
 		}
 	}
+
 }

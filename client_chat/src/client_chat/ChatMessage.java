@@ -17,17 +17,9 @@ public class ChatMessage {
 
 	enum Type {
 		INITIALIZE, /* Used to Registry a new user to the channel */
-		CONNECTIONGRANTED,
-		TEXT, /* Duh. */		 
+		CONNECTIONGRANTED, TEXT, /* Duh. */
 		NEWUSER, /* Needed to tell to server there's a new boy in town */
-		USERDISCONNECTED,
-		USERLIST,
-		DISCONNECTING,
-		REQUESTPRIVATECHAT,
-		REQUESTEDPRIVATECHAT,
-		YESPRIVATECHAT,
-		NOPRIVATECHAT,
-		NICKNAMEUNAVAIABLE
+		USERDISCONNECTED, USERLIST, DISCONNECTING, REQUESTPRIVATECHAT, REQUESTEDPRIVATECHAT, YESPRIVATECHAT, NOPRIVATECHAT, NICKNAMEUNAVAIABLE
 	}
 
 	private Param additionalParams;// =new Param();
@@ -104,14 +96,15 @@ public class ChatMessage {
 		private Boolean visibility;
 		private ArrayList<String> usersList = new ArrayList<String>();
 		private String ip;
+
 		public Param() {
 
 		}
 
 		/*
 		 * ricoradrsi di specificare che il nickname in questi parametri
-		 * addizionali √® usato SOLO per il primo avvio. Dopo la faccenda dei
-		 * nickname sar√† gestita SOLO dal webserver: sar√† lui a inserirlo, per
+		 * addizionali Ë usato SOLO per il primo avvio. Dopo la faccenda dei
+		 * nickname sar‡ gestita SOLO dal webserver: sar‡ lui a inserirlo, per
 		 * un motivo di sicurezza.
 		 */
 		public void setNickname(String Nick) {
@@ -126,16 +119,14 @@ public class ChatMessage {
 			visibility = visible;
 			;
 		}
-		
-		public void setIP(String ip){
-			this.ip=ip;
-		}		
-		
-		
+
+		public void setIP(String ip) {
+			this.ip = ip;
+		}
+
 		public Boolean getVisibility() {
 			return visibility;
 		}
-		
 
 		public ArrayList<String> getUsersList() {
 			return usersList;
@@ -144,8 +135,8 @@ public class ChatMessage {
 		public void appendUser(String UserNickname) {
 			usersList.add(UserNickname);
 		}
-		
-		public String getIP(){
+
+		public String getIP() {
 			return ip;
 		}
 	}

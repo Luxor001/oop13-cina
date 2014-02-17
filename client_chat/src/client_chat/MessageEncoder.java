@@ -13,13 +13,12 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 	@Override
 	public String encode(ChatMessage message) throws EncodeException {
 		JsonObject jsonObject;
-		if (message.isParamSet()){
+		if (message.isParamSet()) {
 			jsonObject = Json.createObjectBuilder()
 					.add("Type", message.getType().toString())
 					.add("Message", message.getMessage())
 					.add("addParams", ParamToJsonArray(message)).build();
-		}
-		else{
+		} else {
 			jsonObject = Json.createObjectBuilder()
 					.add("Type", message.getType().toString())
 					.add("Message", message.getMessage()).build();
@@ -43,7 +42,6 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 		ChatMessage.Param param = message.getAdditionalParams();
 		JsonArrayBuilder builder = Json.createArrayBuilder();
 
-		
 		if (message.getType() == ChatMessage.Type.USERLIST) {
 			JsonArrayBuilder listbuilder = Json.createArrayBuilder();
 			for (String cUser : message.getAdditionalParams().getUsersList())
@@ -54,8 +52,8 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 			return builder.build();
 		}
 		if (message.getType() == ChatMessage.Type.NEWUSER
-				|| message.getType() == ChatMessage.Type.USERDISCONNECTED ||
-				message.getType() == ChatMessage.Type.REQUESTPRIVATECHAT) {
+				|| message.getType() == ChatMessage.Type.USERDISCONNECTED
+				|| message.getType() == ChatMessage.Type.REQUESTPRIVATECHAT) {
 			builder.add(Json.createObjectBuilder().add("Nickname",
 					param.getNickname()));
 			return builder.build();
@@ -66,8 +64,8 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 					param.getNickname()));
 			return builder.build();
 		}
-		
-		if(message.getType() == ChatMessage.Type.YESPRIVATECHAT){
+
+		if (message.getType() == ChatMessage.Type.YESPRIVATECHAT) {
 			builder.add(Json.createObjectBuilder().add("Nickname",
 					param.getNickname()));
 			builder.add(Json.createObjectBuilder().add("ip", param.getIP()));

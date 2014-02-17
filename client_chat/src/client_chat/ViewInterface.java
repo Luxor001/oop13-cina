@@ -2,33 +2,30 @@ package client_chat;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.JTextArea;
-
 public interface ViewInterface {
 
-	void attachViewObserver(ViewObserver controller);
+    void attachViewObserver(ViewObserver controller);
 
-	String sendMessage();
+    String sendMessage();
 
-	void closeTab(ActionEvent e);
+    void closeTab(ActionEvent e);
 
-	String getTitle();
+    String getTitle();
 
-	void showMessage(String message, String title);
+    void showMessage(String message, String title);
 
-	JTextArea createTab(String title);
+    void createTab(String title);
 
-	int getTabIndex();
+    int getTabIndex();
 
-	void showMessageMain(String Message);
+    void showMessageMain(String Message);
 
-	int buildChoiceMessageBox(String Message, String title, Object[] options,
-			int IconType);
+    int buildChoiceMessageBox(String Message, String title, Object[] options,
+	    int IconType);
 
-	String getTabName();
+    String getTabName();
 
-	void appendUser(String user);
+    void appendUser(String user);
 
-	boolean removeUser(String user);
-	
+    boolean removeUser(String user);
 }

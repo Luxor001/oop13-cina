@@ -7,26 +7,24 @@ import javax.websocket.EncodeException;
 
 public interface ViewObserver {
 
-    void commandSendMessage(/* String message */);
+	void commandSendMessage(/* String message */);
 
-    void commandCloseTab(ActionEvent e);
+	void commandCloseTab(ActionEvent e);
 
-    void commandCreateTab();
+	void commandCreateTab();
 
-    void commandCreateTab(String ip);
+	void commandCreateTab(String ip, String keystore);
 
-    void commandReceiveMessage(String message, String title);
+	void commandReceiveMessage(String message, String title);
 
-    void commandCloseAll();
+	void commandCloseAll();
 
-    void commandCloseClient(String name);
+	void showMessageMain(String Message);
 
-    void showMessageMain(String Message);
+	void notifyClosing() throws IOException, EncodeException;
 
-    void notifyClosing() throws IOException, EncodeException;
+	void notifyChatUser() throws IOException, EncodeException;
 
-    void notifyChatUser() throws IOException, EncodeException;
-
-    public int buildChoiceMessageBox(String Message, String title,
-	    Object[] options, int IconType);
+	public int buildChoiceMessageBox(String Message, String title,
+			Object[] options, int IconType);
 }

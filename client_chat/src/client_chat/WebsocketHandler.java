@@ -3,8 +3,14 @@ package client_chat;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -14,14 +20,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.CloseReason.CloseCode;
 
 import org.glassfish.tyrus.client.ClientManager;
 
@@ -32,27 +36,32 @@ import client_chat.Model.connectionResult;
 public class WebsocketHandler {
 	static Session ClientSession;
 	private static Controller controller;
-	public static String DEBUG_NICKNAME = System.getProperty("user.name");
+	public static String DEBUG_NICKNAME = System.getProperty("user.name");// "Lux"
+																			// +
+																			// Math.random();
+	public final static Object monitor = 1;
 
-	public final static Object monitor=1;
 	/**
 	 * Method run at the successful connection beetween Client & Server
 	 * 
 	 * @throws EncodeException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	@OnOpen
-	public void onOpen(Session session) throws IOException, EncodeException, InterruptedException {
+	public void onOpen(Session session) throws IOException, EncodeException,
+			InterruptedException {
 		// view.writeText("Connected to Channel : \"Main\"",0);
-		
-		/*waiting for application class to draw the interface, or i will be unable to write
-		 * "Connected" and other funny things..*/
-		/*synchronized (WebsocketHandler.class) {
-			WebsocketHandler.class.wait();
-		}*/
-			
-			
-/*		controller.showMessageMain("Connected!");*/
+
+		/*
+		 * waiting for application class to draw the interface, or i will be
+		 * unable to write "Connected" and other funny things..
+		 */
+		/*
+		 * synchronized (WebsocketHandler.class) {
+		 * WebsocketHandler.class.wait(); }
+		 */
+
+		/* controller.showMessageMain("Connected!"); */
 		System.out.println("Sending my INITIALIZE message..");
 
 		ClientSession = session;
@@ -62,7 +71,7 @@ public class WebsocketHandler {
 		SendMex(Message); /* send my request of connection to the server */
 
 		System.out.println("Sent!");
-		
+
 	}
 
 	/**
@@ -70,56 +79,50 @@ public class WebsocketHandler {
 	 * 
 	 * @throws EncodeException
 	 * @throws IOException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 * 
 	 */
 	@OnMessage
 	public void onMessage(ChatMessage message, Session session)
 			throws IOException, EncodeException, InterruptedException {
 
-		if(message.getType() == Type.NICKNAMEUNAVAIABLE){
-			/*server refused me to connect*/
+		if (message.getType() == Type.NICKNAMEUNAVAIABLE) {
+			/* server refused me to connect */
 			synchronized (WebsocketHandler.monitor) {
-				Application.granted=false;
+				Application.granted = false;
 				WebsocketHandler.monitor.notifyAll();
 			}
-			
-			
+
 		}
-		
-		if(message.getType() == Type.CONNECTIONGRANTED){
-			/*i got a grant from server: now i can load the chat window*/
+
+		if (message.getType() == Type.CONNECTIONGRANTED) {
+			/* i got a grant from server: now i can load the chat window */
 			synchronized (WebsocketHandler.monitor) {
-				Application.granted=true;
+				Application.granted = true;
 				WebsocketHandler.monitor.notifyAll();
 			}
-			
+
 			synchronized (WebsocketHandler.monitor) {
 				System.out.println("Waiting");
 				monitor.wait();
 				System.out.println("escaped");
-			}		
-			SendMex(new ChatMessage("userlist",Type.USERLIST));
-			
-		}
-		
-		
-		
+			}
+			SendMex(new ChatMessage("userlist", Type.USERLIST));
 
-		/*the app is stil loading the main chat: discard any new message*/
-		if(Application.loaded == false){
-			
+		}
+
+		/* the app is stil loading the main chat: discard any new message */
+		if (Application.loaded == false) {
+
 			return;
 		}
 		if (message.getType() == Type.USERLIST) {
-			
-			System.out
-					.println("Number of current clients except me: "
-							+ (message.getAdditionalParams().getUsersList()
-									.size()));			
+
+			System.out.println("Number of current clients except me: "
+					+ (message.getAdditionalParams().getUsersList().size()));
 			for (String user : message.getAdditionalParams().getUsersList())
 				controller.appendUser(user);
-			
+
 			/*
 			 * System.out.println("USERLIST MESSAGE TYPE, USERS:" +
 			 * message.getAdditionalParams().getUsersList().get(0) + "\n" +
@@ -127,9 +130,6 @@ public class WebsocketHandler {
 			 */
 		}
 
-		
-		
-		
 		if (message.getType() == Type.TEXT) {
 
 			controller.showMessageMain(message.getAdditionalParams()
@@ -179,16 +179,52 @@ public class WebsocketHandler {
 		}
 
 		if (message.getType() == Type.YESPRIVATECHAT) {
+
 			String iptoconnect = message.getAdditionalParams().getIP(); /*
 																		 * ##IP
 																		 * TO
 																		 * CONNECT
 																		 * ##
 																		 */
+
+			Socket socket = new Socket(iptoconnect, 9998);
+
+			File file = new File(System.getProperty("user.name")
+					+ "ServerKey.jks");
+			String name = "";
+			try {
+
+				ObjectInputStream ois = new ObjectInputStream(
+						socket.getInputStream());
+				ObjectOutputStream oos = new ObjectOutputStream(
+						socket.getOutputStream());
+
+				oos.writeUTF(System.getProperty("user.name"));
+				oos.flush();
+				name = ois.readUTF();
+				FileInputStream fileStream = new FileInputStream(file);
+				byte[] buffer = new byte[10240];
+				fileStream.read(buffer);
+				oos.write(buffer);
+				FileOutputStream outStream = new FileOutputStream(name
+						+ "ServerKey.jks");
+
+				byte[] bufferReader = new byte[10240];
+				ois.readFully(buffer);
+				outStream.write(bufferReader);
+				oos.close();
+				ois.close();
+				socket.close();
+				fileStream.close();
+				outStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 			System.out.println("IP TO CONNECT:"
 					+ message.getAdditionalParams().getIP());
 			/* ##CONNECT TO IP## */
-			controller.commandCreateTab(iptoconnect);
+			controller.commandCreateTab(iptoconnect, name + "ServerKey.jks");
 		}
 	}
 
@@ -237,7 +273,8 @@ public class WebsocketHandler {
 		controller = c;
 	}
 
-    private static CountDownLatch latch;
+	private static CountDownLatch latch;
+
 	public synchronized connectionResult AttemptConnection() throws IOException {
 
 		latch = new CountDownLatch(1);
@@ -248,11 +285,11 @@ public class WebsocketHandler {
 			e.printStackTrace();
 		}
 
-	//	sockethandler = new WebsocketHandler();
+		// sockethandler = new WebsocketHandler();
 		/* Attemp connection to web service */
 		try {
 			client.connectToServer(this, null, new URI(
-					"ws://localhost:8080/ServerWebSocket/websocket"));
+					"ws://79.42.240.180:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));
