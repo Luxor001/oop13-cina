@@ -1,18 +1,24 @@
 package client_chat;
 
-import javax.swing.JTextArea;
-
 public interface ModelInterface {
 
-    void attachViewObserver(ViewObserver controller);
+	void attachViewObserver(ViewObserver controller);
 
-    void sendMessage(String message, int index, String name);
+	void sendMessage(String message, String name);
 
-    void closeAll();
+	void addNickName(String name, String ip);
 
-    void closeClient(String name);
+	void closeAll();
 
-    void connectToServer(JTextArea chat, int index, String ip);
+	String exist(String name);
 
-    WebsocketHandler getSocketHandler();
+	boolean isConnect(String ip);
+
+	void closeClient(String name);
+
+	void closeServer(String ip);
+
+	void connectToServer(String ip, String keyStore);
+
+	WebsocketHandler getSocketHandler();
 }

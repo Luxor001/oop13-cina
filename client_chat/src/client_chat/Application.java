@@ -8,14 +8,14 @@ import client_chat.Model.connectionResult;
 
 public class Application {
 
-    private static SplashScreen splash;
-    private static WebsocketHandler web;
+	private static SplashScreen splash;
+	private static WebsocketHandler web;
 
-    public static void main(String[] args) throws IOException {
-	
-		web=new WebsocketHandler();
-		splash=new SplashScreen();
-    }
+	public static void main(String[] args) throws IOException {
+
+		web = new WebsocketHandler();
+		splash = new SplashScreen();
+	}
 
 	public static void chat_initialization() throws IOException {
 
@@ -25,46 +25,51 @@ public class Application {
 				connectionResult result = null;
 				int userchoice = 0;
 				splash.setVisibilityLoadingCircle(true);
-				
-				do{
+
+				do {
 					try {
 						result = new WebsocketHandler().AttemptConnection();
-					} catch (IOException e) {}
-					
-					if(result == connectionResult.TIMEOUT && userchoice == 0)
+					} catch (IOException e) {
+					}
+
+					if (result == connectionResult.TIMEOUT && userchoice == 0)
 						userchoice = splash.buildChoiceMessageBox(
-								"Chat Channel is not responding,"+ "\nconnection failed",
-								"Connection Failed", new Object[] { "Reconnect",
-										"Cancel" }, JOptionPane.ERROR_MESSAGE);
-					
-				}while((result == connectionResult.TIMEOUT && userchoice == 0));
-				
-								
+								"Chat Channel is not responding,"
+										+ "\nconnection failed",
+								"Connection Failed", new Object[] {
+										"Reconnect", "Cancel" },
+								JOptionPane.ERROR_MESSAGE);
+
+				} while ((result == connectionResult.TIMEOUT && userchoice == 0));
+
 				if (result == connectionResult.OK) {
 					try {
 						draw();
-					} catch (Exception e) {}
+					} catch (Exception e) {
+					}
 				}
 
 			};
 		}.start();
 
 	}
-	public static boolean granted=false;
-	public static boolean loaded=false;
+
+	public static boolean granted = false;
+	public static boolean loaded = false;
+
 	public static void draw() throws IOException, InterruptedException {
-		
-		/*websockethandler has received response for INITIALIZE from server*/
+
+		/* websockethandler has received response for INITIALIZE from server */
 		synchronized (WebsocketHandler.monitor) {
 			WebsocketHandler.monitor.wait();
-			if(granted==false){
+			if (granted == false) {
 				splash.nicknameInvalid();
 				splash.setVisibilityLoadingCircle(false);
 				return;
-				
+
 			}
-		}		
-		
+		}
+
 		splash.setVisibilityLoadingCircle(false);
 		Model m = new Model();
 		Controller c = new Controller();
@@ -73,18 +78,17 @@ public class Application {
 		c.setModel(m);
 
 		WebsocketHandler.setController(c);
-		
-		/*chat window builded, websockethandler can now list the players.*/
+
+		/* chat window builded, websockethandler can now list the players. */
 		synchronized (WebsocketHandler.monitor) {
 			WebsocketHandler.monitor.notifyAll();
 		}
-		loaded=true;
-				
-		
-		v.setVisible(true); 
-		
+		loaded = true;
+
+		v.setVisible(true);
+
 		splash.disposeFrame();
-		
+
 	}
 
 }
