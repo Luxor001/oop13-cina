@@ -14,12 +14,14 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
+import javax.websocket.CloseReason.CloseCode;
 
 import org.glassfish.tyrus.client.ClientManager;
 
@@ -30,10 +32,9 @@ import client_chat.Model.connectionResult;
 public class WebsocketHandler {
 	static Session ClientSession;
 	private static Controller controller;
-	private static String DEBUG_NICKNAME = System.getProperty("user.name");// "Lux"
-																			// +
-																			// Math.random();
+	public static String DEBUG_NICKNAME = System.getProperty("user.name");
 
+	public final static Object monitor=1;
 	/**
 	 * Method run at the successful connection beetween Client & Server
 	 * 
@@ -46,12 +47,12 @@ public class WebsocketHandler {
 		
 		/*waiting for application class to draw the interface, or i will be unable to write
 		 * "Connected" and other funny things..*/
-		synchronized (WebsocketHandler.class) {
+		/*synchronized (WebsocketHandler.class) {
 			WebsocketHandler.class.wait();
-		}
+		}*/
 			
 			
-		controller.showMessageMain("Connected!");
+/*		controller.showMessageMain("Connected!");*/
 		System.out.println("Sending my INITIALIZE message..");
 
 		ClientSession = session;
@@ -61,6 +62,7 @@ public class WebsocketHandler {
 		SendMex(Message); /* send my request of connection to the server */
 
 		System.out.println("Sent!");
+		
 	}
 
 	/**
@@ -68,22 +70,56 @@ public class WebsocketHandler {
 	 * 
 	 * @throws EncodeException
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 * 
 	 */
 	@OnMessage
 	public void onMessage(ChatMessage message, Session session)
-			throws IOException, EncodeException {
+			throws IOException, EncodeException, InterruptedException {
 
+		if(message.getType() == Type.NICKNAMEUNAVAIABLE){
+			/*server refused me to connect*/
+			synchronized (WebsocketHandler.monitor) {
+				Application.granted=false;
+				WebsocketHandler.monitor.notifyAll();
+			}
+			
+			
+		}
+		
+		if(message.getType() == Type.CONNECTIONGRANTED){
+			/*i got a grant from server: now i can load the chat window*/
+			synchronized (WebsocketHandler.monitor) {
+				Application.granted=true;
+				WebsocketHandler.monitor.notifyAll();
+			}
+			
+			synchronized (WebsocketHandler.monitor) {
+				System.out.println("Waiting");
+				monitor.wait();
+				System.out.println("escaped");
+			}		
+			SendMex(new ChatMessage("userlist",Type.USERLIST));
+			
+		}
+		
+		
+		
+
+		/*the app is stil loading the main chat: discard any new message*/
+		if(Application.loaded == false){
+			
+			return;
+		}
 		if (message.getType() == Type.USERLIST) {
-
+			
 			System.out
-					.println("Server has responded! Number of current clients except me: "
+					.println("Number of current clients except me: "
 							+ (message.getAdditionalParams().getUsersList()
-									.size()));
-
+									.size()));			
 			for (String user : message.getAdditionalParams().getUsersList())
 				controller.appendUser(user);
-
+			
 			/*
 			 * System.out.println("USERLIST MESSAGE TYPE, USERS:" +
 			 * message.getAdditionalParams().getUsersList().get(0) + "\n" +
@@ -91,6 +127,9 @@ public class WebsocketHandler {
 			 */
 		}
 
+		
+		
+		
 		if (message.getType() == Type.TEXT) {
 
 			controller.showMessageMain(message.getAdditionalParams()
@@ -220,8 +259,6 @@ public class WebsocketHandler {
 			 */
 
 		} catch (Exception e) {
-
-			e.printStackTrace();
 			if (e.getClass().isAssignableFrom(DeploymentException.class)) {
 				return connectionResult.TIMEOUT;
 			}

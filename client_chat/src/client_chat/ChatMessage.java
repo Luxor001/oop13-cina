@@ -17,6 +17,7 @@ public class ChatMessage {
 
 	enum Type {
 		INITIALIZE, /* Used to Registry a new user to the channel */
+		CONNECTIONGRANTED,
 		TEXT, /* Duh. */		 
 		NEWUSER, /* Needed to tell to server there's a new boy in town */
 		USERDISCONNECTED,

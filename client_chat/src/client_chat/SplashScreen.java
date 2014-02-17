@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
@@ -24,8 +25,8 @@ public class SplashScreen {
 
 	private JFrame frame;
 	private static String TITLE = "CryptoChat V. 1.0 PreciseFatCat";
-	private static String INVALID_NICKNAME_MESSAGE="Invalid Nickname.";/* \nPlease enter a non-empty" +
-			" nickname within 12 characters";*/
+	private static String INVALID_NICKNAME_MESSAGE="Invalid Nickname.";/* \nPlease enter a non-empty" +	" nickname within 12 characters";*/
+	private static String NICKNAME_ALREADY_USED_MESSAGE="Nickname Already in use";
 	
 	private static Point frameSize=new Point(300,400);
 	private static JComboBox<String> cmb_channel;
@@ -35,7 +36,8 @@ public class SplashScreen {
 	
 	private static JLabel lbl_nickname;
 	private static JTextArea txt_nickname;
-	private static JButton btn_login;
+	private static JButton btn_login;	
+	private JLabel loadingCircle=new JLabel();
 	
 	private static int offsetcenter=30;
 	private static int centerscaling=120;
@@ -102,6 +104,15 @@ public class SplashScreen {
 		
 		pnl_main.add(btn_login);
 		
+
+		loadingCircle.setIcon(new ImageIcon("resources/loadingif.gif"));
+		loadingCircle.setSize(loadingCircle.getPreferredSize());
+		loadingCircle.setLocation(5,5);
+		pnl_main.add(loadingCircle);		
+		loadingCircle.setVisible(false);
+
+		
+		
 		btn_login.addActionListener(new ActionListener() {
 			
 			@Override
@@ -114,6 +125,7 @@ public class SplashScreen {
 				}
 				else{
 					try {
+						WebsocketHandler.DEBUG_NICKNAME=txt_nickname.getText();
 						Application.chat_initialization();
 					} catch (IOException e1) {	}
 					
@@ -121,21 +133,7 @@ public class SplashScreen {
 				}				
 			}
 		});
-		/*pnl_main.setLayout(new GridBagLayout());
-		GridBagConstraints cnst=new GridBagConstraints();
-		cnst.gridy=0;
-		cnst.insets=new Insets(3, 3, 3, 3);
-		cnst.fill=GridBagConstraints.HORIZONTAL;
-		channelist=new DefaultComboBoxModel<String>();
-		channelist.addElement("main");
-		cmb_channel=new JComboBox<String>(channelist);
-		cmb_channel.setEnabled(false);
-		JLabel lbl_channel=new JLabel("Channel:");
-		pnl_main.add(lbl_channel,cnst);
-		cnst.gridy++;
-		pnl_main.add(cmb_channel,cnst);
-		cnst.gridy++;
-*/
+		
 		frame.setVisible(true);
 		
 	}
@@ -148,6 +146,27 @@ public class SplashScreen {
 
 	public void disposeFrame(){
 		frame.dispose();
+	}
+	
+	public int buildChoiceMessageBox(String Message, String title,
+			Object[] options, int IconType) {
+		// Object[] options = { "Yes, please", "No way!" };
+		int n = JOptionPane.showOptionDialog(frame, Message, title,
+				JOptionPane.YES_NO_OPTION, IconType, null, options, null);
+
+		return n;
+	}
+	
+
+	public void setVisibilityLoadingCircle(boolean visibile){
+		loadingCircle.setVisible(visibile);
+	}
+	
+	public void nicknameInvalid(){
+
+		 BalloonTip bln_invalidnick=new BalloonTip(txt_nickname,
+				 NICKNAME_ALREADY_USED_MESSAGE);
+		 bln_invalidnick.setVisible(true);
 	}
 	
 }

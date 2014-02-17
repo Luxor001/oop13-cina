@@ -2,6 +2,8 @@ package client_chat;
 
 import java.io.IOException;
 
+import javax.swing.JOptionPane;
+
 import client_chat.Model.connectionResult;
 
 public class Application {
@@ -10,76 +12,79 @@ public class Application {
     private static WebsocketHandler web;
 
     public static void main(String[] args) throws IOException {
-	draw();
-	//	web=new WebsocketHandler();
-	//	splash=new SplashScreen();
+	
+		web=new WebsocketHandler();
+		splash=new SplashScreen();
     }
 
-    public static void chat_initialization() throws IOException {
+	public static void chat_initialization() throws IOException {
 
-	new Thread() {
-	    public void run() {
+		new Thread() {
+			public void run() {
 
-		connectionResult result = null;
-		int userchoice = 0;
-		try {
-		    result = new WebsocketHandler().AttemptConnection();
-		} catch (IOException e) {
-		}
+				connectionResult result = null;
+				int userchoice = 0;
+				splash.setVisibilityLoadingCircle(true);
+				
+				do{
+					try {
+						result = new WebsocketHandler().AttemptConnection();
+					} catch (IOException e) {}
+					
+					if(result == connectionResult.TIMEOUT && userchoice == 0)
+						userchoice = splash.buildChoiceMessageBox(
+								"Chat Channel is not responding,"+ "\nconnection failed",
+								"Connection Failed", new Object[] { "Reconnect",
+										"Cancel" }, JOptionPane.ERROR_MESSAGE);
+					
+				}while((result == connectionResult.TIMEOUT && userchoice == 0));
+				
+								
+				if (result == connectionResult.OK) {
+					try {
+						draw();
+					} catch (Exception e) {}
+				}
 
-		/* connects to webserver */
+			};
+		}.start();
 
-		while (result == connectionResult.TIMEOUT && userchoice == 0) {
-
-		    /*	userchoice = c.buildChoiceMessageBox(
-		    			"Chat Channel is not responding," + "\nconnection failed",
-		    			"Connection Failed", new Object[] { "Reconnect",
-		    					"Quit to Main" }, JOptionPane.ERROR_MESSAGE);*/
-		    System.out.print("Canale non visibile");
-
-		    if (userchoice == 0)
-			try {
-			    result = web.AttemptConnection();
-			} catch (IOException e) {
-			}
-		    if (userchoice == 1) {
-
-		    }
-		    /* splashscreen, needs to be implemented */
-		}
-
-		if (result == connectionResult.OK) {
-
-		    //DISABLE ALL OTHER COMPONENTS..SHOW A CIRCLE LOADING
-
-		    try {
-
-			draw();
-		    } catch (IOException e) {
-		    }
-		}
-
-	    };
-	}.start();
-
-    }
-
-    public static void draw() throws IOException {
-
-	Model m = new Model();
-	Controller c = new Controller();
-	View v = new View();
-	c.setView(v);
-	c.setModel(m);
-
-	WebsocketHandler.setController(c);
-
-	synchronized (WebsocketHandler.class) {
-	    WebsocketHandler.class.notify();
 	}
+	public static boolean granted=false;
+	public static boolean loaded=false;
+	public static void draw() throws IOException, InterruptedException {
+		
+		/*websockethandler has received response for INITIALIZE from server*/
+		synchronized (WebsocketHandler.monitor) {
+			WebsocketHandler.monitor.wait();
+			if(granted==false){
+				splash.nicknameInvalid();
+				splash.setVisibilityLoadingCircle(false);
+				return;
+				
+			}
+		}		
+		
+		splash.setVisibilityLoadingCircle(false);
+		Model m = new Model();
+		Controller c = new Controller();
+		View v = new View();
+		c.setView(v);
+		c.setModel(m);
 
-	int a = 0;
-	//splash.disposeFrame();
-    }
+		WebsocketHandler.setController(c);
+		
+		/*chat window builded, websockethandler can now list the players.*/
+		synchronized (WebsocketHandler.monitor) {
+			WebsocketHandler.monitor.notifyAll();
+		}
+		loaded=true;
+				
+		
+		v.setVisible(true); 
+		
+		splash.disposeFrame();
+		
+	}
 
 }
