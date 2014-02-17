@@ -30,4 +30,5 @@ public interface ViewInterface {
 	void appendUser(String user);
 
 	boolean removeUser(String user);
+	
 }

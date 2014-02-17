@@ -10,12 +10,14 @@ import java.util.Set;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpServletRequest;
+import javax.websocket.CloseReason;
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.ServerEndpoint;
 
 import endpoint.ChatMessage.Param;
@@ -66,9 +68,23 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 						
 			
 			boolean nickavaible=checkAvailabilityNickname(UserNickname);
-			if(!nickavaible){
-				
+			
+			if (!nickavaible) {
+				sendMex(new ChatMessage("unavaiable", Type.NICKNAMEUNAVAIABLE),
+						clientsession);
+				return;
+			} else {
+				sendMex(new ChatMessage("granted", Type.CONNECTIONGRANTED),
+						clientsession);
+
 			}
+			
+			
+			/*
+			/* send users list to the new client 
+			if (UsersList.size() != 0) {
+				sendUserList(clientsession);				
+			}*/
 			
 			if(UserVisibility.equals(true)){ /*alerts other clients of new user*/
 				
@@ -78,12 +94,6 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 				sendGlobalMex(newmessage);				
 			}
 
-			
-			/* send users list to the new client */
-			if (UsersList.size() != 0) {
-				sendUserList(clientsession);				
-			}
-			
 			
 			if(UserVisibility)
 				UsersList.put(clientsession,new User(UserNickname,State.VISIBLE, clientsession));
@@ -210,7 +220,7 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 		 ChatMessage messagetoclient = new ChatMessage("Users List",
 					Type.USERLIST);
 			for (User cUser : UsersList.values()) {
-				if (cUser.GetState() == State.VISIBLE) {
+				if (cUser.GetState() == State.VISIBLE && cUser.GetSession() != target) {
 					messagetoclient.getAdditionalParams().appendUser(
 							cUser.GetNickname());
 				}

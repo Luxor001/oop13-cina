@@ -9,26 +9,26 @@ import javax.swing.JTextArea;
 
 public class Model implements ModelInterface {
 
-    public enum connectionResult {
-	OK, TIMEOUT, BAD_URI
-    }
-
-    ManageClient client;
-    Server server;
-
-    public void sendMessage(String message, int index, String name) {
-
-	if (message != "") {
-
-	    //CHANGE
-	    if (server != null) {
-		if (!server.sendMessage(message, name)) {
-		    client.sendMessage(message, name);
-		}
-	    } else
-		client.sendMessage(message, name);
+	public enum connectionResult {
+		OK, TIMEOUT, BAD_URI
 	}
-    }
+
+	ManageClient client;
+	Server server;
+
+	public void sendMessage(String message, int index, String name) {
+
+		if (message != "") {
+
+			// CHANGE
+			if (server != null) {
+				if (!server.sendMessage(message, name)) {
+					client.sendMessage(message, name);
+				}
+			} else
+				client.sendMessage(message, name);
+		}
+	}
 
     public synchronized void connectToServer(JTextArea chat, int index,
 	    String ip) {
