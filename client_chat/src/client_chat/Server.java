@@ -96,7 +96,8 @@ public class Server implements Runnable {
 	public synchronized boolean sendMessage(String message, String name) {
 
 		for (int i = 0; i < client.size(); i++) {
-			if (!client.get(i).isClosed() && client.get(i).isConnected()) {
+			if (!client.get(i).isClosed() && client.get(i).isConnected()
+					&& client.get(i).getNameClient().equals(name)) {
 				try {
 					client.get(i).sendMessage(message);
 					return true;

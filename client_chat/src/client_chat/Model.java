@@ -23,19 +23,19 @@ public class Model implements ModelInterface {
 		if (message != "") {
 
 			// CHANGE
-			if (server != null) {
-				if (!server.sendMessage(message, name)) {
-					if (!client.sendMessage(message, name)) {
-						connectToServer(peopleChat.get(name), name
-								+ "ServerKey.jks");
-						client.sendMessage(message, name);
-					}
+			// if (server != null) {
+			if (!server.sendMessage(message, name)) {
+				if (!client.sendMessage(message, name)) {
+					connectToServer(peopleChat.get(name).substring(1), name
+							+ "ServerKey.jks");
+					client.sendMessage(message, name);
 				}
-			} else if (!client.sendMessage(message, name)) {
-				connectToServer(peopleChat.get(name).substring(1), name
-						+ "ServerKey.jks");
-				client.sendMessage(message, name);
 			}
+			// } else if (!client.sendMessage(message, name)) {
+			// connectToServer(peopleChat.get(name).substring(1), name
+			// + "ServerKey.jks");
+			// client.sendMessage(message, name);
+			// }
 		}
 	}
 

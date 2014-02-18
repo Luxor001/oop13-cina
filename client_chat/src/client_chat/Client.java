@@ -231,15 +231,30 @@ public class Client implements Runnable {
 	}
 
 	public synchronized void sendMessage(String message) {
-		if (sslSocket.isConnected() && !sslSocket.isClosed()) {
-			try {
-				resetTime = true;
-				oos.writeObject(message);
-				oos.flush();
-			} catch (IOException e) {
+		int cont = 0;
+
+		while (cont < 5) {
+			if (sslSocket.isConnected() && !sslSocket.isClosed()) {
+				try {
+					resetTime = true;
+					oos.writeObject(message);
+					oos.flush();
+					cont = 6;
+				} catch (IOException e) {
+				}
+			} else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
-		} else {
-			System.out.println("Timeout");
+			cont++;
+		}
+
+		if (cont == 5) {
+			controller.commandReceiveMessage("Messaggio non inviato,riprova",
+					getNameServer());
 		}
 
 	}
