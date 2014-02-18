@@ -25,19 +25,7 @@ public class SplashScreen {
 
 	private JFrame frame;
 	private static String TITLE = "CryptoChat V. 1.0 PreciseFatCat";
-	private static String INVALID_NICKNAME_MESSAGE = "Invalid Nickname.";/*
-																		 * \nPlease
-																		 * enter
-																		 * a
-																		 * non-
-																		 * empty
-																		 * " +	"
-																		 * nickname
-																		 * within
-																		 * 12
-																		 * characters
-																		 * ";
-																		 */
+	private static String INVALID_NICKNAME_MESSAGE = "Invalid Nickname.";
 	private static String NICKNAME_ALREADY_USED_MESSAGE = "Nickname Already in use";
 
 	private static Point frameSize = new Point(300, 400);

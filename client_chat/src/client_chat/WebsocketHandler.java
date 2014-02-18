@@ -34,13 +34,26 @@ import client_chat.Model.connectionResult;
 
 @ClientEndpoint(encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
 public class WebsocketHandler {
+	
+	/*Let's make this a sigleton class, shall we?*/
+	private final static WebsocketHandler wshandler=new WebsocketHandler();	
+	
+	
 	static Session ClientSession;
 	private static Controller controller;
 	public static String DEBUG_NICKNAME = System.getProperty("user.name");// "Lux"
 																			// +
 																			// Math.random();
+	
 	public final static Object monitor = 1;
 
+	private WebsocketHandler(){
+		
+	}
+	
+	public static WebsocketHandler getWebSocketHandler(){
+		return wshandler;
+	}
 	/**
 	 * Method run at the successful connection beetween Client & Server
 	 * 
@@ -118,16 +131,9 @@ public class WebsocketHandler {
 		}
 		if (message.getType() == Type.USERLIST) {
 
-			System.out.println("Number of current clients except me: "
-					+ (message.getAdditionalParams().getUsersList().size()));
 			for (String user : message.getAdditionalParams().getUsersList())
 				controller.appendUser(user);
 
-			/*
-			 * System.out.println("USERLIST MESSAGE TYPE, USERS:" +
-			 * message.getAdditionalParams().getUsersList().get(0) + "\n" +
-			 * message.getAdditionalParams().getUsersList().get(1));
-			 */
 		}
 
 		if (message.getType() == Type.TEXT) {
@@ -171,7 +177,6 @@ public class WebsocketHandler {
 				msg = new ChatMessage("Yes", Type.YESPRIVATECHAT);
 				msg.getAdditionalParams().setNickname(senderNick);
 				msg.getAdditionalParams().setIP(ip);
-				/* ##START LISTENING SERVER## */
 			} else {
 				msg = new ChatMessage("No", Type.NOPRIVATECHAT);
 			}
@@ -179,14 +184,8 @@ public class WebsocketHandler {
 		}
 
 		if (message.getType() == Type.YESPRIVATECHAT) {
-
-			String iptoconnect = message.getAdditionalParams().getIP(); /*
-																		 * ##IP
-																		 * TO
-																		 * CONNECT
-																		 * ##
-																		 */
-
+			/*IP to connect on private chat*/
+			String iptoconnect = message.getAdditionalParams().getIP(); 
 			Socket socket = new Socket(iptoconnect, 9998);
 
 			File file = new File(System.getProperty("user.name")
@@ -245,28 +244,6 @@ public class WebsocketHandler {
 
 	public void SendMex(ChatMessage Mex) throws IOException, EncodeException {
 		ClientSession.getBasicRemote().sendObject(Mex);
-	}
-
-	/* needed to intercept the action of closing window */
-	class CustomWindowAdapter extends WindowAdapter {
-
-		JFrame window = null;
-
-		CustomWindowAdapter(JFrame window) {
-			this.window = window;
-		}
-
-		// implement windowClosing method
-		public void windowClosing(WindowEvent e) {
-			try {
-				ClientSession.close();
-			} /* tells the server we're going out */
-			catch (IOException e1) {
-				e1.printStackTrace();
-			}
-
-			System.exit(0);
-		}
 	}
 
 	public static void setController(Controller c) {

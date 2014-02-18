@@ -34,7 +34,7 @@ public class Controller implements ViewObserver {
 			 */
 
 			try {
-				this.model.getSocketHandler().SendMex(
+				WebsocketHandler.getWebSocketHandler().SendMex(
 						new ChatMessage(this.view.sendMessage(), Type.TEXT));
 			} catch (Exception e) {
 
@@ -88,7 +88,7 @@ public class Controller implements ViewObserver {
 	}
 
 	public void notifyClosing() throws IOException, EncodeException {
-		this.model.getSocketHandler().SendMex(
+		WebsocketHandler.getWebSocketHandler().SendMex(
 				new ChatMessage("Closing", Type.DISCONNECTING));
 	}
 

@@ -13,12 +13,12 @@ public class Application {
 
 	public static void main(String[] args) throws IOException {
 
-		web = new WebsocketHandler();
 		splash = new SplashScreen();
 	}
 
 	public static void chat_initialization() throws IOException {
 
+		web=WebsocketHandler.getWebSocketHandler();
 		new Thread() {
 			public void run() {
 
@@ -28,7 +28,7 @@ public class Application {
 
 				do {
 					try {
-						result = new WebsocketHandler().AttemptConnection();
+						result = web.AttemptConnection();
 					} catch (IOException e) {
 					}
 
@@ -78,6 +78,7 @@ public class Application {
 		c.setModel(m);
 
 		WebsocketHandler.setController(c);
+		
 
 		/* chat window builded, websockethandler can now list the players. */
 		synchronized (WebsocketHandler.monitor) {
