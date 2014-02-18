@@ -79,13 +79,7 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 
 			}
 			
-			
-			/*
-			/* send users list to the new client 
-			if (UsersList.size() != 0) {
-				sendUserList(clientsession);				
-			}*/
-			
+						
 			if(UserVisibility.equals(true)){ /*alerts other clients of new user*/
 				
 				ChatMessage newmessage;

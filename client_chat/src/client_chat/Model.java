@@ -17,6 +17,7 @@ public class Model implements ModelInterface {
 	private Server server;
 	private KeyStoreServer keyStoreServer;
 	private Map<String, String> peopleChat = new HashMap<>();
+	private WebsocketHandler sockethandler;
 
 	public void sendMessage(String message, String name) {
 
@@ -66,10 +67,9 @@ public class Model implements ModelInterface {
 	}
 
 	public void closeAll() {
-
+/*
 		client.close();
-
-		server.close();
+		server.close();*/
 	}
 
 	public synchronized void closeClient(String name) {
@@ -95,7 +95,7 @@ public class Model implements ModelInterface {
 		}
 
 		// server will be created at start of programm and pending some clients
-
+/*
 		try {
 			keyStoreServer = new KeyStoreServer();
 			server = new Server(controller, this);
@@ -105,14 +105,13 @@ public class Model implements ModelInterface {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 
 	}
 
-	public WebsocketHandler sockethandler;
 
 	private void createKeyStore(String name, String alias, String password) {
-		try {
+		/*try {
 
 			String path = System.getProperty("user.dir") + "\\" + name;
 			String nameCertificate;
@@ -159,7 +158,7 @@ public class Model implements ModelInterface {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public WebsocketHandler getSocketHandler() {

@@ -73,7 +73,7 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 
 				if (currObject.containsKey("usersList")) {
 					JsonArray array = currObject.getJsonArray("usersList");
-					for (int i2 = 0; i < array.size(); i++) {
+					for (int i2 = 0; i2 < array.size(); i2++) {
 						additionalParams.appendUser(array.getString(i2));
 					}
 				}
