@@ -23,5 +23,6 @@
 	<classpathentry kind="lib" path="/home/lux/glassfish4/glassfish/lib/gf-client.jar"/>
 	<classpathentry kind="lib" path="/home/lux/glassfish4/glassfish/lib/javaee.jar"/>
 	<classpathentry kind="lib" path="/home/lux/glassfish4/glassfish/lib/jndi-properties.jar"/>
+	<classpathentry kind="lib" path="/client_chat/lib/javax.websocket-api.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
