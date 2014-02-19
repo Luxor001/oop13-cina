@@ -14,6 +14,9 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -26,6 +29,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.text.DefaultCaret;
+
+/* SFX Used in this Class:
+ * -Snap: for plain text notifications. Creative commons 0 license. 
+ *   http://www.freesound.org/people/Nmb910/sounds/164079/ 
+ *  
+ * -Request: for request (file, private chat) notifications. Attribution License.
+ 	 http://www.freesound.org/people/cameronmusic/sounds/138413/
+ * */
 
 public class View extends JFrame implements ViewInterface {
 
@@ -182,6 +193,8 @@ public class View extends JFrame implements ViewInterface {
 		int index = checkTab(title);
 
 		if (index != getTabIndex() && index != -1) {
+			
+			
 			Toolkit.getDefaultToolkit().beep();
 		}
 
@@ -194,7 +207,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	public void showMessageMain(String Message) {
-		chatList.get(0).append("\n" + Message);
+		chatList.get(0).append(Message+"\n");
 	}
 
 	private void setAction() {
@@ -236,7 +249,6 @@ public class View extends JFrame implements ViewInterface {
 			}
 		};
 	}
-
 	private KeyListener getKeyListener() {
 		return new KeyListener() {
 
@@ -245,8 +257,12 @@ public class View extends JFrame implements ViewInterface {
 
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					
 					e.consume(); // ignore the key pressed
-					controller.commandSendMessage();
+					if(!textList.get(getTabIndex()).getText().trim().isEmpty()){
+						controller.commandSendMessage();					
+					}
+					
 				}
 			}
 
@@ -323,6 +339,18 @@ public class View extends JFrame implements ViewInterface {
 		return found;
 	}
 
+	public void playSound(){
+		 try {
+		        Clip clip = AudioSystem.getClip();
+		        AudioInputStream inputStream = AudioSystem.getAudioInputStream(
+		          Application.class.getResourceAsStream("resources/sfx/request.mp3"));
+		        clip.open(inputStream);
+		        clip.start(); 
+		      } catch (Exception e) {
+		        System.err.println(e.getMessage());
+		      }
+	}
+	
 	/* needed to intercept the action of closing window */
 
 	class CustomWindowAdapter extends WindowAdapter {

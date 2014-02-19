@@ -16,6 +16,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.websocket.ClientEndpoint;
@@ -154,6 +157,7 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDPRIVATECHAT) {
 
+		
 			String surl = "http://vallentinsource.com/globalip.php";
 			URL url = new URL(surl);
 			InputStreamReader inpstrmread = new InputStreamReader(
