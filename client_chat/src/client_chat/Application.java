@@ -24,22 +24,25 @@ public class Application {
 
 				connectionResult result = null;
 				int userchoice = 0;
-				splash.setVisibilityLoadingCircle(true);
 
 				do {
+
+					splash.setVisibilityLoadingCircle(true);
 					try {
 						result = web.AttemptConnection();
 					} catch (IOException e) {
 					}
+					
+					if (result == connectionResult.TIMEOUT && userchoice == 0){
 
-					if (result == connectionResult.TIMEOUT && userchoice == 0)
+						splash.setVisibilityLoadingCircle(false);
 						userchoice = splash.buildChoiceMessageBox(
 								"Chat Channel is not responding,"
 										+ "\nconnection failed",
 								"Connection Failed", new Object[] {
 										"Reconnect", "Cancel" },
 								JOptionPane.ERROR_MESSAGE);
-
+					}
 				} while ((result == connectionResult.TIMEOUT && userchoice == 0));
 
 				if (result == connectionResult.OK) {
