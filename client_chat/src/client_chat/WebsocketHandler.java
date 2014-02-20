@@ -33,6 +33,7 @@ import javax.websocket.Session;
 import org.glassfish.tyrus.client.ClientManager;
 
 import client_chat.ChatMessage.Type;
+import client_chat.Controller.MessageBoxReason;
 import client_chat.Model.connectionResult;
 
 @ClientEndpoint(encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
@@ -166,15 +167,13 @@ public class WebsocketHandler {
 			String ip = reader.readLine();
 			/* ## GOT IP (store to private static variable?) ## */
 
-			System.out.println("MINE IP IS " + ip);
+			
 
 			// BISOGNA CONTROLLARE SE QUESTI JOPTIONPANE NON FERMANO IL THREAD.
 			String senderNick = message.getAdditionalParams().getNickname();
-			int choice = WebsocketHandler.controller.buildChoiceMessageBox(
-					"User " + senderNick
-							+ "wants to have a private chat with you",
-					"Private Chat", new Object[] { "Yes", "No Way!" },
-					JOptionPane.WARNING_MESSAGE);
+			int choice = WebsocketHandler.controller.
+					buildChoiceMessageBox(MessageBoxReason.REQUEST_PRIVATE_CHAT,senderNick);
+
 
 			ChatMessage msg;
 			if (choice == 0) {
@@ -223,10 +222,7 @@ public class WebsocketHandler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
-			System.out.println("IP TO CONNECT:"
-					+ message.getAdditionalParams().getIP());
-			/* ##CONNECT TO IP## */
+			
 			controller.commandCreateTab(iptoconnect, name + "ServerKey.jks");
 		}
 	}
@@ -270,7 +266,7 @@ public class WebsocketHandler {
 		/* Attemp connection to web service */
 		try {
 			client.connectToServer(this, null, new URI(
-					"ws://79.42.240.180:8080/ServerWebSocket/websocket"));
+					"ws://localhost:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));

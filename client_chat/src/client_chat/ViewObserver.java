@@ -25,6 +25,6 @@ public interface ViewObserver {
 
 	void notifyChatUser() throws IOException, EncodeException;
 
-	public int buildChoiceMessageBox(String Message, String title,
-			Object[] options, int IconType);
+	public int buildChoiceMessageBox(Controller.MessageBoxReason reason,String optsender);
+
 }

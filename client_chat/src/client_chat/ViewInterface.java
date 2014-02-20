@@ -2,6 +2,8 @@ package client_chat;
 
 import java.awt.event.ActionEvent;
 
+import client_chat.View.sfx;
+
 public interface ViewInterface {
 
     void attachViewObserver(ViewObserver controller);
@@ -28,4 +30,6 @@ public interface ViewInterface {
     void appendUser(String user);
 
     boolean removeUser(String user);
+    
+    public void playSound(sfx soundeffect);
 }
