@@ -23,6 +23,7 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 		String Message = jsonObject.getString("Message"); // gets the textual
 															// message.
 
+		System.out.println("Message Received "+Type);
 		ChatMessage message = new ChatMessage(Message,
 				ChatMessage.Type.valueOf(Type));
 

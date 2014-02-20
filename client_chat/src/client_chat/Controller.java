@@ -3,15 +3,22 @@ package client_chat;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 
+import javax.swing.JOptionPane;
 import javax.websocket.EncodeException;
 
 import client_chat.ChatMessage.Type;
+import client_chat.View.sfx;
 
 public class Controller implements ViewObserver {
 
 	private ViewInterface view;
 	private ModelInterface model;
 
+	public enum MessageBoxReason{
+		REQUEST_PRIVATE_CHAT,
+		REQUEST_RECEIVE_FILE,
+		ALERT_CLOSING_WINDOW
+	}
 	public Controller() {
 	}
 
@@ -92,13 +99,49 @@ public class Controller implements ViewObserver {
 				new ChatMessage("Closing", Type.DISCONNECTING));
 	}
 
-	public int buildChoiceMessageBox(String Message, String title,
-			Object[] options, int IconType) {
-		return view.buildChoiceMessageBox(Message, title, options, IconType);
+	public int buildChoiceMessageBox(MessageBoxReason reason,String optsender) {
+		String message="";
+		String title="";
+		Object [] options=null;
+		int iconType=0;
+		
+		switch (reason) {
+		case REQUEST_PRIVATE_CHAT:{
+			message="User " + optsender
+					+ "wants to have a private chat with you";
+			title="Private Chat";
+			options= new Object[] { "Yes", "No Way!" };
+			iconType=JOptionPane.WARNING_MESSAGE;
+			view.playSound(sfx.REQUEST);
+			break;
+		}
+		
+		
+		case REQUEST_RECEIVE_FILE:{
+			message="User " + optsender
+				+ "wants to send you a file";	
+			title="Receiving File";
+			options= new Object[] { "Yes", "No Way!" };
+			iconType=JOptionPane.WARNING_MESSAGE;
+			view.playSound(sfx.REQUEST);
+			break;			
+		}
+
+		case ALERT_CLOSING_WINDOW:{
+			message="Are you sure you to close cryptochat?\n all opened connections will be lost!";
+			title="Are you sure?";
+			options= new Object[] { "Yes", "No Way!" };
+			iconType=JOptionPane.WARNING_MESSAGE;
+			break;			
+		}
+		}
+		
+		return view.buildChoiceMessageBox(message, title, options, iconType);
 	}
 
 	public synchronized void notifyChatUser() throws IOException,
 			EncodeException {
+
 
 		String ip = model.exist(view.getTitle());
 		if (ip == null) {
@@ -107,7 +150,7 @@ public class Controller implements ViewObserver {
 			ChatMessage.Param params = new ChatMessage.Param();
 			params.setNickname(view.getTitle());
 			message.setAdditionalParams(params);
-			this.model.getSocketHandler().SendMex(message);
+			WebsocketHandler.getWebSocketHandler().SendMex(message);
 		} else {
 			commandCreateTab(ip, view.getTitle() + "ServerKey.jks");
 		}

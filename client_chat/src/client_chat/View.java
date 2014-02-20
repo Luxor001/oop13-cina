@@ -11,6 +11,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +48,11 @@ public class View extends JFrame implements ViewInterface {
 	final private static int HGAP = 10;
 	final private static int VGAP = 10;
 	private ViewObserver controller;
+	
+	public enum sfx{
+		REQUEST,
+		PLAIN_TEXT
+	}
 
 	// create Tabview
 	JTabbedPane tabView = new JTabbedPane();
@@ -212,7 +219,6 @@ public class View extends JFrame implements ViewInterface {
 
 	private void setAction() {
 		enter.addActionListener(getActionListener());
-
 		usersJList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
@@ -339,16 +345,31 @@ public class View extends JFrame implements ViewInterface {
 		return found;
 	}
 
-	public void playSound(){
-		 try {
-		        Clip clip = AudioSystem.getClip();
-		        AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-		          Application.class.getResourceAsStream("resources/sfx/request.mp3"));
-		        clip.open(inputStream);
-		        clip.start(); 
-		      } catch (Exception e) {
-		        System.err.println(e.getMessage());
-		      }
+	public void playSound(sfx soundeffect) {
+		String path = "";
+
+		switch (soundeffect) {
+		case REQUEST:
+			path = "resources/sfx/request.wav";
+			break;
+
+		case PLAIN_TEXT:
+			path = "resources/sfx/plain.wav";
+			break;
+		}
+
+		try {
+
+			AudioInputStream audioIn = AudioSystem
+					.getAudioInputStream(new File(path));
+			// Get a sound clip resource.
+			Clip clip = AudioSystem.getClip();
+			// Open audio clip and load samples from the audio input stream.
+			clip.open(audioIn);
+			clip.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/* needed to intercept the action of closing window */
