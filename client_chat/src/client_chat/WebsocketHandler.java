@@ -1,7 +1,5 @@
 package client_chat;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,11 +14,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
 import javax.websocket.DeploymentException;
@@ -38,26 +31,26 @@ import client_chat.Model.connectionResult;
 
 @ClientEndpoint(encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
 public class WebsocketHandler {
-	
-	/*Let's make this a sigleton class, shall we?*/
-	private final static WebsocketHandler wshandler=new WebsocketHandler();	
-	
-	
+
+	/* Let's make this a sigleton class, shall we? */
+	private final static WebsocketHandler wshandler = new WebsocketHandler();
+
 	static Session ClientSession;
 	private static Controller controller;
 	public static String DEBUG_NICKNAME = System.getProperty("user.name");// "Lux"
 																			// +
 																			// Math.random();
-	
+
 	public final static Object monitor = 1;
 
-	private WebsocketHandler(){
-		
+	private WebsocketHandler() {
+
 	}
-	
-	public static WebsocketHandler getWebSocketHandler(){
+
+	public static WebsocketHandler getWebSocketHandler() {
 		return wshandler;
 	}
+
 	/**
 	 * Method run at the successful connection beetween Client & Server
 	 * 
@@ -158,7 +151,6 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDPRIVATECHAT) {
 
-		
 			String surl = "http://vallentinsource.com/globalip.php";
 			URL url = new URL(surl);
 			InputStreamReader inpstrmread = new InputStreamReader(
@@ -167,13 +159,10 @@ public class WebsocketHandler {
 			String ip = reader.readLine();
 			/* ## GOT IP (store to private static variable?) ## */
 
-			
-
 			// BISOGNA CONTROLLARE SE QUESTI JOPTIONPANE NON FERMANO IL THREAD.
 			String senderNick = message.getAdditionalParams().getNickname();
-			int choice = WebsocketHandler.controller.
-					buildChoiceMessageBox(MessageBoxReason.REQUEST_PRIVATE_CHAT,senderNick);
-
+			int choice = WebsocketHandler.controller.buildChoiceMessageBox(
+					MessageBoxReason.REQUEST_PRIVATE_CHAT, senderNick);
 
 			ChatMessage msg;
 			if (choice == 0) {
@@ -187,12 +176,12 @@ public class WebsocketHandler {
 		}
 
 		if (message.getType() == Type.YESPRIVATECHAT) {
-			/*IP to connect on private chat*/
-			String iptoconnect = message.getAdditionalParams().getIP(); 
+			/* IP to connect on private chat */
+			String iptoconnect = message.getAdditionalParams().getIP();
 			Socket socket = new Socket(iptoconnect, 9998);
 
-			File file = new File(System.getProperty("user.name")
-					+ "ServerKey.jks");
+			File file = new File(System.getProperty("user.dir") + "/"
+					+ System.getProperty("user.name") + "ServerKey.jks");
 			String name = "";
 			try {
 
@@ -208,11 +197,13 @@ public class WebsocketHandler {
 				byte[] buffer = new byte[10240];
 				fileStream.read(buffer);
 				oos.write(buffer);
-				FileOutputStream outStream = new FileOutputStream(name
-						+ "ServerKey.jks");
+				File receivedFile = new File(System.getProperty("user.dir")
+						+ "/" + name + "ServerKey.jks");
+				receivedFile.createNewFile();
+				FileOutputStream outStream = new FileOutputStream(receivedFile);
 
 				byte[] bufferReader = new byte[10240];
-				ois.readFully(buffer);
+				ois.readFully(bufferReader);
 				outStream.write(bufferReader);
 				oos.close();
 				ois.close();
@@ -222,7 +213,7 @@ public class WebsocketHandler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 			controller.commandCreateTab(iptoconnect, name + "ServerKey.jks");
 		}
 	}
@@ -266,7 +257,7 @@ public class WebsocketHandler {
 		/* Attemp connection to web service */
 		try {
 			client.connectToServer(this, null, new URI(
-					"ws://localhost:8080/ServerWebSocket/websocket"));
+					"ws://79.32.190.112:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));

@@ -26,8 +26,7 @@ public class KeyStoreServer extends Thread {
 	public void Run() {
 		while (true) {
 			try {
-				Socket socket = serverSocket.accept();
-				new TransferKeyStore(socket).start();
+				new TransferKeyStore(serverSocket.accept()).start();
 			} catch (IOException e) {
 			}
 		}
@@ -50,8 +49,8 @@ public class KeyStoreServer extends Thread {
 
 		public void run() {
 
-			File file = new File(System.getProperty("user.name")
-					+ "ServerKey.jks");
+			File file = new File(System.getProperty("user.dir") + "/"
+					+ System.getProperty("user.name") + "ServerKey.jks");
 			try {
 				oos.writeUTF(System.getProperty("user.name"));
 				oos.flush();
@@ -60,8 +59,11 @@ public class KeyStoreServer extends Thread {
 				byte[] buffer = new byte[10240];
 				fileStream.read(buffer);
 				oos.write(buffer);
-				FileOutputStream outStream = new FileOutputStream(name
-						+ "ServerKey.jks");
+
+				File receivedFile = new File(System.getProperty("user.dir")
+						+ "/" + name + "ServerKey.jks");
+				receivedFile.createNewFile();
+				FileOutputStream outStream = new FileOutputStream(receivedFile);
 
 				byte[] bufferReader = new byte[10240];
 				ois.readFully(buffer);
