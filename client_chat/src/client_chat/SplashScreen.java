@@ -86,7 +86,9 @@ public class SplashScreen {
 		txt_nickname.setSize(txt_nickname.getSize().width,
 				txt_nickname.getSize().height + 5);
 		txt_nickname.setLocation(CenteredX(txt_nickname), centerscaling);
-		txt_nickname.setText("DEBUG_NICK" + (Math.round(Math.random() * 10)));
+		txt_nickname.setText(System.getProperty("user.name"));
+		// txt_nickname.setText("DEBUG_NICK" + (Math.round(Math.random() *
+		// 10)));
 		centerscaling += 20;
 		Border border = BorderFactory.createLineBorder(Color.BLACK);
 		txt_nickname.setBorder(border);
@@ -130,24 +132,21 @@ public class SplashScreen {
 			}
 		});
 
-		
-		JButton BUTTON_DELETEME=new JButton("Test, Delete me!");
+		JButton BUTTON_DELETEME = new JButton("Test, Delete me!");
 		BUTTON_DELETEME.setSize(BUTTON_DELETEME.getPreferredSize());
-		BUTTON_DELETEME.setLocation(20,340);
+		BUTTON_DELETEME.setLocation(20, 340);
 		BUTTON_DELETEME.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Credits c=new Credits();
-				
+				Credits c = new Credits();
+
 			}
 		});
-		
+
 		pnl_main.add(BUTTON_DELETEME);
-		
+
 		frame.setResizable(false);
 		frame.setVisible(true);
-		
-		
 
 	}
 

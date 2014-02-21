@@ -33,8 +33,9 @@ public class Server implements Runnable {
 		try {
 
 			KeyStore serverKeys = KeyStore.getInstance("JKS");
-			serverKeys.load(new FileInputStream(System.getProperty("user.name")
-					+ "ServerKey.jks"), null);
+			serverKeys.load(new FileInputStream(System.getProperty("user.dir")
+					+ "/" + System.getProperty("user.name") + "ServerKey.jks"),
+					null);
 
 			KeyManagerFactory serverKeyManager = KeyManagerFactory
 					.getInstance("SunX509");

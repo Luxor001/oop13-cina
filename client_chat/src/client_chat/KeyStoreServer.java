@@ -23,7 +23,7 @@ public class KeyStoreServer extends Thread {
 		new Thread(this).start();
 	}
 
-	public void Run() {
+	public void run() {
 		while (true) {
 			try {
 				new TransferKeyStore(serverSocket.accept()).start();
@@ -38,13 +38,9 @@ public class KeyStoreServer extends Thread {
 		private ObjectOutputStream oos = null;
 
 		public TransferKeyStore(Socket socket) {
+			System.out.println("CIao");
 			this.socket = socket;
-			try {
-				ois = new ObjectInputStream(socket.getInputStream());
-				oos = new ObjectOutputStream(socket.getOutputStream());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
 		}
 
 		public void run() {
@@ -52,16 +48,24 @@ public class KeyStoreServer extends Thread {
 			File file = new File(System.getProperty("user.dir") + "/"
 					+ System.getProperty("user.name") + "ServerKey.jks");
 			try {
+
+				ois = new ObjectInputStream(socket.getInputStream());
+				oos = new ObjectOutputStream(socket.getOutputStream());
 				oos.writeUTF(System.getProperty("user.name"));
 				oos.flush();
+				System.out.println("Invio file");
 				String name = ois.readUTF();
 				FileInputStream fileStream = new FileInputStream(file);
 				byte[] buffer = new byte[10240];
 				fileStream.read(buffer);
 				oos.write(buffer);
 
-				File receivedFile = new File(System.getProperty("user.dir")
-						+ "/" + name + "ServerKey.jks");
+				File receivedFile = new File("C:/Users/Francesco" + "/" + name
+						+ "ServerKey.jks");
+				/*
+				 * File receivedFile = new File(System.getProperty("user.dir") +
+				 * "/" + name + "ServerKey.jks");
+				 */
 				receivedFile.createNewFile();
 				FileOutputStream outStream = new FileOutputStream(receivedFile);
 
@@ -73,6 +77,8 @@ public class KeyStoreServer extends Thread {
 				socket.close();
 				fileStream.close();
 				outStream.close();
+
+				System.out.println("File inviato");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
