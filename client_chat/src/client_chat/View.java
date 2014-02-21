@@ -32,8 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
+import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
 
 /* SFX Used in this Class:
@@ -41,7 +40,7 @@ import javax.swing.text.DefaultCaret;
  *   http://www.freesound.org/people/Nmb910/sounds/164079/ 
  *  
  * -Request: for request (file, private chat) notifications. Attribution License.
- 	 http://www.freesound.org/people/cameronmusic/sounds/138413/
+ http://www.freesound.org/people/cameronmusic/sounds/138413/
  * */
 
 public class View extends JFrame implements ViewInterface {
@@ -52,10 +51,9 @@ public class View extends JFrame implements ViewInterface {
 	final private static int HGAP = 10;
 	final private static int VGAP = 10;
 	private ViewObserver controller;
-	
-	public enum sfx{
-		REQUEST,
-		PLAIN_TEXT
+
+	public enum sfx {
+		REQUEST, PLAIN_TEXT
 	}
 
 	// create Tabview
@@ -204,8 +202,7 @@ public class View extends JFrame implements ViewInterface {
 		int index = checkTab(title);
 
 		if (index != getTabIndex() && index != -1) {
-			
-			
+
 			Toolkit.getDefaultToolkit().beep();
 		}
 
@@ -218,7 +215,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	public void showMessageMain(String Message) {
-		chatList.get(0).append(Message+"\n");
+		chatList.get(0).append(Message + "\n");
 	}
 
 	private void setAction() {
@@ -226,11 +223,11 @@ public class View extends JFrame implements ViewInterface {
 		usersJList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
-					
-					/*check if tab with user already exist..*/
+
+					/* check if tab with user already exist.. */
 					int index = checkTab(getTitle());
-					if (index == -1) { //if not..
-							
+					if (index == -1) { // if not..
+
 						try {
 							controller.notifyChatUser();
 						} catch (Exception e1) {
@@ -241,14 +238,21 @@ public class View extends JFrame implements ViewInterface {
 						tabView.setSelectedIndex(index);
 					}
 				}
-				if(e.isMetaDown()){
-					PopUpDemo a=new PopUpDemo();
-					int sIndex=usersJList.getSelectedIndex();
-					Rectangle rSelection=usersJList.getCellBounds(sIndex, sIndex+1);
-					/*centerx allows to have a small offset*/
-					a.doPop(e,(int) rSelection.getCenterX(), rSelection.y);	
-					
-				}			
+
+				// check if i click with righ mouse button
+				if (SwingUtilities.isRightMouseButton(e) && e.isMetaDown()
+						&& e.getClickCount() == 1) {
+
+					PopUpDemo a = new PopUpDemo();
+
+					int sIndex = usersJList.locationToIndex(e.getPoint());
+					usersJList.setSelectedIndex(sIndex);
+
+					Rectangle rSelection = usersJList.getCellBounds(sIndex,
+							sIndex + 1);
+					// centerx allows to have a small offset
+					a.doPop(e, (int) rSelection.getCenterX(), rSelection.y);
+				}
 			}
 		});
 
@@ -268,6 +272,7 @@ public class View extends JFrame implements ViewInterface {
 			}
 		};
 	}
+
 	private KeyListener getKeyListener() {
 		return new KeyListener() {
 
@@ -276,12 +281,12 @@ public class View extends JFrame implements ViewInterface {
 
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					
+
 					e.consume(); // ignore the key pressed
-					if(!textList.get(getTabIndex()).getText().trim().isEmpty()){
-						controller.commandSendMessage();					
+					if (!textList.get(getTabIndex()).getText().trim().isEmpty()) {
+						controller.commandSendMessage();
 					}
-					
+
 				}
 			}
 
@@ -384,7 +389,7 @@ public class View extends JFrame implements ViewInterface {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/* needed to intercept the action of closing window */
 
 	class CustomWindowAdapter extends WindowAdapter {
@@ -408,57 +413,60 @@ public class View extends JFrame implements ViewInterface {
 			System.exit(0);
 		}
 	}
-	
-	class PopUpDemo extends JPopupMenu {
-	    private JMenuItem anItem;
-	    public PopUpDemo(){
-	        anItem = new JMenuItem("Private Chat (ssl)");
-	        add(anItem);
-	        anItem.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					//View.This.notify()
-					System.out.println("Clicked Private Chat!");
-					
-				}
-			});
-	        anItem = new JMenuItem("Send File");
-	        add(anItem);
-	        anItem.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					//View.This.notify()
-					System.out.println("Clicked Send File!");
-					
-				}
-			});
-	        anItem = new JMenuItem("Poke");
-	        add(anItem);       
-	        anItem.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					//View.This.notify()
-					System.out.println("Clicked Poke!");
-					
-				}
-			});
-	    }
-	    
-	    public void doPop(MouseEvent e,int x, int y){
 
-	   /* 	this.setInvoker(e.getComponent());
-	    	this.setLocation(x, y);
-	    	this.setSize(this.getPreferredSize());
-	    	this.setVisible(true);*/
-	   	this.show(e.getComponent(), x, y);
-	    	
-	     /*   PopUpDemo menu = new PopUpDemo();
-	        menu.show(e.getComponent(), x, y);*/
-	        
-	    }
+	class PopUpDemo extends JPopupMenu {
+		private JMenuItem anItem;
+
+		public PopUpDemo() {
+			anItem = new JMenuItem("Private Chat (ssl)");
+			add(anItem);
+			anItem.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// View.This.notify()
+					System.out.println("Clicked Private Chat!");
+
+				}
+			});
+			anItem = new JMenuItem("Send File");
+			add(anItem);
+			anItem.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// View.This.notify()
+					System.out.println("Clicked Send File!");
+
+				}
+			});
+			anItem = new JMenuItem("Poke");
+			add(anItem);
+			anItem.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// View.This.notify()
+					System.out.println("Clicked Poke!");
+
+				}
+			});
+		}
+
+		public void doPop(MouseEvent e, int x, int y) {
+
+			/*
+			 * this.setInvoker(e.getComponent()); this.setLocation(x, y);
+			 * this.setSize(this.getPreferredSize()); this.setVisible(true);
+			 */
+			this.show(e.getComponent(), x, y);
+
+			/*
+			 * PopUpDemo menu = new PopUpDemo(); menu.show(e.getComponent(), x,
+			 * y);
+			 */
+
+		}
 	}
 
 }

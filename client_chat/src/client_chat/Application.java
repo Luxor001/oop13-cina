@@ -18,7 +18,7 @@ public class Application {
 
 	public static void chat_initialization() throws IOException {
 
-		web=WebsocketHandler.getWebSocketHandler();
+		web = WebsocketHandler.getWebSocketHandler();
 		new Thread() {
 			public void run() {
 
@@ -32,8 +32,8 @@ public class Application {
 						result = web.AttemptConnection();
 					} catch (IOException e) {
 					}
-					
-					if (result == connectionResult.TIMEOUT && userchoice == 0){
+
+					if (result == connectionResult.TIMEOUT && userchoice == 0) {
 
 						splash.setVisibilityLoadingCircle(false);
 						userchoice = splash.buildChoiceMessageBox(
@@ -81,7 +81,6 @@ public class Application {
 		c.setModel(m);
 
 		WebsocketHandler.setController(c);
-		
 
 		/* chat window builded, websockethandler can now list the players. */
 		synchronized (WebsocketHandler.monitor) {
