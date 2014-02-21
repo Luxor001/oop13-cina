@@ -2,6 +2,7 @@ package client_chat;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +13,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +24,16 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.text.DefaultCaret;
 
 /* SFX Used in this Class:
@@ -222,9 +226,11 @@ public class View extends JFrame implements ViewInterface {
 		usersJList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
+					
+					/*check if tab with user already exist..*/
 					int index = checkTab(getTitle());
-					if (index == -1) {
-
+					if (index == -1) { //if not..
+							
 						try {
 							controller.notifyChatUser();
 						} catch (Exception e1) {
@@ -235,7 +241,14 @@ public class View extends JFrame implements ViewInterface {
 						tabView.setSelectedIndex(index);
 					}
 				}
-
+				if(e.isMetaDown()){
+					PopUpDemo a=new PopUpDemo();
+					int sIndex=usersJList.getSelectedIndex();
+					Rectangle rSelection=usersJList.getCellBounds(sIndex, sIndex+1);
+					/*centerx allows to have a small offset*/
+					a.doPop(e,(int) rSelection.getCenterX(), rSelection.y);	
+					
+				}			
 			}
 		});
 
@@ -394,6 +407,58 @@ public class View extends JFrame implements ViewInterface {
 
 			System.exit(0);
 		}
+	}
+	
+	class PopUpDemo extends JPopupMenu {
+	    private JMenuItem anItem;
+	    public PopUpDemo(){
+	        anItem = new JMenuItem("Private Chat (ssl)");
+	        add(anItem);
+	        anItem.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					//View.This.notify()
+					System.out.println("Clicked Private Chat!");
+					
+				}
+			});
+	        anItem = new JMenuItem("Send File");
+	        add(anItem);
+	        anItem.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					//View.This.notify()
+					System.out.println("Clicked Send File!");
+					
+				}
+			});
+	        anItem = new JMenuItem("Poke");
+	        add(anItem);       
+	        anItem.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					//View.This.notify()
+					System.out.println("Clicked Poke!");
+					
+				}
+			});
+	    }
+	    
+	    public void doPop(MouseEvent e,int x, int y){
+
+	   /* 	this.setInvoker(e.getComponent());
+	    	this.setLocation(x, y);
+	    	this.setSize(this.getPreferredSize());
+	    	this.setVisible(true);*/
+	   	this.show(e.getComponent(), x, y);
+	    	
+	     /*   PopUpDemo menu = new PopUpDemo();
+	        menu.show(e.getComponent(), x, y);*/
+	        
+	    }
 	}
 
 }
