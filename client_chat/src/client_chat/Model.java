@@ -1,6 +1,8 @@
 package client_chat;
 
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +27,9 @@ public class Model implements ModelInterface {
 			// if (server != null) {
 			if (!server.sendMessage(message, name)) {
 				if (!client.sendMessage(message, name)) {
-					connectToServer(peopleChat.get(name).substring(1), name
-							+ "ServerKey.jks");
+					connectToServer(peopleChat.get(name).substring(1),
+							System.getProperty("user.dir") + "/" + name
+									+ "ServerKey.jks");
 					client.sendMessage(message, name);
 				}
 			}
@@ -65,9 +68,8 @@ public class Model implements ModelInterface {
 	}
 
 	public void closeAll() {
-/*
 		client.close();
-		server.close();*/
+		server.close();
 	}
 
 	public synchronized void closeClient(String name) {
@@ -93,7 +95,6 @@ public class Model implements ModelInterface {
 		}
 
 		// server will be created at start of programm and pending some clients
-/*
 		try {
 			keyStoreServer = new KeyStoreServer();
 			server = new Server(controller, this);
@@ -103,13 +104,12 @@ public class Model implements ModelInterface {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 
 	}
 
-
 	private void createKeyStore(String name, String alias, String password) {
-		/*try {
+		try {
 
 			String path = System.getProperty("user.dir") + "\\" + name;
 			String nameCertificate;
@@ -156,7 +156,7 @@ public class Model implements ModelInterface {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}*/
+		}
 	}
 
 	public WebsocketHandler getSocketHandler() {

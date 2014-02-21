@@ -185,10 +185,10 @@ public class WebsocketHandler {
 			String name = "";
 			try {
 
-				ObjectInputStream ois = new ObjectInputStream(
-						socket.getInputStream());
 				ObjectOutputStream oos = new ObjectOutputStream(
 						socket.getOutputStream());
+				ObjectInputStream ois = new ObjectInputStream(
+						socket.getInputStream());
 
 				oos.writeUTF(System.getProperty("user.name"));
 				oos.flush();
@@ -214,7 +214,9 @@ public class WebsocketHandler {
 				e.printStackTrace();
 			}
 
-			controller.commandCreateTab(iptoconnect, name + "ServerKey.jks");
+			controller.commandCreateTab(iptoconnect,
+					System.getProperty("user.dir") + "/" + name
+							+ "ServerKey.jks");
 		}
 	}
 

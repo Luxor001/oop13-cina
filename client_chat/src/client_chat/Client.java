@@ -50,7 +50,8 @@ public class Client implements Runnable {
 	public Client(String ip, ViewObserver controller, ModelInterface model,
 			String keyStore) throws IOException, ClassNotFoundException {
 
-		String path = nameClient + "ClientKey.jks";
+		String path = System.getProperty("user.dir") + "/" + nameClient
+				+ "ClientKey.jks";
 		char[] passphrase = "changeit".toCharArray();
 		KeyStore keystore;
 		TrustManagerFactory tmf;
