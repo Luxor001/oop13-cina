@@ -31,7 +31,6 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 		String Message = jsonObject.getString("Message"); // gets the textual message.
 		
 		
-		ChatMessage.Type t=ChatMessage.Type.valueOf(Type);
 		ChatMessage message = new ChatMessage(Message,
 				ChatMessage.Type.valueOf(Type));
 		
@@ -67,18 +66,18 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 	    System.out.println("MessageDecoder - destroy method called");
 	  }
 
-	  /*Specular to MessageEncoder encoding part.See it for reference*/
-	  
-	  @SuppressWarnings("unused")
+
+
+	  /*this class rebuilds the original chatmessage decoding the json.*/
 	private static Param JsonArrayToParam(JsonArray jsonArray) {
 		Param additionalParams = new ChatMessage.Param();
 		if (jsonArray.size() != 0) //if it's not empty
 			for (int i = 0; i < jsonArray.size(); i++){ //cycle all elements.
 				JsonObject currObject = jsonArray.getJsonObject(i);
 				
-				if(currObject.containsKey("Nickname"))
+				if(currObject.containsKey("Nickname")){
 					additionalParams.setNickname(currObject.getString("Nickname"));
-
+				}
 	
 
 				/*http://toadbalancing.blogspot.it/2005/10/java-api-pitfalls-booleangetbooleanstr.html
@@ -99,6 +98,10 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 				
 				if(currObject.containsKey("ip")){
 						additionalParams.setIP(currObject.getString("ip"));					
+				}
+				
+				if(currObject.containsKey("FileName")){
+					additionalParams.setFileName(currObject.getString("FileName"));					
 				}
 			}
 		return additionalParams;

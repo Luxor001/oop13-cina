@@ -218,6 +218,18 @@ public class WebsocketHandler {
 					System.getProperty("user.dir") + "/" + name
 							+ "ServerKey.jks");
 		}
+		
+		if(message.getType() == Type.REQUESTEDSENDFILE){
+
+
+			String senderNick = message.getAdditionalParams().getNickname();
+			String fileName=message.getAdditionalParams().getFileName();
+			int choice = WebsocketHandler.controller.buildChoiceMessageBox(
+					MessageBoxReason.REQUEST_RECEIVE_FILE, 
+					senderNick,fileName);
+
+			System.out.println(choice);
+		}
 	}
 
 	/**
@@ -259,7 +271,7 @@ public class WebsocketHandler {
 		/* Attemp connection to web service */
 		try {
 			client.connectToServer(this, null, new URI(
-					"ws://79.32.190.112:8080/ServerWebSocket/websocket"));
+					"ws://192.168.1.3:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));

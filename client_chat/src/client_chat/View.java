@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +35,7 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
+import javax.websocket.EncodeException;
 
 /* SFX Used in this Class:
  * -Snap: for plain text notifications. Creative commons 0 license. 
@@ -424,22 +426,26 @@ public class View extends JFrame implements ViewInterface {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// View.This.notify()
-					System.out.println("Clicked Private Chat!");
-
+					try {
+						controller.notifyChatUser();
+					} catch (Exception e1) {}
 				}
 			});
+			
+			
 			anItem = new JMenuItem("Send File");
 			add(anItem);
 			anItem.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// View.This.notify()
-					System.out.println("Clicked Send File!");
-
+					try {
+						controller.notifySendFileUser();
+					} catch (Exception e1) {}
 				}
 			});
+			
+			
 			anItem = new JMenuItem("Poke");
 			add(anItem);
 			anItem.addActionListener(new ActionListener() {

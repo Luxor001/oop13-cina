@@ -99,7 +99,7 @@ public class Controller implements ViewObserver {
 				new ChatMessage("Closing", Type.DISCONNECTING));
 	}
 
-	public int buildChoiceMessageBox(MessageBoxReason reason,String optsender) {
+	public int buildChoiceMessageBox(MessageBoxReason reason,String ... optsender) {
 		String message="";
 		String title="";
 		Object [] options=null;
@@ -107,8 +107,8 @@ public class Controller implements ViewObserver {
 		
 		switch (reason) {
 		case REQUEST_PRIVATE_CHAT:{
-			message="User " + optsender
-					+ "wants to have a private chat with you";
+			message="User " + optsender[0]
+					+ " wants to have a private chat with you";
 			title="Private Chat";
 			options= new Object[] { "Yes", "No Way!" };
 			iconType=JOptionPane.WARNING_MESSAGE;
@@ -118,8 +118,8 @@ public class Controller implements ViewObserver {
 		
 		
 		case REQUEST_RECEIVE_FILE:{
-			message="User " + optsender
-				+ "wants to send you a file";	
+			message="User " + optsender[0]
+				+ " wants to send you file:"+optsender[1];	
 			title="Receiving File";
 			options= new Object[] { "Yes", "No Way!" };
 			iconType=JOptionPane.WARNING_MESSAGE;
@@ -141,8 +141,6 @@ public class Controller implements ViewObserver {
 
 	public synchronized void notifyChatUser() throws IOException,
 			EncodeException {
-
-
 		String ip = model.exist(view.getTitle());
 		if (ip == null) {
 			ChatMessage message = new ChatMessage("Connect to",
@@ -154,6 +152,18 @@ public class Controller implements ViewObserver {
 		} else {
 			commandCreateTab(ip, view.getTitle() + "ServerKey.jks");
 		}
+	}
+	
+	public synchronized void notifySendFileUser() throws IOException, EncodeException {
+
+			ChatMessage message = new ChatMessage("Connect to",
+					Type.REQUESTSENDFILE);
+			ChatMessage.Param params = new ChatMessage.Param();
+			params.setNickname(view.getTitle());
+			params.setFileName("Path"); /*##INSERT PATH HERE FOR GOD SAKE##*/
+			message.setAdditionalParams(params);
+			WebsocketHandler.getWebSocketHandler().SendMex(message);
+
 	}
 
 }

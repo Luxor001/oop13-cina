@@ -82,6 +82,10 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 				if (currObject.containsKey("ip")) {
 					additionalParams.setIP(currObject.getString("ip"));
 				}
+				
+				if(currObject.containsKey("FileName")){
+					additionalParams.setFileName(currObject.getString("FileName"));					
+				}
 			}
 		return additionalParams;
 	}
