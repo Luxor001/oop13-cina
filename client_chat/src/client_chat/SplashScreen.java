@@ -55,11 +55,12 @@ public class SplashScreen {
 		frame.getContentPane().add(pnl_main);
 
 		JLabel lbl_image = new JLabel();
-		lbl_image.setIcon(new ImageIcon("resources/prova.png"));
+		lbl_image.setIcon(new ImageIcon("resources/logo.png"));
 		lbl_image.setSize(lbl_image.getPreferredSize());
-		lbl_image.setLocation(CenteredX(lbl_image), 20);
+		lbl_image.setLocation(CenteredX(lbl_image)+5, 0);
 		pnl_main.add(lbl_image);
 
+		centerscaling += 20;
 		channelist = new DefaultComboBoxModel<String>();
 		channelist.addElement("longname");
 		channelist.addElement("main");
