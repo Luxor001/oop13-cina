@@ -18,7 +18,9 @@ public class ChatMessage {
 		REQUESTEDPRIVATECHAT,
 		YESPRIVATECHAT,
 		NOPRIVATECHAT,
-		NICKNAMEUNAVAIABLE
+		NICKNAMEUNAVAIABLE,
+		REQUESTSENDFILE,
+		REQUESTEDSENDFILE
 	}
 
 
@@ -88,6 +90,7 @@ public class ChatMessage {
 		private Boolean visibility;
 		private ArrayList<String> usersList=new ArrayList<String>();
 		private String ip;
+		private String fileName;
 			
 		public Param(){
 			
@@ -95,8 +98,12 @@ public class ChatMessage {
 		
 		public void setNickname(String Nick){
 			nickname=Nick;
+		}		
+
+		public void setFileName(String fileName){
+			this.fileName=fileName;
 		}
-		
+
 		public void SetVisibility(Boolean visible){
 			visibility=visible;
 		}		
@@ -120,8 +127,13 @@ public class ChatMessage {
 		public String getNickname(){
 			return nickname;
 		}
+		
 		public void appendUser(String UserNickname){
 			usersList.add(UserNickname);
 		}	
+
+		public String getFileName(){
+			return fileName;
+		}
 	}
 }

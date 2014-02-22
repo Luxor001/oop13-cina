@@ -120,11 +120,21 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			sendGlobalMex(message,clientsession);
 		}
 		
-		if(message.getType() == Type.REQUESTPRIVATECHAT){
+		if(message.getType() == Type.REQUESTPRIVATECHAT
+				| message.getType() == Type.REQUESTSENDFILE){
 			String SenderNickname=searchUser(clientsession).GetNickname();	/*Sender*/
 			User Targetusr=searchUser(message.getAdditionalParams().getNickname()); /*Target*/
 			
-			ChatMessage cmessage=new ChatMessage("respond",Type.REQUESTEDPRIVATECHAT);
+			ChatMessage cmessage;
+			if(message.getType() == Type.REQUESTSENDFILE){
+				cmessage=new ChatMessage("respond",Type.REQUESTEDSENDFILE);
+				cmessage.getAdditionalParams().setFileName(
+						message.getAdditionalParams().getFileName());
+			}
+			else{
+				cmessage=new ChatMessage("respond",Type.REQUESTEDPRIVATECHAT);
+			}
+			
 			cmessage.getAdditionalParams().setNickname(SenderNickname);
 			sendMex(cmessage, Targetusr.GetSession());
 		}
@@ -140,6 +150,7 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			cmessage.getAdditionalParams().setIP(message.getAdditionalParams().getIP());
 			sendMex(cmessage,Targetusr.GetSession());
 		}
+		
 			
 	}
 

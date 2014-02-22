@@ -68,8 +68,12 @@ public class Model implements ModelInterface {
 	}
 
 	public void closeAll() {
-		client.close();
-		server.close();
+		try {
+			client.close();
+			server.close();
+		} catch (Exception e) {
+
+		}
 	}
 
 	public synchronized void closeClient(String name) {

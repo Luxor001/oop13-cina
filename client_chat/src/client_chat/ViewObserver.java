@@ -24,7 +24,9 @@ public interface ViewObserver {
 	void notifyClosing() throws IOException, EncodeException;
 
 	void notifyChatUser() throws IOException, EncodeException;
+	
+	void notifySendFileUser() throws IOException, EncodeException;
 
-	public int buildChoiceMessageBox(Controller.MessageBoxReason reason,String optsender);
+	public int buildChoiceMessageBox(Controller.MessageBoxReason reason,String ... optsender);
 
 }

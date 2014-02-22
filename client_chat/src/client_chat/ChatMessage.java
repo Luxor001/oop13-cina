@@ -19,10 +19,19 @@ public class ChatMessage {
 		INITIALIZE, /* Used to Registry a new user to the channel */
 		CONNECTIONGRANTED, TEXT, /* Duh. */
 		NEWUSER, /* Needed to tell to server there's a new boy in town */
-		USERDISCONNECTED, USERLIST, DISCONNECTING, REQUESTPRIVATECHAT, REQUESTEDPRIVATECHAT, YESPRIVATECHAT, NOPRIVATECHAT, NICKNAMEUNAVAIABLE
+		USERDISCONNECTED, 
+		USERLIST,
+		DISCONNECTING, 
+		REQUESTPRIVATECHAT, 
+		REQUESTEDPRIVATECHAT, 
+		YESPRIVATECHAT, 
+		NOPRIVATECHAT, 
+		NICKNAMEUNAVAIABLE,
+		REQUESTSENDFILE,
+		REQUESTEDSENDFILE
 	}
 
-	private Param additionalParams;// =new Param();
+	private Param additionalParams;
 	private Type messageType;
 	private String message;
 
@@ -96,6 +105,7 @@ public class ChatMessage {
 		private Boolean visibility;
 		private ArrayList<String> usersList = new ArrayList<String>();
 		private String ip;
+		private String fileName;
 
 		public Param() {
 
@@ -103,12 +113,16 @@ public class ChatMessage {
 
 		/*
 		 * ricoradrsi di specificare che il nickname in questi parametri
-		 * addizionali è usato SOLO per il primo avvio. Dopo la faccenda dei
-		 * nickname sarà gestita SOLO dal webserver: sarà lui a inserirlo, per
+		 * addizionali ï¿½ usato SOLO per il primo avvio. Dopo la faccenda dei
+		 * nickname sarï¿½ gestita SOLO dal webserver: sarï¿½ lui a inserirlo, per
 		 * un motivo di sicurezza.
 		 */
 		public void setNickname(String Nick) {
 			nickname = Nick;
+		}
+		
+		public void setFileName(String fileName){
+			this.fileName=fileName;
 		}
 
 		public String getNickname() {
@@ -117,7 +131,7 @@ public class ChatMessage {
 
 		public void SetVisibility(Boolean visible) {
 			visibility = visible;
-			;
+			
 		}
 
 		public void setIP(String ip) {
@@ -138,6 +152,10 @@ public class ChatMessage {
 
 		public String getIP() {
 			return ip;
+		}
+		
+		public String getFileName(){
+			return fileName;
 		}
 	}
 }

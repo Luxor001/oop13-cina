@@ -75,6 +75,14 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 			return builder.build();
 			
 		}
+		
+		if(message.getType() == ChatMessage.Type.REQUESTEDSENDFILE){
+			builder.add(Json.createObjectBuilder().add("Nickname",
+					param.getNickname()));
+			builder.add(Json.createObjectBuilder().add("FileName",
+					param.getFileName()));
+			return builder.build();		
+		}
 
 		builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
 		builder.add(Json.createObjectBuilder().add("Visibility",param.getVisibility().toString()));				
