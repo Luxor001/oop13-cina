@@ -1,13 +1,17 @@
 package client_chat;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -72,29 +76,13 @@ public class Server implements Runnable {
 
 				client.get(client.size() - 1).start();
 
-				// SEND FILE
-				/*
-				 * client.get(client.size() - 1).sendMessage("Paperino"); File
-				 * file = new File( "F:\\Radioactive.mp3"); long fileSize =
-				 * file.length(); long completed = 0; int step = 150000; long
-				 * size = fileSize; System.out.println("File sending");
-				 * FileInputStream fileStream = new FileInputStream(file);
-				 * byte[] buffer = new byte[step]; while (completed < fileSize)
-				 * { size -= step; int oldstep=step; if (size < 0) { step =
-				 * (int) (size + step); } fileStream.read(buffer);
-				 * client.get(client.size() - 1).sendMessage(buffer, step);
-				 * completed += oldstep; }
-				 * 
-				 * fileStream.close(); System.out.println("File Send");
-				 */
-				// SEND FILE
 			} catch (IOException e1) {
 			}
 		}
 
 	}
 
-	public synchronized boolean sendMessage(String message, String name) {
+	public boolean sendMessage(String message, String name) {
 
 		for (int i = 0; i < client.size(); i++) {
 			if (!client.get(i).isClosed() && client.get(i).isConnected()
@@ -106,6 +94,22 @@ public class Server implements Runnable {
 					e.printStackTrace();
 				}
 
+			}
+		}
+
+		return false;
+	}
+
+	public boolean sendFile(File file, String name) {
+		for (int i = 0; i < client.size(); i++) {
+			if (!client.get(i).isClosed() && client.get(i).isConnected()
+					&& client.get(i).getNameClient().equals(name)) {
+				try {
+					client.get(i).sendFile(file);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return true;
 			}
 		}
 
@@ -202,9 +206,40 @@ public class Server implements Runnable {
 			// leggo quello che mi arriva dal client
 			try {
 
-				while ((str = (String) ois.readObject()) != null) {
-					controller.commandReceiveMessage(nameClient + " : " + str,
-							nameClient);
+				Object o;
+				byte[] buffer = new byte[150000];
+				Map<String, FileOutputStream> file = new HashMap<>();
+
+				while ((o = ois.readObject()) != null) {
+					if (o instanceof Boolean) {
+						if ((boolean) o) {
+							int step = ois.readInt();
+							String name = ois.readUTF();
+
+							System.out.println("Bytes received from " + name
+									+ " : " + step);
+							ois.readFully(buffer, 0, step);
+							FileOutputStream fileStream = file.get(name);
+							if (fileStream == null) {
+								fileStream = new FileOutputStream(new File(
+										System.getProperty("user.dir") + "/"
+												+ name));
+							}
+
+							fileStream.write(buffer, 0, step);
+							file.put(name, fileStream);
+							if (step < 1024) {
+								System.out.println("File received " + name);
+								fileStream.flush();
+								fileStream.close();
+								file.put(name, fileStream);
+								file.remove(name);
+							}
+						} else {
+							controller.commandReceiveMessage(nameClient + " : "
+									+ ois.readUTF(), nameClient);
+						}
+					}
 				}
 
 				if (!close) {
@@ -222,15 +257,37 @@ public class Server implements Runnable {
 
 		}
 
+		public void sendFile(File file) throws IOException {
+			String name = file.getName();
+			int step = 150000;
+			long fileSize = file.length();
+			FileInputStream fileStream = new FileInputStream(file);
+			byte[] buffer = new byte[step];
+
+			System.out.println("File sending");
+			while (fileSize > 0) {
+				fileSize -= step;
+
+				if (fileSize < 0) {
+					fileSize += step;
+					step = (int) fileSize;
+				}
+
+				fileStream.read(buffer);
+				sendMessage(buffer, step, name);
+			}
+
+			System.out.println("File sent");
+			fileStream.close();
+		}
+
 		public synchronized void sendMessage(Object message) throws IOException {
 
 			if (!close) {
 
-				// SEND FILE
-				/*
-				 * oos.writeObject(false); oos.flush();
-				 */
-				// SEND FILE
+				oos.writeObject(false);
+				oos.flush();
+
 				oos.writeObject(message);
 				oos.flush();
 			}
@@ -240,8 +297,8 @@ public class Server implements Runnable {
 			}
 		}
 
-		public synchronized void sendMessage(byte[] message, int step)
-				throws IOException {
+		public synchronized void sendMessage(byte[] message, int step,
+				String name) throws IOException {
 
 			if (!close) {
 
@@ -249,7 +306,9 @@ public class Server implements Runnable {
 				oos.flush();
 				oos.writeInt(step);
 				oos.flush();
-				oos.write(message, 0, 150000);
+				oos.writeUTF(name);
+				oos.flush();
+				oos.write(message, 0, step);
 				oos.flush();
 			}
 

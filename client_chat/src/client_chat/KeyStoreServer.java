@@ -38,7 +38,6 @@ public class KeyStoreServer extends Thread {
 		private ObjectOutputStream oos = null;
 
 		public TransferKeyStore(Socket socket) {
-			System.out.println("CIao");
 			this.socket = socket;
 
 		}
@@ -60,12 +59,9 @@ public class KeyStoreServer extends Thread {
 				fileStream.read(buffer);
 				oos.write(buffer);
 
-				File receivedFile = new File("C:/Users/Francesco" + "/" + name
-						+ "ServerKey.jks");
-				/*
-				 * File receivedFile = new File(System.getProperty("user.dir") +
-				 * "/" + name + "ServerKey.jks");
-				 */
+				File receivedFile = new File(System.getProperty("user.dir")
+						+ "/" + name + "ServerKey.jks");
+
 				receivedFile.createNewFile();
 				FileOutputStream outStream = new FileOutputStream(receivedFile);
 

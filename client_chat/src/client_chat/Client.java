@@ -1,6 +1,8 @@
 package client_chat;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -12,6 +14,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -38,13 +42,6 @@ public class Client implements Runnable {
 	private boolean resetTime = false;
 	private boolean stop = false;
 	private CountDownLatch latch = new CountDownLatch(1);
-
-	/*
-	 * FileOutputStream outStream = new FileOutputStream(
-	 * "C:\\Users\\Francesco\\Desktop\\Radioactive.mp3");
-	 */
-	byte[] buffer = new byte[200000];
-	int bytesRead = 0, counter = 0;
 	ModelInterface model;
 
 	public Client(String ip, ViewObserver controller, ModelInterface model,
@@ -125,9 +122,6 @@ public class Client implements Runnable {
 
 			oos.writeObject(nameClient);
 			oos.flush();
-			// SEND FILE
-			// ois.readObject();
-			// SEND FILE
 			nameServer = (String) ois.readObject();
 			model.addNickName(nameServer, sslSocket.getInetAddress().toString());
 
@@ -172,12 +166,48 @@ public class Client implements Runnable {
 		// leggo quello che mi arriva dal server
 		try {
 
-			// LOGOUT
-			while ((str = (String) ois.readObject()) != null) {
-				controller.commandReceiveMessage(nameServer + " : " + str,
-						nameServer);
-				resetTime = true;
+			Object o;
+			byte[] buffer = new byte[150000];
+			Map<String, FileOutputStream> file = new HashMap<>();
+
+			while ((o = ois.readObject()) != null) {
+				if (o instanceof Boolean) {
+					if ((boolean) o) {
+						int step = ois.readInt();
+						String name = ois.readUTF();
+						ois.readFully(buffer, 0, step);
+						System.out.println("Bytes received from " + name
+								+ " : " + step);
+						FileOutputStream fileStream = file.get(name);
+						if (fileStream == null) {
+							fileStream = new FileOutputStream(
+									new File(System.getProperty("user.dir")
+											+ "/" + name));
+						}
+
+						fileStream.write(buffer, 0, step);
+						file.put(name, fileStream);
+						if (step < 1024) {
+							fileStream.flush();
+							fileStream.close();
+							file.put(name, fileStream);
+							file.remove(name);
+							System.out.println("File received " + name);
+						}
+					} else {
+						controller.commandReceiveMessage(nameServer + " : "
+								+ ois.readUTF(), nameServer);
+					}
+					resetTime = true;
+				}
 			}
+
+			// LOGOUT
+			// while ((str = (String) ois.readObject()) != null) {
+			// controller.commandReceiveMessage(nameServer + " : " + str,
+			// nameServer);
+			// resetTime = true;
+			// }
 			// LOGOUT
 
 			/*
@@ -204,7 +234,7 @@ public class Client implements Runnable {
 		} catch (IOException | ClassNotFoundException e) {
 			// SEND FILE
 			/*
-			 * System.out.println(bytesRead); try { outStream.close(); } catch
+			 * System.out.println(bytesRead); try { outStrbeam.close(); } catch
 			 * (IOException e1) { e1.printStackTrace(); }
 			 */
 			// SEND FILE
@@ -231,6 +261,47 @@ public class Client implements Runnable {
 
 	}
 
+	public void sendFile(File file) throws IOException {
+		String name = file.getName();
+		int step = 150000;
+		long fileSize = file.length();
+		FileInputStream fileStream = new FileInputStream(file);
+		byte[] buffer = new byte[step];
+
+		System.out.println("File sending");
+		while (fileSize > 0) {
+			fileSize -= step;
+
+			if (fileSize < 0) {
+				fileSize += step;
+				step = (int) fileSize;
+			}
+
+			fileStream.read(buffer);
+			sendMessage(buffer, step, name);
+		}
+		System.out.println("File sent");
+
+		fileStream.close();
+	}
+
+	public synchronized void sendMessage(byte[] message, int step, String name) {
+		if (sslSocket.isConnected() && !sslSocket.isClosed()) {
+			try {
+				oos.writeObject(true);
+				oos.flush();
+				oos.writeInt(step);
+				oos.flush();
+				oos.writeUTF(name);
+				oos.flush();
+				oos.write(message, 0, step);
+				oos.flush();
+				resetTime = true;
+			} catch (IOException e) {
+			}
+		}
+	}
+
 	public synchronized void sendMessage(String message) {
 		int cont = 0;
 
@@ -238,6 +309,8 @@ public class Client implements Runnable {
 			if (sslSocket.isConnected() && !sslSocket.isClosed()) {
 				try {
 					resetTime = true;
+					oos.writeObject(false);
+					oos.flush();
 					oos.writeObject(message);
 					oos.flush();
 					cont = 6;
