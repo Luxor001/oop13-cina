@@ -1,6 +1,7 @@
 package client_chat;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
@@ -11,14 +12,13 @@ import client_chat.View.sfx;
 
 public class Controller implements ViewObserver {
 
-	private ViewInterface view;
-	private ModelInterface model;
+	private ViewInterface view = null;
+	private ModelInterface model = null;
 
-	public enum MessageBoxReason{
-		REQUEST_PRIVATE_CHAT,
-		REQUEST_RECEIVE_FILE,
-		ALERT_CLOSING_WINDOW
+	public enum MessageBoxReason {
+		REQUEST_PRIVATE_CHAT, REQUEST_RECEIVE_FILE, ALERT_CLOSING_WINDOW
 	}
+
 	public Controller() {
 	}
 
@@ -48,8 +48,11 @@ public class Controller implements ViewObserver {
 				e.printStackTrace();
 			}
 		} else { /* instead user wants to write on a private chat.. */
-			this.model.sendMessage((this.view.sendMessage()),
-					this.view.getTabName());
+			new Thread() {
+				public void run() {
+					model.sendMessage((view.sendMessage()), view.getTabName());
+				}
+			}.start();
 		}
 
 	}
@@ -99,44 +102,49 @@ public class Controller implements ViewObserver {
 				new ChatMessage("Closing", Type.DISCONNECTING));
 	}
 
-	public int buildChoiceMessageBox(MessageBoxReason reason,String ... optsender) {
-		String message="";
-		String title="";
-		Object [] options=null;
-		int iconType=0;
-		
+	public int buildChoiceMessageBox(MessageBoxReason reason,
+			String... optsender) {
+		String message = "";
+		String title = "";
+		Object[] options = null;
+		int iconType = 0;
+
 		switch (reason) {
-		case REQUEST_PRIVATE_CHAT:{
-			message="User " + optsender[0]
+		case REQUEST_PRIVATE_CHAT: {
+			message = "User " + optsender[0]
 					+ " wants to have a private chat with you";
-			title="Private Chat";
-			options= new Object[] { "Yes", "No Way!" };
-			iconType=JOptionPane.WARNING_MESSAGE;
+			title = "Private Chat";
+			options = new Object[] { "Yes", "No Way!" };
+			iconType = JOptionPane.WARNING_MESSAGE;
 			view.playSound(sfx.REQUEST);
 			break;
 		}
-		
-		
-		case REQUEST_RECEIVE_FILE:{
-			message="User " + optsender[0]
-				+ " wants to send you file:"+optsender[1];	
-			title="Receiving File";
-			options= new Object[] { "Yes", "No Way!" };
-			iconType=JOptionPane.WARNING_MESSAGE;
+
+		case REQUEST_RECEIVE_FILE: {
+			message = "User " + optsender[0] + " wants to send you file:"
+					+ optsender[1];
+			title = "Receiving File";
+			options = new Object[] { "Yes", "No Way!" };
+			iconType = JOptionPane.WARNING_MESSAGE;
 			view.playSound(sfx.REQUEST);
-			break;			
+			break;
 		}
 
-		case ALERT_CLOSING_WINDOW:{
-			message="Are you sure you to close cryptochat?\n all opened connections will be lost!";
-			title="Are you sure?";
-			options= new Object[] { "Yes", "No Way!" };
-			iconType=JOptionPane.WARNING_MESSAGE;
-			break;			
+		case ALERT_CLOSING_WINDOW: {
+			message = "Are you sure you to close cryptochat?\n all opened connections will be lost!";
+			title = "Are you sure?";
+			options = new Object[] { "Yes", "No Way!" };
+			iconType = JOptionPane.WARNING_MESSAGE;
+			break;
 		}
 		}
-		
+
 		return view.buildChoiceMessageBox(message, title, options, iconType);
+	}
+
+	public void notifyFileUser(File file) {
+
+		model.sendFile(file, view.getTitle());
 	}
 
 	public synchronized void notifyChatUser() throws IOException,
@@ -153,16 +161,16 @@ public class Controller implements ViewObserver {
 			commandCreateTab(ip, view.getTitle() + "ServerKey.jks");
 		}
 	}
-	
-	public synchronized void notifySendFileUser() throws IOException, EncodeException {
 
-			ChatMessage message = new ChatMessage("Connect to",
-					Type.REQUESTSENDFILE);
-			ChatMessage.Param params = new ChatMessage.Param();
-			params.setNickname(view.getTitle());
-			params.setFileName("Path"); /*##INSERT PATH HERE FOR GOD SAKE##*/
-			message.setAdditionalParams(params);
-			WebsocketHandler.getWebSocketHandler().SendMex(message);
+	public void notifySendFileUser() throws IOException, EncodeException {
+
+		ChatMessage message = new ChatMessage("Connect to",
+				Type.REQUESTSENDFILE);
+		ChatMessage.Param params = new ChatMessage.Param();
+		params.setNickname(view.getTitle());
+		params.setFileName("Path"); /* ##INSERT PATH HERE FOR GOD SAKE## */
+		message.setAdditionalParams(params);
+		WebsocketHandler.getWebSocketHandler().SendMex(message);
 
 	}
 

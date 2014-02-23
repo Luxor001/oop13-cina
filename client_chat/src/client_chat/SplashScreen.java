@@ -58,7 +58,7 @@ public class SplashScreen {
 		JLabel lbl_image = new JLabel();
 		lbl_image.setIcon(new ImageIcon("resources/logo.png"));
 		lbl_image.setSize(lbl_image.getPreferredSize());
-		lbl_image.setLocation(CenteredX(lbl_image)+5, 0);
+		lbl_image.setLocation(CenteredX(lbl_image) + 5, 0);
 		pnl_main.add(lbl_image);
 
 		centerscaling += 20;
@@ -142,7 +142,8 @@ public class SplashScreen {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					Credits c = new Credits();
-				} catch (BadLocationException e1) {	}
+				} catch (BadLocationException e1) {
+				}
 			}
 		});
 

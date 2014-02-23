@@ -19,16 +19,7 @@ public class ChatMessage {
 		INITIALIZE, /* Used to Registry a new user to the channel */
 		CONNECTIONGRANTED, TEXT, /* Duh. */
 		NEWUSER, /* Needed to tell to server there's a new boy in town */
-		USERDISCONNECTED, 
-		USERLIST,
-		DISCONNECTING, 
-		REQUESTPRIVATECHAT, 
-		REQUESTEDPRIVATECHAT, 
-		YESPRIVATECHAT, 
-		NOPRIVATECHAT, 
-		NICKNAMEUNAVAIABLE,
-		REQUESTSENDFILE,
-		REQUESTEDSENDFILE
+		USERDISCONNECTED, USERLIST, DISCONNECTING, REQUESTPRIVATECHAT, REQUESTEDPRIVATECHAT, YESPRIVATECHAT, NOPRIVATECHAT, NICKNAMEUNAVAIABLE, REQUESTSENDFILE, REQUESTEDSENDFILE
 	}
 
 	private Param additionalParams;
@@ -120,9 +111,9 @@ public class ChatMessage {
 		public void setNickname(String Nick) {
 			nickname = Nick;
 		}
-		
-		public void setFileName(String fileName){
-			this.fileName=fileName;
+
+		public void setFileName(String fileName) {
+			this.fileName = fileName;
 		}
 
 		public String getNickname() {
@@ -131,7 +122,7 @@ public class ChatMessage {
 
 		public void SetVisibility(Boolean visible) {
 			visibility = visible;
-			
+
 		}
 
 		public void setIP(String ip) {
@@ -153,8 +144,8 @@ public class ChatMessage {
 		public String getIP() {
 			return ip;
 		}
-		
-		public String getFileName(){
+
+		public String getFileName() {
 			return fileName;
 		}
 	}

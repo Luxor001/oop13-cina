@@ -1,10 +1,14 @@
 package client_chat;
 
+import java.io.File;
+
 public interface ModelInterface {
 
 	void attachViewObserver(ViewObserver controller);
 
 	void sendMessage(String message, String name);
+
+	void sendFile(File file, String name);
 
 	void addNickName(String name, String ip);
 

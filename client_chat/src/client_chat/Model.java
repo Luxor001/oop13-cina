@@ -19,12 +19,9 @@ public class Model implements ModelInterface {
 	private Map<String, String> peopleChat = new HashMap<>();
 	private WebsocketHandler sockethandler;
 
-	public void sendMessage(String message, String name) {
+	public synchronized void sendMessage(String message, String name) {
 
 		if (message != "") {
-
-			// CHANGE
-			// if (server != null) {
 			if (!server.sendMessage(message, name)) {
 				if (!client.sendMessage(message, name)) {
 					connectToServer(peopleChat.get(name).substring(1),
@@ -33,11 +30,17 @@ public class Model implements ModelInterface {
 					client.sendMessage(message, name);
 				}
 			}
-			// } else if (!client.sendMessage(message, name)) {
-			// connectToServer(peopleChat.get(name).substring(1), name
-			// + "ServerKey.jks");
-			// client.sendMessage(message, name);
-			// }
+		}
+	}
+
+	public void sendFile(File file, String name) {
+		if (!server.sendFile(file, name)) {
+			if (!client.sendFile(file, name)) {
+				connectToServer(peopleChat.get(name).substring(1),
+						System.getProperty("user.dir") + "/" + name
+								+ "ServerKey.jks");
+				client.sendFile(file, name);
+			}
 		}
 	}
 
@@ -68,12 +71,12 @@ public class Model implements ModelInterface {
 	}
 
 	public void closeAll() {
-	/*	try {
+		try {
 			client.close();
 			server.close();
 		} catch (Exception e) {
 
-		}*/
+		}
 	}
 
 	public synchronized void closeClient(String name) {
@@ -85,7 +88,7 @@ public class Model implements ModelInterface {
 	}
 
 	public void attachViewObserver(ViewObserver controller) {
-/*
+
 		if (!new File(System.getProperty("user.name") + "ServerKey.jks")
 				.exists()) {
 			createKeyStore(System.getProperty("user.name") + "Server",
@@ -108,12 +111,12 @@ public class Model implements ModelInterface {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 
 	}
 
 	private void createKeyStore(String name, String alias, String password) {
-	/*	try {
+		try {
 
 			String path = System.getProperty("user.dir") + "\\" + name;
 			String nameCertificate;
@@ -160,7 +163,7 @@ public class Model implements ModelInterface {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}*/
+		}
 	}
 
 	public WebsocketHandler getSocketHandler() {

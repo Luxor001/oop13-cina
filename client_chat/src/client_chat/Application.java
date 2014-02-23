@@ -13,7 +13,8 @@ public class Application {
 
 	public static void main(String[] args) throws IOException {
 
-		splash = new SplashScreen();
+		new View();
+		// splash = new SplashScreen();
 	}
 
 	public static void chat_initialization() throws IOException {
