@@ -68,12 +68,12 @@ public class Model implements ModelInterface {
 	}
 
 	public void closeAll() {
-		try {
+	/*	try {
 			client.close();
 			server.close();
 		} catch (Exception e) {
 
-		}
+		}*/
 	}
 
 	public synchronized void closeClient(String name) {
@@ -85,7 +85,7 @@ public class Model implements ModelInterface {
 	}
 
 	public void attachViewObserver(ViewObserver controller) {
-
+/*
 		if (!new File(System.getProperty("user.name") + "ServerKey.jks")
 				.exists()) {
 			createKeyStore(System.getProperty("user.name") + "Server",
@@ -108,12 +108,12 @@ public class Model implements ModelInterface {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 
 	}
 
 	private void createKeyStore(String name, String alias, String password) {
-		try {
+	/*	try {
 
 			String path = System.getProperty("user.dir") + "\\" + name;
 			String nameCertificate;
@@ -160,7 +160,7 @@ public class Model implements ModelInterface {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public WebsocketHandler getSocketHandler() {

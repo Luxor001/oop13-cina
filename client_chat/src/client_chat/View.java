@@ -205,7 +205,8 @@ public class View extends JFrame implements ViewInterface {
 
 		if (index != getTabIndex() && index != -1) {
 
-			Toolkit.getDefaultToolkit().beep();
+			playSound(sfx.PLAIN_TEXT);
+			//Toolkit.getDefaultToolkit().beep();
 		}
 
 		if (index != -1) {
@@ -214,9 +215,13 @@ public class View extends JFrame implements ViewInterface {
 			createTab(title);
 			chatList.get(chatList.size() - 1).append(message + "\n");
 		}
+		
+
+		playSound(sfx.PLAIN_TEXT);
 	}
 
 	public void showMessageMain(String Message) {
+		playSound(sfx.PLAIN_TEXT);
 		chatList.get(0).append(Message + "\n");
 	}
 

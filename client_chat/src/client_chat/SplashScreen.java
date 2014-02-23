@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
+import javax.swing.text.BadLocationException;
 
 import net.java.balloontip.BalloonTip;
 
@@ -139,8 +140,9 @@ public class SplashScreen {
 		BUTTON_DELETEME.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Credits c = new Credits();
-
+				try {
+					Credits c = new Credits();
+				} catch (BadLocationException e1) {	}
 			}
 		});
 
