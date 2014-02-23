@@ -270,6 +270,7 @@ public class WebsocketHandler {
 		// sockethandler = new WebsocketHandler();
 		/* Attemp connection to web service */
 		try {
+			
 			client.connectToServer(this, null, new URI(
 					"ws://localhost:8080/ServerWebSocket/websocket"));
 			/*

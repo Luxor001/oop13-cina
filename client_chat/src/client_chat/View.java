@@ -136,7 +136,8 @@ public class View extends JFrame implements ViewInterface {
 		int index = getTabIndex();
 		String message = textList.get(index).getText();
 		if (!message.equals("")) {
-			chatList.get(index).append(message + "\n");
+			chatList.get(index).append(" "+WebsocketHandler.DEBUG_NICKNAME
+					+": "+message + "\n");
 			textList.get(index).setText("");
 			textList.get(index).requestFocus();
 		}
@@ -210,19 +211,19 @@ public class View extends JFrame implements ViewInterface {
 		}
 
 		if (index != -1) {
-			chatList.get(index).append(message + "\n");
+			chatList.get(index).append(" "+message + "\n");
 		} else {
 			createTab(title);
-			chatList.get(chatList.size() - 1).append(message + "\n");
+			chatList.get(chatList.size() - 1).append(" "+message + "\n");
 		}
 		
 
 		playSound(sfx.PLAIN_TEXT);
 	}
 
-	public void showMessageMain(String Message) {
+	public void showMessageMain(String message) {
 		playSound(sfx.PLAIN_TEXT);
-		chatList.get(0).append(Message + "\n");
+		chatList.get(0).append(" "+message + "\n");
 	}
 
 	private void setAction() {
