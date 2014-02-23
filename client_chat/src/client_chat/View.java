@@ -13,7 +13,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,9 +21,12 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -35,7 +37,6 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
-import javax.websocket.EncodeException;
 
 /* SFX Used in this Class:
  * -Snap: for plain text notifications. Creative commons 0 license. 
@@ -61,6 +62,12 @@ public class View extends JFrame implements ViewInterface {
 	// create Tabview
 	JTabbedPane tabView = new JTabbedPane();
 	JButton enter = new JButton("Send");
+	JButton send = new JButton("Send File");
+	JFileChooser chooser;
+	JMenu privateChat = new JMenu("Private Chat");
+	JMenu options = new JMenu("Options");
+	JMenu help = new JMenu("Help");
+
 	List<JTextArea> textList = new ArrayList<>(); /*
 												 * ## NEED TO IMPLEMENT PRIVATE
 												 * PROPERTY! ##
@@ -95,6 +102,15 @@ public class View extends JFrame implements ViewInterface {
 		DefaultCaret caret = (DefaultCaret) chat.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
+		JMenuBar menuBar = new JMenuBar();
+
+		options.add(new JMenuItem("Preferences"));
+
+		menuBar.add(privateChat);
+		menuBar.add(options);
+		menuBar.add(help);
+
+		this.setJMenuBar(menuBar);
 		// add tabview to form
 		this.getContentPane().add(tabView);
 
@@ -119,6 +135,7 @@ public class View extends JFrame implements ViewInterface {
 		scrollList.add(this.getMyScroll(chat));
 
 		south.add(enter);
+		south.add(send);
 		// add panel to the form
 		this.add(south, BorderLayout.SOUTH);
 
@@ -205,8 +222,7 @@ public class View extends JFrame implements ViewInterface {
 
 		if (index != getTabIndex() && index != -1) {
 
-			playSound(sfx.PLAIN_TEXT);
-			//Toolkit.getDefaultToolkit().beep();
+			Toolkit.getDefaultToolkit().beep();
 		}
 
 		if (index != -1) {
@@ -215,9 +231,6 @@ public class View extends JFrame implements ViewInterface {
 			createTab(title);
 			chatList.get(chatList.size() - 1).append(message + "\n");
 		}
-		
-
-		playSound(sfx.PLAIN_TEXT);
 	}
 
 	public void showMessageMain(String Message) {
@@ -227,41 +240,11 @@ public class View extends JFrame implements ViewInterface {
 
 	private void setAction() {
 		enter.addActionListener(getActionListener());
-		usersJList.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
-
-					/* check if tab with user already exist.. */
-					int index = checkTab(getTitle());
-					if (index == -1) { // if not..
-
-						try {
-							controller.notifyChatUser();
-						} catch (Exception e1) {
-						}
-
-						// controller.commandCreateTab();
-					} else {
-						tabView.setSelectedIndex(index);
-					}
-				}
-
-				// check if i click with righ mouse button
-				if (SwingUtilities.isRightMouseButton(e) && e.isMetaDown()
-						&& e.getClickCount() == 1) {
-
-					PopUpDemo a = new PopUpDemo();
-
-					int sIndex = usersJList.locationToIndex(e.getPoint());
-					usersJList.setSelectedIndex(sIndex);
-
-					Rectangle rSelection = usersJList.getCellBounds(sIndex,
-							sIndex + 1);
-					// centerx allows to have a small offset
-					a.doPop(e, (int) rSelection.getCenterX(), rSelection.y);
-				}
-			}
-		});
+		send.addActionListener(getActionListener());
+		privateChat.addMouseListener(getMouseListener());
+		options.addMouseListener(getMouseListener());
+		help.addMouseListener(getMouseListener());
+		usersJList.addMouseListener(getMouseListener());
 
 	}
 
@@ -275,6 +258,80 @@ public class View extends JFrame implements ViewInterface {
 
 				if (e.getActionCommand().equals("x")) {
 					controller.commandCloseTab(e);
+				}
+
+				if (e.getActionCommand().equals("Send File")) {
+
+					chooser = new JFileChooser();
+
+					int returnVal = chooser.showDialog(new JButton("Send"),
+							"Send");
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						new Thread() {
+							public void run() {
+								controller.notifyFileUser(chooser
+										.getSelectedFile());
+							}
+						}.start();
+					}
+				}
+			}
+		};
+	}
+
+	private MouseAdapter getMouseListener() {
+		return new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+
+				if (e.getComponent() instanceof JList) {
+					if (e.getClickCount() == 2) {
+						/* check if tab with user already exist.. */
+						int index = checkTab(getTitle());
+						if (index == -1) { // if not..
+
+							new Thread() {
+								public void run() {
+									try {
+										controller.notifyChatUser();
+									} catch (Exception e1) {
+									}
+								}
+							}.start();
+						} else {
+							tabView.setSelectedIndex(index);
+						}
+					}
+
+					// check if i click with righ mouse button
+					if (SwingUtilities.isRightMouseButton(e) && e.isMetaDown()
+							&& e.getClickCount() == 1) {
+
+						PopUpDemo a = new PopUpDemo();
+
+						int sIndex = usersJList.locationToIndex(e.getPoint());
+						usersJList.setSelectedIndex(sIndex);
+
+						Rectangle rSelection = usersJList.getCellBounds(sIndex,
+								sIndex + 1);
+						// centerx allows to have a small offset
+						a.doPop(e, (int) rSelection.getCenterX(), rSelection.y);
+					}
+				} else {
+					if (e.getComponent() instanceof JMenu) {
+						JMenu menu = (JMenu) e.getComponent();
+
+						switch (menu.getText()) {
+						case "Private Chat": {
+							System.out.println("Private Chat");
+						}
+							break;
+						case "Help": {
+							System.out.println("Help");
+						}
+							break;
+						}
+
+					}
 				}
 			}
 		};
@@ -433,11 +490,11 @@ public class View extends JFrame implements ViewInterface {
 				public void actionPerformed(ActionEvent e) {
 					try {
 						controller.notifyChatUser();
-					} catch (Exception e1) {}
+					} catch (Exception e1) {
+					}
 				}
 			});
-			
-			
+
 			anItem = new JMenuItem("Send File");
 			add(anItem);
 			anItem.addActionListener(new ActionListener() {
@@ -446,11 +503,11 @@ public class View extends JFrame implements ViewInterface {
 				public void actionPerformed(ActionEvent e) {
 					try {
 						controller.notifySendFileUser();
-					} catch (Exception e1) {}
+					} catch (Exception e1) {
+					}
 				}
 			});
-			
-			
+
 			anItem = new JMenuItem("Poke");
 			add(anItem);
 			anItem.addActionListener(new ActionListener() {

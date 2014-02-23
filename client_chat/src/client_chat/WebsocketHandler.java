@@ -218,15 +218,15 @@ public class WebsocketHandler {
 					System.getProperty("user.dir") + "/" + name
 							+ "ServerKey.jks");
 		}
-		
-		if(message.getType() == Type.REQUESTEDSENDFILE){
 
+		if (message.getType() == Type.REQUESTEDSENDFILE) {
 
 			String senderNick = message.getAdditionalParams().getNickname();
-			String fileName=message.getAdditionalParams().getFileName();
-			int choice = WebsocketHandler.controller.buildChoiceMessageBox(
-					MessageBoxReason.REQUEST_RECEIVE_FILE, 
-					senderNick,fileName);
+			String fileName = message.getAdditionalParams().getFileName();
+			int choice = WebsocketHandler.controller
+					.buildChoiceMessageBox(
+							MessageBoxReason.REQUEST_RECEIVE_FILE, senderNick,
+							fileName);
 
 			System.out.println(choice);
 		}

@@ -1,5 +1,6 @@
 package client_chat;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,22 @@ public class ManageClient {
 			for (Client c : client) {
 				if (c.getNameServer().equals(name)) {
 					c.sendMessage(message);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean sendFile(File file, String name) {
+		if (client != null) {
+			for (Client c : client) {
+				if (c.getNameServer().equals(name)) {
+					try {
+						c.sendFile(file);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 					return true;
 				}
 			}
