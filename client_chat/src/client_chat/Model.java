@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Model implements ModelInterface {
@@ -118,6 +119,9 @@ public class Model implements ModelInterface {
 	private void createKeyStore(String name, String alias, String password) {
 		try {
 
+			String language = Locale.getDefault().getLanguage();
+
+			File certificate;
 			String path = System.getProperty("user.dir") + "/" + name;
 			String nameCertificate;
 			String confirm = "";
@@ -127,15 +131,27 @@ public class Model implements ModelInterface {
 
 			if (System.getProperty("os.name").contains("Windows")) {
 				nameCertificate = path + "Certificate.bat";
-				confirm = "si";
+				if (language.equals("it")) {
+					confirm = "si";
+				} else {
+					confirm = "yes";
+				}
 			} else {
 				nameCertificate = path + "Certificate.sh";
-				confirm = "s";
+				if (language.equals("it")) {
+					confirm = "s";
+				} else {
+					confirm = "y";
+				}
 			}
 
-			output = new FileOutputStream(nameCertificate);
+			certificate = new File(nameCertificate);
+			certificate.setExecutable(true);
+			output = new FileOutputStream(certificate);
+
 			stdout = new DataOutputStream(output);
 			// codice per la creazione di un certificato
+
 			stdout.write("@echo off\n".getBytes());
 			stdout.write("cd ".getBytes());
 			stdout.write(System.getProperty("java.home").getBytes());
@@ -172,8 +188,9 @@ public class Model implements ModelInterface {
 			if (System.getProperty("os.name").contains("Windows")) {
 				Runtime.getRuntime().exec(nameCertificate).waitFor();
 			} else {
-				Runtime.getRuntime().exec(
-						new String[] { "/bin/sh", "-c", nameCertificate });
+				Runtime.getRuntime()
+						.exec(new String[] { "/bin/sh", "-c", nameCertificate })
+						.waitFor();
 			}
 
 		} catch (IOException e) {
