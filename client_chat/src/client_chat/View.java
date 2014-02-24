@@ -15,7 +15,6 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -74,8 +73,8 @@ public class View extends JFrame implements ViewInterface {
 	private JMenu menu_chat = new JMenu("Chat");
 	private JMenu menu_options = new JMenu("Options");
 	private JMenu menu_help = new JMenu("Help");
-	private String icon_path="resources/Icon.png";
-	private String frame_title="CryptoChat";
+	private String icon_path = "resources/Icon.png";
+	private String frame_title = "CryptoChat";
 	private List<JTextArea> textList = new ArrayList<>(); /*
 														 * ## NEED TO IMPLEMENT
 														 * PRIVATE PROPERTY! ##
@@ -89,7 +88,7 @@ public class View extends JFrame implements ViewInterface {
 									 */
 	private DefaultListModel<String> usersList = new DefaultListModel<String>();
 
-	public View() throws IOException{
+	public View() throws IOException {
 
 		super(TITLE);
 		// this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -98,10 +97,10 @@ public class View extends JFrame implements ViewInterface {
 		this.setAction();
 		this.setResizable(false);
 		this.setVisible(true);
-		
+
 	}
 
-	private void buildGUI()  throws IOException  {
+	private void buildGUI() throws IOException {
 
 		JPanel mainPanel = new JPanel(new BorderLayout(HGAP, VGAP));
 		JPanel textPanel = new JPanel(new BorderLayout(HGAP, VGAP));
@@ -112,11 +111,10 @@ public class View extends JFrame implements ViewInterface {
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 		JMenuBar menuBar = new JMenuBar();
-		
+
 		menu_options.add(new JMenuItem("Preferences"));
 		menu_chat.add(new JMenuItem("Private chat to.."));
-		
-		
+
 		menuBar.add(menu_chat);
 		menuBar.add(menu_options);
 		menuBar.add(menu_help);
@@ -156,7 +154,6 @@ public class View extends JFrame implements ViewInterface {
 		mainPanel.add(new JPanel().add(usersJList), BorderLayout.EAST);
 
 		tabView.addTab("Main", mainPanel);
-		
 
 		InputStream imgStream = new FileInputStream(new File(icon_path));
 		BufferedImage myImg = ImageIO.read(imgStream);
@@ -253,7 +250,11 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	public void showMessageMain(String message) {
-		playSound(sfx.PLAIN_TEXT);
+
+		if (getTabIndex() != 0) {
+			tabView.setBackgroundAt(0, Color.ORANGE);
+			playSound(sfx.PLAIN_TEXT);
+		}
 		chatList.get(0).append(" " + message + "\n");
 	}
 
@@ -344,16 +345,17 @@ public class View extends JFrame implements ViewInterface {
 							System.out.println("Private Chat");
 						}
 							break;
-							
-						case "Help": {							
-							new Thread(){
+
+						case "Help": {
+							new Thread() {
 								public void run() {
 									try {
-										Credits a=new Credits();
-									} catch (BadLocationException e) {}									
+										Credits a = new Credits();
+									} catch (BadLocationException e) {
+									}
 								};
 							}.start();
-							
+
 						}
 							break;
 						}

@@ -120,8 +120,8 @@ public class Client implements Runnable {
 			oos = new ObjectOutputStream(sslSocket.getOutputStream());
 			ois = new ObjectInputStream(sslSocket.getInputStream());
 
-			oos.writeObject(nameClient);
-			oos.flush();
+			sendMessage(nameClient);
+			ois.readObject();
 			nameServer = (String) ois.readObject();
 			model.addNickName(nameServer, sslSocket.getInetAddress().toString());
 
@@ -196,7 +196,7 @@ public class Client implements Runnable {
 						}
 					} else {
 						controller.commandReceiveMessage(nameServer + " : "
-								+ ois.readUTF(), nameServer);
+								+ (String) ois.readObject(), nameServer);
 					}
 					resetTime = true;
 				}

@@ -71,12 +71,12 @@ public class Model implements ModelInterface {
 	}
 
 	public void closeAll() {
-	/*	try {
+		try {
 			client.close();
 			server.close();
 		} catch (Exception e) {
 
-		}*/
+		}
 	}
 
 	public synchronized void closeClient(String name) {
@@ -88,7 +88,7 @@ public class Model implements ModelInterface {
 	}
 
 	public void attachViewObserver(ViewObserver controller) {
-/*
+
 		if (!new File(System.getProperty("user.name") + "ServerKey.jks")
 				.exists()) {
 			createKeyStore(System.getProperty("user.name") + "Server",
@@ -111,24 +111,26 @@ public class Model implements ModelInterface {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 
 	}
 
 	private void createKeyStore(String name, String alias, String password) {
-		/*try {
+		try {
 
-			String path = System.getProperty("user.dir") + "\\" + name;
+			String path = System.getProperty("user.dir") + "/" + name;
 			String nameCertificate;
+			String confirm = "";
 			// creo un file bat
 			FileOutputStream output;
 			DataOutputStream stdout;
 
 			if (System.getProperty("os.name").contains("Windows")) {
-				nameCertificate = name + "Certificate.bat";
+				nameCertificate = path + "Certificate.bat";
+				confirm = "si";
 			} else {
-				nameCertificate = name + "Certificate.sh";
-
+				nameCertificate = path + "Certificate.sh";
+				confirm = "s";
 			}
 
 			output = new FileOutputStream(nameCertificate);
@@ -138,14 +140,25 @@ public class Model implements ModelInterface {
 			stdout.write("cd ".getBytes());
 			stdout.write(System.getProperty("java.home").getBytes());
 			stdout.write("\n".getBytes());
-			stdout.write(("(echo francesco cozzolino & echo cozzo & echo cozzo & echo misano adriatico "
-					+ "& echo rn & echo it & echo si) | keytool -genkey -alias "
-					+ alias
-					+ " -keyalg RSA"
-					+ " -keypass "
-					+ password
-					+ " -storepass " + password + " -keystore " + path + "Key.jks\n")
-					.getBytes());
+
+			if (System.getProperty("os.name").contains("Windows")) {
+				stdout.write(("(echo francesco cozzolino & echo cozzo & echo cozzo & echo misano adriatico "
+						+ "& echo rn & echo it & echo si) | keytool -genkey -alias "
+						+ alias
+						+ " -keyalg RSA"
+						+ " -keypass "
+						+ password
+						+ " -storepass " + password + " -keystore " + path + "Key.jks\n")
+						.getBytes());
+			} else {
+				stdout.write(("(echo "
+						+ confirm
+						+ " & echo cozzo & echo cozzo & echo misano adriatico "
+						+ "& echo rn & echo it & echo francesco cozzolino) | keytool -genkey -alias "
+						+ alias + " -keyalg RSA" + " -keypass " + password
+						+ " -storepass " + password + " -keystore " + path + "Key.jks\n")
+						.getBytes());
+			}
 
 			stdout.write(("keytool -export -alias " + alias + " -storepass "
 					+ password + " -file " + path
@@ -155,15 +168,20 @@ public class Model implements ModelInterface {
 			stdout.write("echo on\n".getBytes());
 
 			stdout.close();
-
-			Runtime.getRuntime().exec(nameCertificate).waitFor();
+			output.close();
+			if (System.getProperty("os.name").contains("Windows")) {
+				Runtime.getRuntime().exec(nameCertificate).waitFor();
+			} else {
+				Runtime.getRuntime().exec(
+						new String[] { "/bin/sh", "-c", nameCertificate });
+			}
 
 		} catch (IOException e) {
 
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}*/
+		}
 	}
 
 	public WebsocketHandler getSocketHandler() {
