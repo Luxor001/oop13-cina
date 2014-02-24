@@ -192,9 +192,9 @@ public class Server implements Runnable {
 
 			try {
 				// LOGOUT
-				oos.writeObject(nameServer);
-				oos.flush();
+				sendMessage(nameServer);
 				// LOGUT
+				ois.readObject();
 				nameClient = (String) ois.readObject();
 				ip = sslSocket.getInetAddress().toString();
 				model.addNickName(nameClient, sslSocket.getInetAddress()
@@ -237,7 +237,7 @@ public class Server implements Runnable {
 							}
 						} else {
 							controller.commandReceiveMessage(nameClient + " : "
-									+ ois.readUTF(), nameClient);
+									+ (String) ois.readObject(), nameClient);
 						}
 					}
 				}
