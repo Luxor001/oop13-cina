@@ -1,9 +1,9 @@
 package client_chat;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -60,26 +60,26 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	// create Tabview
-	private JTabbedPane tabView = new JTabbedPane();
-	private JButton enter = new JButton("Send");
-	private JButton send = new JButton("Send File");
-	private JFileChooser chooser;
-	private JMenu privateChat = new JMenu("Private Chat");
-	private JMenu options = new JMenu("Options");
-	private JMenu help = new JMenu("Help");
+	JTabbedPane tabView = new JTabbedPane();
+	JButton enter = new JButton("Send");
+	JButton send = new JButton("Send File");
+	JFileChooser chooser;
+	JMenu privateChat = new JMenu("Private Chat");
+	JMenu options = new JMenu("Options");
+	JMenu help = new JMenu("Help");
 
-	private List<JTextArea> textList = new ArrayList<>(); /*
-														 * ## NEED TO IMPLEMENT
-														 * PRIVATE PROPERTY! ##
-														 */
-	private List<JTextArea> chatList = new ArrayList<>();
-	private List<JScrollPane> scrollList = new ArrayList<>();
+	List<JTextArea> textList = new ArrayList<>(); /*
+												 * ## NEED TO IMPLEMENT PRIVATE
+												 * PROPERTY! ##
+												 */
+	List<JTextArea> chatList = new ArrayList<>();
+	List<JScrollPane> scrollList = new ArrayList<>();
 	// create listview
-	private JList<String> usersJList; /*
-									 * it's not parametized, but oracle's
-									 * official docs use so
-									 */
-	private DefaultListModel<String> usersList = new DefaultListModel<String>();
+	JList<String> usersJList; /*
+							 * it's not parametized, but oracle's official docs
+							 * use so
+							 */
+	DefaultListModel<String> usersList = new DefaultListModel<String>();
 
 	public View() {
 
@@ -145,7 +145,6 @@ public class View extends JFrame implements ViewInterface {
 		mainPanel.add(new JPanel().add(usersJList), BorderLayout.EAST);
 
 		tabView.addTab("Main", mainPanel);
-
 	}
 
 	public String sendMessage() {
@@ -154,9 +153,7 @@ public class View extends JFrame implements ViewInterface {
 		int index = getTabIndex();
 		String message = textList.get(index).getText();
 		if (!message.equals("")) {
-			chatList.get(index).append(
-					" " + WebsocketHandler.DEBUG_NICKNAME + ": " + message
-							+ "\n");
+			chatList.get(index).append(message + "\n");
 			textList.get(index).setText("");
 			textList.get(index).requestFocus();
 		}
@@ -224,20 +221,21 @@ public class View extends JFrame implements ViewInterface {
 		int index = checkTab(title);
 
 		if (index != getTabIndex() && index != -1) {
-			tabView.setBackgroundAt(index, Color.ORANGE);
+
+			Toolkit.getDefaultToolkit().beep();
 		}
 
 		if (index != -1) {
-			chatList.get(index).append(" " + message + "\n");
+			chatList.get(index).append(message + "\n");
 		} else {
 			createTab(title);
-			chatList.get(chatList.size() - 1).append(" " + message + "\n");
+			chatList.get(chatList.size() - 1).append(message + "\n");
 		}
 	}
 
-	public void showMessageMain(String message) {
+	public void showMessageMain(String Message) {
 		playSound(sfx.PLAIN_TEXT);
-		chatList.get(0).append(" " + message + "\n");
+		chatList.get(0).append(Message + "\n");
 	}
 
 	private void setAction() {
@@ -247,7 +245,7 @@ public class View extends JFrame implements ViewInterface {
 		options.addMouseListener(getMouseListener());
 		help.addMouseListener(getMouseListener());
 		usersJList.addMouseListener(getMouseListener());
-		tabView.addMouseListener(getMouseListener());
+
 	}
 
 	private ActionListener getActionListener() {
@@ -333,13 +331,6 @@ public class View extends JFrame implements ViewInterface {
 							break;
 						}
 
-					} else {
-						if (e.getComponent() instanceof JTabbedPane) {
-							if (tabView.getBackgroundAt(getTabIndex()) == Color.ORANGE) {
-								tabView.setBackgroundAt(getTabIndex(),
-										new Color(238, 238, 238));
-							}
-						}
 					}
 				}
 			}
