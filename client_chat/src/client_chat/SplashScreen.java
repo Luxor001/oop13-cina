@@ -134,21 +134,7 @@ public class SplashScreen {
 			}
 		});
 
-		JButton BUTTON_DELETEME = new JButton("Test, Delete me!");
-		BUTTON_DELETEME.setSize(BUTTON_DELETEME.getPreferredSize());
-		BUTTON_DELETEME.setLocation(20, 340);
-		BUTTON_DELETEME.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					Credits c = new Credits();
-				} catch (BadLocationException e1) {
-				}
-			}
-		});
-
-		pnl_main.add(BUTTON_DELETEME);
-
+	
 		frame.setResizable(false);
 		frame.setVisible(true);
 

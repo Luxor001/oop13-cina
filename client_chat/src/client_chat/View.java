@@ -12,10 +12,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -36,6 +42,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 
 /* SFX Used in this Class:
@@ -64,10 +71,11 @@ public class View extends JFrame implements ViewInterface {
 	private JButton enter = new JButton("Send");
 	private JButton send = new JButton("Send File");
 	private JFileChooser chooser;
-	private JMenu privateChat = new JMenu("Private Chat");
-	private JMenu options = new JMenu("Options");
-	private JMenu help = new JMenu("Help");
-
+	private JMenu menu_chat = new JMenu("Chat");
+	private JMenu menu_options = new JMenu("Options");
+	private JMenu menu_help = new JMenu("Help");
+	private String icon_path="resources/Icon.png";
+	private String frame_title="CryptoChat";
 	private List<JTextArea> textList = new ArrayList<>(); /*
 														 * ## NEED TO IMPLEMENT
 														 * PRIVATE PROPERTY! ##
@@ -81,7 +89,7 @@ public class View extends JFrame implements ViewInterface {
 									 */
 	private DefaultListModel<String> usersList = new DefaultListModel<String>();
 
-	public View() {
+	public View() throws IOException{
 
 		super(TITLE);
 		// this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -90,9 +98,10 @@ public class View extends JFrame implements ViewInterface {
 		this.setAction();
 		this.setResizable(false);
 		this.setVisible(true);
+		
 	}
 
-	private void buildGUI() {
+	private void buildGUI()  throws IOException  {
 
 		JPanel mainPanel = new JPanel(new BorderLayout(HGAP, VGAP));
 		JPanel textPanel = new JPanel(new BorderLayout(HGAP, VGAP));
@@ -103,12 +112,14 @@ public class View extends JFrame implements ViewInterface {
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 		JMenuBar menuBar = new JMenuBar();
-
-		options.add(new JMenuItem("Preferences"));
-
-		menuBar.add(privateChat);
-		menuBar.add(options);
-		menuBar.add(help);
+		
+		menu_options.add(new JMenuItem("Preferences"));
+		menu_chat.add(new JMenuItem("Private chat to.."));
+		
+		
+		menuBar.add(menu_chat);
+		menuBar.add(menu_options);
+		menuBar.add(menu_help);
 
 		this.setJMenuBar(menuBar);
 		// add tabview to form
@@ -145,6 +156,12 @@ public class View extends JFrame implements ViewInterface {
 		mainPanel.add(new JPanel().add(usersJList), BorderLayout.EAST);
 
 		tabView.addTab("Main", mainPanel);
+		
+
+		InputStream imgStream = new FileInputStream(new File(icon_path));
+		BufferedImage myImg = ImageIO.read(imgStream);
+		this.setIconImage(myImg);
+		this.setTitle(frame_title);
 
 	}
 
@@ -243,9 +260,9 @@ public class View extends JFrame implements ViewInterface {
 	private void setAction() {
 		enter.addActionListener(getActionListener());
 		send.addActionListener(getActionListener());
-		privateChat.addMouseListener(getMouseListener());
-		options.addMouseListener(getMouseListener());
-		help.addMouseListener(getMouseListener());
+		menu_chat.addMouseListener(getMouseListener());
+		menu_options.addMouseListener(getMouseListener());
+		menu_help.addMouseListener(getMouseListener());
 		usersJList.addMouseListener(getMouseListener());
 		tabView.addMouseListener(getMouseListener());
 	}
@@ -323,12 +340,20 @@ public class View extends JFrame implements ViewInterface {
 						JMenu menu = (JMenu) e.getComponent();
 
 						switch (menu.getText()) {
-						case "Private Chat": {
+						case "Chat": {
 							System.out.println("Private Chat");
 						}
 							break;
-						case "Help": {
-							System.out.println("Help");
+							
+						case "Help": {							
+							new Thread(){
+								public void run() {
+									try {
+										Credits a=new Credits();
+									} catch (BadLocationException e) {}									
+								};
+							}.start();
+							
 						}
 							break;
 						}
