@@ -32,4 +32,6 @@ public interface ViewInterface {
     boolean removeUser(String user);
     
     public void playSound(sfx soundeffect);
+    
+    public void closeChat();
 }

@@ -32,5 +32,7 @@ public interface ViewObserver {
 
 	public int buildChoiceMessageBox(Controller.MessageBoxReason reason,
 			String... optsender);
+	
+	public void closeChat();
 
 }

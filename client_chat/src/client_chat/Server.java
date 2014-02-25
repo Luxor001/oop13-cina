@@ -36,6 +36,13 @@ public class Server implements Runnable {
 
 		try {
 
+	/*	File a=new File(System.getProperty("user.dir")
+					+ "/" + System.getProperty("user.name") + "ServerKey.jks");
+			while(!a.exists()){
+				
+			}*/
+			
+			
 			KeyStore serverKeys = KeyStore.getInstance("JKS");
 			serverKeys.load(new FileInputStream(System.getProperty("user.dir")
 					+ "/" + System.getProperty("user.name") + "ServerKey.jks"),
@@ -186,7 +193,7 @@ public class Server implements Runnable {
 
 		public void run() {
 
-			System.out.println("** Un client si è connesso **");
+			System.out.println("** Un client si ï¿½ connesso **");
 			System.out.println("IP: " + sslSocket.getInetAddress());
 			System.out.println("Porta: " + sslSocket.getPort());
 

@@ -170,8 +170,12 @@ public class Controller implements ViewObserver {
 		params.setNickname(view.getTitle());
 		params.setFileName("Path"); /* ##INSERT PATH HERE FOR GOD SAKE## */
 		message.setAdditionalParams(params);
-		WebsocketHandler.getWebSocketHandler().SendMex(message);
-
+		WebsocketHandler.getWebSocketHandler().SendMex(message);		
+	}
+	
+	public void closeChat(){
+		model.closeAll();
+		view.closeChat();
 	}
 
 }
