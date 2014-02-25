@@ -40,6 +40,7 @@ public class WebsocketHandler {
 	public static String DEBUG_NICKNAME = System.getProperty("user.name");// "Lux"
 																			// +
 																			// Math.random();
+	public static boolean RESET_FLAG_DELETE_ME = false;
 
 	public final static Object monitor = 1;
 
@@ -72,15 +73,23 @@ public class WebsocketHandler {
 		 */
 
 		/* controller.showMessageMain("Connected!"); */
+
 		System.out.println("Sending my INITIALIZE message..");
 
 		ClientSession = session;
-		ChatMessage Message = new ChatMessage("hello", Type.INITIALIZE);
-		Message.getAdditionalParams().setNickname(DEBUG_NICKNAME);
-		Message.getAdditionalParams().SetVisibility(true);
-		SendMex(Message); /* send my request of connection to the server */
+		if (RESET_FLAG_DELETE_ME) {
+			ChatMessage message = new ChatMessage("reset", Type.RESETFLAG);
+			SendMex(message);
+			RESET_FLAG_DELETE_ME = false;
+		} else {
 
-		System.out.println("Sent!");
+			ChatMessage Message = new ChatMessage("hello", Type.INITIALIZE);
+			Message.getAdditionalParams().setNickname(DEBUG_NICKNAME);
+			Message.getAdditionalParams().SetVisibility(true);
+			SendMex(Message); /* send my request of connection to the server */
+
+			System.out.println("Sent!");
+		}
 
 	}
 
@@ -181,7 +190,11 @@ public class WebsocketHandler {
 			Socket socket = new Socket(iptoconnect, 9998);
 
 			File file = new File(System.getProperty("user.dir") + "/"
-					+ System.getProperty("user.name") + "ServerKey.jks");
+<<<<<<< local
+					+WebsocketHandler.DEBUG_NICKNAME +  "ServerKey.jks");
+=======
+					+ DEBUG_NICKNAME + "ServerKey.jks");
+>>>>>>> other
 			String name = "";
 			try {
 
@@ -190,7 +203,7 @@ public class WebsocketHandler {
 				ObjectInputStream ois = new ObjectInputStream(
 						socket.getInputStream());
 
-				oos.writeUTF(System.getProperty("user.name"));
+				oos.writeUTF(DEBUG_NICKNAME);
 				oos.flush();
 				name = ois.readUTF();
 				FileInputStream fileStream = new FileInputStream(file);
@@ -215,7 +228,7 @@ public class WebsocketHandler {
 			}
 
 			controller.commandCreateTab(iptoconnect,
-					System.getProperty("user.dir") + "/" + name
+					WebsocketHandler.DEBUG_NICKNAME +  "/" + name
 							+ "ServerKey.jks");
 		}
 
@@ -244,6 +257,8 @@ public class WebsocketHandler {
 			throws IOException, EncodeException {
 		System.out
 				.println("Connection dropped, you might be kicked from the server");
+		controller.closeChat();
+
 		// latch.countDown();
 	}
 
@@ -270,8 +285,9 @@ public class WebsocketHandler {
 		// sockethandler = new WebsocketHandler();
 		/* Attemp connection to web service */
 		try {
+
 			client.connectToServer(this, null, new URI(
-					"ws://localhost:8080/ServerWebSocket/websocket"));
+					"ws://79.32.190.112:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));
