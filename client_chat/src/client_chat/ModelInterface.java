@@ -12,6 +12,8 @@ public interface ModelInterface {
 
 	void addNickName(String name, String ip);
 
+	void removeNickName(String name);
+
 	void closeAll();
 
 	String exist(String name);

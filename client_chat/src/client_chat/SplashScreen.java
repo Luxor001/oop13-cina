@@ -18,7 +18,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
-import javax.swing.text.BadLocationException;
 
 import net.java.balloontip.BalloonTip;
 
@@ -45,8 +44,8 @@ public class SplashScreen {
 
 	public SplashScreen() {
 
-		centerscaling=120;
-		
+		centerscaling = 120;
+
 		frame = new JFrame();
 		frame.setTitle(TITLE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -91,8 +90,7 @@ public class SplashScreen {
 				txt_nickname.getSize().height + 5);
 		txt_nickname.setLocation(CenteredX(txt_nickname), centerscaling);
 		txt_nickname.setText(System.getProperty("user.name"));
-		// txt_nickname.setText("DEBUG_NICK" + (Math.round(Math.random() *
-		// 10)));
+
 		centerscaling += 20;
 		Border border = BorderFactory.createLineBorder(Color.BLACK);
 		txt_nickname.setBorder(border);
@@ -136,28 +134,27 @@ public class SplashScreen {
 			}
 		});
 
-		JButton b=new JButton("Reset");
+		JButton b = new JButton("Reset");
 		b.setSize(b.getPreferredSize());
-		b.setLocation(10,350);
+		b.setLocation(10, 350);
 		pnl_main.add(b);
-		
+
 		b.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				WebsocketHandler.RESET_FLAG_DELETE_ME=true;
-				WebsocketHandler w=WebsocketHandler.getWebSocketHandler();
+				WebsocketHandler.RESET_FLAG_DELETE_ME = true;
+				WebsocketHandler w = WebsocketHandler.getWebSocketHandler();
 				try {
 					w.AttemptConnection();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
+
 			}
 		});
-		
-	
+
 		frame.setResizable(false);
 		frame.setVisible(true);
 

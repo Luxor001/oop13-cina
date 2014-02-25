@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Model implements ModelInterface {
@@ -48,6 +49,12 @@ public class Model implements ModelInterface {
 		peopleChat.put(nickName, ip);
 	}
 
+	public synchronized void removeNickName(String name) {
+		peopleChat.remove(name);
+		deleteFile(new File(System.getProperty("user.dir") + "/" + name
+				+ "ServerKey.jks"));
+	}
+
 	public synchronized void connectToServer(String ip, String keyStore) {
 
 		try {
@@ -87,19 +94,32 @@ public class Model implements ModelInterface {
 		client.closeServer(ip);
 	}
 
+	private void deleteFile(File file) {
+
+		if (file.exists()) {
+			file.delete();
+		}
+
+	}
+
 	public void attachViewObserver(ViewObserver controller) {
 
-		if (!new File(System.getProperty("user.name") + "ServerKey.jks")
-				.exists()) {
-			createKeyStore(System.getProperty("user.name") + "Server",
-					"ServerKey", "password");
+		String path = System.getProperty("user.dir");
+
+		String[] list = new File(path).list();
+		for (int i = 0; i < list.length; i++) {
+			if (list[i].endsWith(".jks") || list[i].endsWith(".bat")
+					|| list[i].endsWith(".sh") || list[i].endsWith(".cer")) {
+
+				deleteFile(new File(path + "/" + list[i]));
+			}
 		}
 
-		if (!new File(System.getProperty("user.name") + "ClientKey.jks")
-				.exists()) {
-			createKeyStore(System.getProperty("user.name") + "Client",
-					"ClientKey", "changeit");
-		}
+		createKeyStore(System.getProperty("user.name") + "Server", "ServerKey",
+				"password");
+
+		createKeyStore(System.getProperty("user.name") + "Client", "ClientKey",
+				"changeit");
 
 		// server will be created at start of programm and pending some clients
 		try {
@@ -112,12 +132,14 @@ public class Model implements ModelInterface {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	private void createKeyStore(String name, String alias, String password) {
 		try {
 
+			String language = Locale.getDefault().getLanguage();
+
+			File certificate;
 			String path = System.getProperty("user.dir") + "/" + name;
 			String nameCertificate;
 			String confirm = "";
@@ -127,15 +149,27 @@ public class Model implements ModelInterface {
 
 			if (System.getProperty("os.name").contains("Windows")) {
 				nameCertificate = path + "Certificate.bat";
-				confirm = "si";
+				if (language.equals("it")) {
+					confirm = "si";
+				} else {
+					confirm = "yes";
+				}
 			} else {
 				nameCertificate = path + "Certificate.sh";
-				confirm = "s";
+				if (language.equals("it")) {
+					confirm = "s";
+				} else {
+					confirm = "y";
+				}
 			}
 
-			output = new FileOutputStream(nameCertificate);
+			certificate = new File(nameCertificate);
+			certificate.setExecutable(true);
+			output = new FileOutputStream(certificate);
+
 			stdout = new DataOutputStream(output);
 			// codice per la creazione di un certificato
+
 			stdout.write("@echo off\n".getBytes());
 			stdout.write("cd ".getBytes());
 			stdout.write(System.getProperty("java.home").getBytes());
@@ -172,11 +206,9 @@ public class Model implements ModelInterface {
 			if (System.getProperty("os.name").contains("Windows")) {
 				Runtime.getRuntime().exec(nameCertificate).waitFor();
 			} else {
-				File a=new File(nameCertificate);
-				a.setExecutable(true);
-				
-				Runtime.getRuntime().exec(
-						new String[] { "/bin/sh", "-c", nameCertificate }).waitFor();
+				Runtime.getRuntime()
+						.exec(new String[] { "/bin/sh", "-c", nameCertificate })
+						.waitFor();
 			}
 
 		} catch (IOException e) {
@@ -185,6 +217,7 @@ public class Model implements ModelInterface {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	public WebsocketHandler getSocketHandler() {
