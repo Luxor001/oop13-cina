@@ -190,7 +190,7 @@ public class WebsocketHandler {
 			Socket socket = new Socket(iptoconnect, 9998);
 
 			File file = new File(System.getProperty("user.dir") + "/"
-					+ DEBUG_NICKNAME + "ServerKey.jks");
+					+WebsocketHandler.DEBUG_NICKNAME +  "ServerKey.jks");
 			String name = "";
 			try {
 
@@ -199,7 +199,7 @@ public class WebsocketHandler {
 				ObjectInputStream ois = new ObjectInputStream(
 						socket.getInputStream());
 
-				oos.writeUTF(DEBUG_NICKNAME);
+				oos.writeUTF(System.getProperty("user.name"));
 				oos.flush();
 				name = ois.readUTF();
 				FileInputStream fileStream = new FileInputStream(file);
@@ -224,7 +224,7 @@ public class WebsocketHandler {
 			}
 
 			controller.commandCreateTab(iptoconnect,
-					System.getProperty("user.dir") + "/" + name
+					WebsocketHandler.DEBUG_NICKNAME +  "/" + name
 							+ "ServerKey.jks");
 		}
 

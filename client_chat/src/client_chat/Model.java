@@ -162,7 +162,7 @@ public class Model implements ModelInterface {
 			}
 
 			certificate = new File(nameCertificate);
-			// certificate.setExecutable(true);
+			//certificate.setExecutable(true);
 			output = new FileOutputStream(certificate);
 
 			stdout = new DataOutputStream(output);
@@ -181,13 +181,15 @@ public class Model implements ModelInterface {
 						.getBytes());
 			} else {
 
-				stdout.write(("(echo " + name + " && echo " + name
-						+ " && echo " + name + " && echo "
-						+ "&& echo  && echo  && echo " + confirm
-						+ ") | keytool -genkey -alias " + alias
-						+ " -keyalg RSA" + " -keypass " + password
-						+ " -storepass " + password + " -keystore " + path + ".jks\n")
-						.getBytes());
+				
+
+				stdout.write(("(echo " + name + " && echo " + name + " && echo "
+                        + name + " && echo " + "&& echo  && echo  && echo "
+                        + confirm + ") | keytool -genkey -alias " + alias
+                        + " -keyalg RSA" + " -keypass " + password
+                        + " -storepass " + password + " -keystore " + path + ".jks\n")
+                        .getBytes());
+
 
 				/*
 				 * stdout.write(("(echo " + confirm + " & echo " + name +
@@ -196,20 +198,15 @@ public class Model implements ModelInterface {
 				 * + " -keypass " + password + " -storepass " + password +
 				 * " -keystore " + path + ".jks\n") .getBytes());
 				 */
-
 			}
 
-			stdout.write(("keytool -export -alias " + alias + " -storepass "
-					+ password + " -file " + path
-					+ "Certificate.cer -keystore " + path + "Key.jks\n")
-					.getBytes());
-
+			stdout.write(("keytool -export -alias " + alias + " -storepass " + password + " -file " + path + "Certificate.cer -keystore " + path + "Key.jks\n") .getBytes());
 			stdout.close();
 			output.close();
 			if (System.getProperty("os.name").contains("Windows")) {
 				Runtime.getRuntime().exec(nameCertificate).waitFor();
 			} else {
-
+				
 				certificate.setExecutable(true);
 				Runtime.getRuntime()
 						.exec(new String[] { "/bin/sh", "-c", nameCertificate })
@@ -222,7 +219,6 @@ public class Model implements ModelInterface {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public WebsocketHandler getSocketHandler() {
