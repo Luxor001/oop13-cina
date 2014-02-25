@@ -37,7 +37,7 @@ public class Client implements Runnable {
 	private String str = "";
 	private ViewObserver controller;
 	private String ip;
-	private String nameClient = System.getProperty("user.name");
+	private String nameClient = WebsocketHandler.DEBUG_NICKNAME;
 	private String nameServer = null;
 	private boolean resetTime = false;
 	private boolean stop = false;
@@ -202,42 +202,8 @@ public class Client implements Runnable {
 				}
 			}
 
-			// LOGOUT
-			// while ((str = (String) ois.readObject()) != null) {
-			// controller.commandReceiveMessage(nameServer + " : " + str,
-			// nameServer);
-			// resetTime = true;
-			// }
-			// LOGOUT
-
-			/*
-			 * //SEND FILE int oldstep = 0; boolean isFile = false;
-			 * 
-			 * while ((o = ois.readObject()) != null) {
-			 * 
-			 * if (o instanceof Boolean) { if ((boolean) o) { int step =
-			 * ois.readInt();
-			 * 
-			 * bytesRead = step; ois.readFully(buffer, 0, step);
-			 * 
-			 * //bytesRead = ois.read(buffer, 0, step); if (bytesRead >= 0) {
-			 * 
-			 * outStream.write(buffer, 0, bytesRead);
-			 * 
-			 * counter += bytesRead; System.out.println("total bytes read: " +
-			 * counter); } if (bytesRead < 1024) { outStream.flush();
-			 * outStream.close(); } oldstep = bytesRead; } else {
-			 * chat.append(nameServer + " : " + (String) ois.readObject() +
-			 * "\n"); } } }
-			 */
-			// SEND FILE
 		} catch (IOException | ClassNotFoundException e) {
-			// SEND FILE
-			/*
-			 * System.out.println(bytesRead); try { outStrbeam.close(); } catch
-			 * (IOException e1) { e1.printStackTrace(); }
-			 */
-			// SEND FILE
+
 			e.printStackTrace();
 		}
 
