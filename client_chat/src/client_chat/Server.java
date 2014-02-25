@@ -236,8 +236,13 @@ public class Server implements Runnable {
 								file.remove(name);
 							}
 						} else {
-							controller.commandReceiveMessage(nameClient + " : "
-									+ (String) ois.readObject(), nameClient);
+							String message = null;
+							if ((message = (String) ois.readObject()) != null) {
+								controller.commandReceiveMessage(nameClient
+										+ " : " + message, nameClient);
+							} else {
+								o = null;
+							}
 						}
 					}
 				}

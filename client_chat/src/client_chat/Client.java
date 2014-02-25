@@ -194,11 +194,19 @@ public class Client implements Runnable {
 							file.remove(name);
 							System.out.println("File received " + name);
 						}
+						resetTime = true;
 					} else {
-						controller.commandReceiveMessage(nameServer + " : "
-								+ (String) ois.readObject(), nameServer);
+
+						String message = null;
+						if ((message = (String) ois.readObject()) != null) {
+							controller.commandReceiveMessage(nameServer + " : "
+									+ message, nameServer);
+							resetTime = true;
+						} else {
+							o = null;
+						}
 					}
-					resetTime = true;
+
 				}
 			}
 
