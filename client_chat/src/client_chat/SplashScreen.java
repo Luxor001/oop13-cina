@@ -41,10 +41,12 @@ public class SplashScreen {
 	private JLabel loadingCircle = new JLabel();
 
 	private static int offsetcenter = 30;
-	private static int centerscaling = 120;
+	private static int centerscaling;
 
 	public SplashScreen() {
 
+		centerscaling=120;
+		
 		frame = new JFrame();
 		frame.setTitle(TITLE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -134,6 +136,27 @@ public class SplashScreen {
 			}
 		});
 
+		JButton b=new JButton("Reset");
+		b.setSize(b.getPreferredSize());
+		b.setLocation(10,350);
+		pnl_main.add(b);
+		
+		b.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				WebsocketHandler.RESET_FLAG_DELETE_ME=true;
+				WebsocketHandler w=WebsocketHandler.getWebSocketHandler();
+				try {
+					w.AttemptConnection();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+			}
+		});
+		
 	
 		frame.setResizable(false);
 		frame.setVisible(true);

@@ -33,15 +33,12 @@ import endpoint.User.State;
 		decoders = { MessageDecoder.class }
 )
 public class MyServerEndpoint implements ServletContextListener{ //http://mjtoolbox.wordpress.com/2013/06/20/websocket-chat-application-using-jee-7-with-glassfish-4-0/
-
-	private static final Set<Session> clientSessions = Collections
-			.synchronizedSet(new HashSet<Session>());	
 	
 	//private static final ArrayList<User> UsersList=new ArrayList<User>();
 	private static final Map<Session,User> UsersList=new HashMap<Session,User>();
 	
 	@OnOpen
-	public void onOpen(Session newSession) throws IOException, EncodeException { // ## METODO CHIAMATO QUANDO UN CLIENT SI CONNETTE ##
+	public void onOpen(Session newSession){ // ## METODO CHIAMATO QUANDO UN CLIENT SI CONNETTE ##
 				
 	//	clientSessions.add(newSession);
 	/*	ChatMessage Message=new ChatMessage("PROVA", Type.INITIALIZE);
@@ -61,7 +58,13 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	public void onMessage(ChatMessage message, Session clientsession) throws IOException,
 			EncodeException {
 
-//		String prova=req.getRemoteAddr();
+		/*RESET THE SERVER*/
+		if(message.getType() == ChatMessage.Type.RESETFLAG){
+			for(User a:UsersList.values()){
+				a.GetSession().close();
+				removeUser(a);				
+			}			
+		}
 		if(message.getType() == ChatMessage.Type.INITIALIZE){ /*connection request from client*/
 			String UserNickname=message.getAdditionalParams().getNickname();
 			Boolean UserVisibility=message.getAdditionalParams().getVisibility();
