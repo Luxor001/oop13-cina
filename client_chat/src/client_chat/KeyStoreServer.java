@@ -45,7 +45,7 @@ public class KeyStoreServer extends Thread {
 		public void run() {
 
 			File file = new File(System.getProperty("user.dir") + "/"
-					+ System.getProperty("user.name") + "ServerKey.jks");
+					+WebsocketHandler.DEBUG_NICKNAME + "ServerKey.jks");
 			try {
 
 				ois = new ObjectInputStream(socket.getInputStream());
