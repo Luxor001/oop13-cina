@@ -19,9 +19,6 @@ public class Controller implements ViewObserver {
 		REQUEST_PRIVATE_CHAT, REQUEST_RECEIVE_FILE, ALERT_CLOSING_WINDOW
 	}
 
-	public Controller() {
-	}
-
 	public void setView(ViewInterface view) {
 		this.view = view;
 		this.view.attachViewObserver(this);
@@ -61,13 +58,6 @@ public class Controller implements ViewObserver {
 		view.closeTab(e);
 	}
 
-	public synchronized void commandCreateTab() {
-		if (!model.isConnect("/192.168.1.103")) {
-			// this.model.connectToServer("192.168.1.103");
-		}
-		this.view.createTab(view.getTitle());
-	}
-
 	public synchronized void commandCreateTab(String ip, String keyStore) {
 
 		if (!model.isConnect(ip)) {
@@ -78,6 +68,10 @@ public class Controller implements ViewObserver {
 
 	public synchronized void commandReceiveMessage(String message, String title) {
 		this.view.showMessage(message, title);
+	}
+
+	public void commandRemoveUser(String name) {
+		this.model.removeNickName(name);
 	}
 
 	public void commandCloseAll() {
@@ -170,10 +164,10 @@ public class Controller implements ViewObserver {
 		params.setNickname(view.getTitle());
 		params.setFileName("Path"); /* ##INSERT PATH HERE FOR GOD SAKE## */
 		message.setAdditionalParams(params);
-		WebsocketHandler.getWebSocketHandler().SendMex(message);		
+		WebsocketHandler.getWebSocketHandler().SendMex(message);
 	}
-	
-	public void closeChat(){
+
+	public void closeChat() {
 		model.closeAll();
 		view.closeChat();
 	}

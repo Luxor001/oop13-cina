@@ -12,11 +12,11 @@ public interface ViewObserver {
 
 	void commandCloseTab(ActionEvent e);
 
-	void commandCreateTab();
-
 	void commandCreateTab(String ip, String keystore);
 
 	void commandReceiveMessage(String message, String title);
+
+	void commandRemoveUser(String name);
 
 	void commandCloseAll();
 
@@ -32,7 +32,7 @@ public interface ViewObserver {
 
 	public int buildChoiceMessageBox(Controller.MessageBoxReason reason,
 			String... optsender);
-	
+
 	public void closeChat();
 
 }

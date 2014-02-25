@@ -99,8 +99,9 @@ public class View extends JFrame implements ViewInterface {
 		this.setVisible(true);
 
 	}
+
 	private void buildGUI() throws IOException {
-		JPanel mainPanel=new JPanel(new BorderLayout(HGAP, VGAP));
+		JPanel mainPanel = new JPanel(new BorderLayout(HGAP, VGAP));
 		JPanel textPanel = new JPanel(new BorderLayout(HGAP, VGAP));
 		JPanel south = new JPanel();
 		JTextArea chat = new JTextArea();
@@ -456,6 +457,21 @@ public class View extends JFrame implements ViewInterface {
 			if (usersList.get(i).equals(user)) {
 				usersList.remove(i);
 				found = true;
+
+				class RemoveUser extends Thread {
+					String user;
+
+					public RemoveUser(String user) {
+						this.user = user;
+					}
+
+					public void run() {
+						controller.commandRemoveUser(user);
+					}
+				}
+
+				new RemoveUser(user).start();
+
 			}
 		}
 		return found;
@@ -512,12 +528,13 @@ public class View extends JFrame implements ViewInterface {
 		}
 	}
 
-	public void closeChat(){
-		
+	public void closeChat() {
+
 		this.dispose();
 		Application.start();
-		
+
 	}
+
 	class PopUpDemo extends JPopupMenu {
 		private JMenuItem anItem;
 
@@ -573,7 +590,7 @@ public class View extends JFrame implements ViewInterface {
 			 * PopUpDemo menu = new PopUpDemo(); menu.show(e.getComponent(), x,
 			 * y);
 			 */
-		}		
+		}
 	}
 
 }

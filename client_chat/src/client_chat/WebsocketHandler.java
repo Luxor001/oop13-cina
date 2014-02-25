@@ -40,7 +40,7 @@ public class WebsocketHandler {
 	public static String DEBUG_NICKNAME = System.getProperty("user.name");// "Lux"
 																			// +
 																			// Math.random();
-	public static boolean RESET_FLAG_DELETE_ME=false;
+	public static boolean RESET_FLAG_DELETE_ME = false;
 
 	public final static Object monitor = 1;
 
@@ -77,12 +77,11 @@ public class WebsocketHandler {
 		System.out.println("Sending my INITIALIZE message..");
 
 		ClientSession = session;
-		if(RESET_FLAG_DELETE_ME){
-			ChatMessage message=new ChatMessage("reset",Type.RESETFLAG);
+		if (RESET_FLAG_DELETE_ME) {
+			ChatMessage message = new ChatMessage("reset", Type.RESETFLAG);
 			SendMex(message);
-			RESET_FLAG_DELETE_ME=false;
-		}
-		else{
+			RESET_FLAG_DELETE_ME = false;
+		} else {
 
 			ChatMessage Message = new ChatMessage("hello", Type.INITIALIZE);
 			Message.getAdditionalParams().setNickname(DEBUG_NICKNAME);
@@ -92,8 +91,6 @@ public class WebsocketHandler {
 			System.out.println("Sent!");
 		}
 
-		
-			
 	}
 
 	/**
@@ -257,12 +254,12 @@ public class WebsocketHandler {
 		System.out
 				.println("Connection dropped, you might be kicked from the server");
 		controller.closeChat();
-		
+
 		// latch.countDown();
 	}
 
 	public void SendMex(ChatMessage Mex) throws IOException, EncodeException {
-		ClientSession.getBasicRemote().sendObject(Mex);	
+		ClientSession.getBasicRemote().sendObject(Mex);
 	}
 
 	public static void setController(Controller c) {
@@ -286,7 +283,7 @@ public class WebsocketHandler {
 		try {
 
 			client.connectToServer(this, null, new URI(
-					"ws://192.168.1.3:8080/ServerWebSocket/websocket"));
+					"ws://79.32.190.112:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));
