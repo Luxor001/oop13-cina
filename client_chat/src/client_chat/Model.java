@@ -115,11 +115,9 @@ public class Model implements ModelInterface {
 			}
 		}
 
-		createKeyStore(System.getProperty("user.name") + "Server", "ServerKey",
-				"password");
+		createKeyStore(WebsocketHandler.DEBUG_NICKNAME, "ServerKey", "password");
 
-		createKeyStore(System.getProperty("user.name") + "Client", "ClientKey",
-				"changeit");
+		createKeyStore(WebsocketHandler.DEBUG_NICKNAME, "ClientKey", "changeit");
 
 		// server will be created at start of programm and pending some clients
 		try {
@@ -140,7 +138,7 @@ public class Model implements ModelInterface {
 			String language = Locale.getDefault().getLanguage();
 
 			File certificate;
-			String path = System.getProperty("user.dir") + "/" + name;
+			String path = System.getProperty("user.dir") + "/" + name + alias;
 			String nameCertificate;
 			String confirm = "";
 			// creo un file bat
@@ -170,36 +168,31 @@ public class Model implements ModelInterface {
 			stdout = new DataOutputStream(output);
 			// codice per la creazione di un certificato
 
-			stdout.write("@echo off\n".getBytes());
 			stdout.write("cd ".getBytes());
 			stdout.write(System.getProperty("java.home").getBytes());
 			stdout.write("\n".getBytes());
 
 			if (System.getProperty("os.name").contains("Windows")) {
-				stdout.write(("(echo francesco cozzolino & echo cozzo & echo cozzo & echo misano adriatico "
-						+ "& echo rn & echo it & echo si) | keytool -genkey -alias "
-						+ alias
-						+ " -keyalg RSA"
-						+ " -keypass "
-						+ password
-						+ " -storepass " + password + " -keystore " + path + "Key.jks\n")
+				stdout.write(("(echo "
+						+ name
+						+ " & echo "
+						+ name
+						+ " & echo "
+						+ name
+						+ " & echo "
+						+ "& echo  & echo  & echo si) | keytool -genkey -alias "
+						+ alias + " -keyalg RSA" + " -keypass " + password
+						+ " -storepass " + password + " -keystore " + path + ".jks\n")
 						.getBytes());
 			} else {
-				stdout.write(("(echo "
-						+ confirm
-						+ " & echo cozzo & echo cozzo & echo misano adriatico "
-						+ "& echo rn & echo it & echo francesco cozzolino) | keytool -genkey -alias "
-						+ alias + " -keyalg RSA" + " -keypass " + password
-						+ " -storepass " + password + " -keystore " + path + "Key.jks\n")
+				stdout.write(("(echo " + confirm + " & echo " + name
+						+ " & echo " + name + " & echo  "
+						+ "& echo  & echo  & echo " + name
+						+ ") | keytool -genkey -alias " + alias
+						+ " -keyalg RSA" + " -keypass " + password
+						+ " -storepass " + password + " -keystore " + path + ".jks\n")
 						.getBytes());
 			}
-
-			stdout.write(("keytool -export -alias " + alias + " -storepass "
-					+ password + " -file " + path
-					+ "Certificate.cer -keystore " + path + "Key.jks\n")
-					.getBytes());
-
-			stdout.write("echo on\n".getBytes());
 
 			stdout.close();
 			output.close();

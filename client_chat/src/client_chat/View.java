@@ -39,10 +39,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultCaret;
 
 /* SFX Used in this Class:
  * -Snap: for plain text notifications. Creative commons 0 license. 
@@ -105,9 +103,6 @@ public class View extends JFrame implements ViewInterface {
 		JPanel textPanel = new JPanel(new BorderLayout(HGAP, VGAP));
 		JPanel south = new JPanel();
 		JTextArea chat = new JTextArea();
-
-		DefaultCaret caret = (DefaultCaret) chat.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 		JMenuBar menuBar = new JMenuBar();
 
@@ -201,8 +196,6 @@ public class View extends JFrame implements ViewInterface {
 		JPanel main = new JPanel(new BorderLayout(10, 10));
 		JPanel tab = new JPanel();
 
-		DefaultCaret caret = (DefaultCaret) chatTmp.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		chatTmp.setLineWrap(true);
 		chatTmp.setEditable(false);
 
@@ -341,6 +334,7 @@ public class View extends JFrame implements ViewInterface {
 
 						switch (menu.getText()) {
 						case "Chat": {
+
 							System.out.println("Private Chat");
 						}
 							break;
@@ -356,6 +350,7 @@ public class View extends JFrame implements ViewInterface {
 							}.start();
 
 						}
+
 							break;
 						}
 
@@ -401,7 +396,7 @@ public class View extends JFrame implements ViewInterface {
 	private JScrollPane getMyScroll(JTextArea chat) {
 
 		JScrollPane scroll = new JScrollPane(chat);
-		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll.setAutoscrolls(true);
 		return scroll;
 	}
