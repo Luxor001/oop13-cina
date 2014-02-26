@@ -262,6 +262,14 @@ public class WebsocketHandler {
 		ClientSession.getBasicRemote().sendObject(Mex);
 	}
 
+	public boolean isConnected() {
+		if (ClientSession != null) {
+			return ClientSession.isOpen();
+		} else {
+			return false;
+		}
+	}
+
 	public static void setController(Controller c) {
 		controller = c;
 	}
