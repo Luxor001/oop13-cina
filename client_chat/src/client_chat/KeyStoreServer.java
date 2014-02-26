@@ -45,12 +45,12 @@ public class KeyStoreServer extends Thread {
 		public void run() {
 
 			File file = new File(System.getProperty("user.dir") + "/"
-					+WebsocketHandler.DEBUG_NICKNAME + "ServerKey.jks");
+					+ WebsocketHandler.DEBUG_NICKNAME + "ServerKey.jks");
 			try {
 
 				ois = new ObjectInputStream(socket.getInputStream());
 				oos = new ObjectOutputStream(socket.getOutputStream());
-				oos.writeUTF(System.getProperty("user.name"));
+				oos.writeUTF(WebsocketHandler.DEBUG_NICKNAME);
 				oos.flush();
 				System.out.println("Invio file");
 				String name = ois.readUTF();
