@@ -168,12 +168,12 @@ public class SplashScreen {
 				try {
 					Downloaded down=new Downloaded();
 
-					down.addFile("Radioactive.mp3");
-					down.addFile("Heavy Metal Chicken.jpg");
-					down.addFile("Hot penguin.por");
-					down.addFile("Hot penguin2.por");
-					down.updateProgressBar("Radioactive.mp3", 55);
-					down.eraseFile("Heavy Metal Chicken.jpg");
+					down.addFile("Radioactive.mp3",100);
+					down.addFile("Heavy Metal Chicken.jpg",100);
+					down.addFile("Hot penguin.por",100);
+					down.addFile("Hot penguin2.por",100);
+					down.updateProgressBar("Radioactive.mp3", 50);
+	//				down.eraseFile("Heavy Metal Chicken.jpg");
 					down.showFrame(true); /*needed*/
 				} catch (BadLocationException e1) {
 					// TODO Auto-generated catch block
@@ -221,6 +221,8 @@ public class SplashScreen {
 				NICKNAME_ALREADY_USED_MESSAGE);
 		bln_invalidnick.setVisible(true);
 	}
+	
+	
 	
 	
 
