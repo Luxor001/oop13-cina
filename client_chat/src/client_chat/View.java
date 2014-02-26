@@ -2,7 +2,6 @@ package client_chat;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -27,7 +26,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -45,7 +43,6 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
-import javax.websocket.EncodeException;
 
 /* SFX Used in this Class:
  * -Snap: for plain text notifications. Creative commons 0 license. 
@@ -112,24 +109,20 @@ public class View extends JFrame implements ViewInterface {
 
 		JMenuBar menuBar = new JMenuBar();
 
-		
-		JMenuItem menuitem=new JMenuItem("Downloads");
-		menu_options.add(menuitem);
-		menuitem.addActionListener(getActionListener());	
-		menuitem=new JMenuItem("Preferences");
+		JMenuItem menuitem = new JMenuItem("Downloads");
 		menu_options.add(menuitem);
 		menuitem.addActionListener(getActionListener());
-		
+		menuitem = new JMenuItem("Preferences");
+		menu_options.add(menuitem);
+		menuitem.addActionListener(getActionListener());
 
-		menuitem=new JMenuItem("Chat to..");
+		menuitem = new JMenuItem("Chat to..");
 		menu_chat.add(menuitem);
-		menuitem.addActionListener(getActionListener());	
-		menu_chat.add(new JSeparator());		
-		menuitem=new JMenuItem("Exit");
+		menuitem.addActionListener(getActionListener());
+		menu_chat.add(new JSeparator());
+		menuitem = new JMenuItem("Exit");
 		menu_chat.add(menuitem);
-		menuitem.addActionListener(getActionListener());	
-
-		
+		menuitem.addActionListener(getActionListener());
 
 		menuBar.add(menu_chat);
 		menuBar.add(menu_options);
@@ -298,7 +291,8 @@ public class View extends JFrame implements ViewInterface {
 				if (e.getActionCommand().equals("Exit")) {
 					try {
 						controller.closeChat();
-					} catch (Exception e1) {}
+					} catch (Exception e1) {
+					}
 				}
 
 				if (e.getActionCommand().equals("x")) {

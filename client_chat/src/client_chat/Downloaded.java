@@ -132,9 +132,7 @@ public class Downloaded {
 	public boolean updateProgressBar(String filename, int percentage) {
 		JPanel pnl = fileReferences.get(filename);
 
-		if (pnl == null) {
-			return false;
-		} else {
+		if (pnl != null) {
 			for (Component ccommp : pnl.getComponents()) {
 				if (ccommp.getName() == "progressbar") {
 					JProgressBar bar = (JProgressBar) ccommp;
@@ -146,9 +144,11 @@ public class Downloaded {
 			return true;
 		}
 
+		return false;
+
 	}
 
-	public void addFile(String filename, int max) throws Exception {
+	public synchronized void addFile(String filename, int max) throws Exception {
 		if (fileReferences.get(filename) != null) {
 			throw new Exception("File Already in list, duplicate!");
 		}
@@ -168,7 +168,7 @@ public class Downloaded {
 		}
 	}
 
-	public void eraseFile(String nickname) {
+	public synchronized void eraseFile(String nickname) {
 		JPanel pnl = fileReferences.get(nickname);
 		pnl_main.remove(pnl);
 		fileReferences.remove(nickname);

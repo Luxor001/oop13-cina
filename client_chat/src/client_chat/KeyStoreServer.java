@@ -16,7 +16,9 @@ public class KeyStoreServer extends Thread {
 	public KeyStoreServer() {
 
 		try {
+
 			serverSocket = new ServerSocket(9998);
+			serverSocket.setReuseAddress(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -29,6 +31,15 @@ public class KeyStoreServer extends Thread {
 				new TransferKeyStore(serverSocket.accept()).start();
 			} catch (IOException e) {
 			}
+		}
+	}
+
+	public void close() {
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

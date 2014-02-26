@@ -56,9 +56,11 @@ public class Server implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		// creo il server
 		sslServerSocket = (SSLServerSocket) sslServerSocketFactory
 				.createServerSocket(9999);
+		sslServerSocket.setReuseAddress(true);
 		sslServerSocket.setNeedClientAuth(false);
 		new Thread(this).start();
 
@@ -82,7 +84,7 @@ public class Server implements Runnable {
 
 	}
 
-	public synchronized boolean sendMessage(String message, String name) {
+	public boolean sendMessage(String message, String name) {
 
 		for (int i = 0; i < client.size(); i++) {
 			if (!client.get(i).isClosed() && client.get(i).isConnected()
@@ -208,11 +210,13 @@ public class Server implements Runnable {
 			// leggo quello che mi arriva dal client
 			try {
 
+				boolean goOn = true;
 				Object o;
 				byte[] buffer = new byte[150000];
 				Map<String, FileOutputStream> file = new HashMap<>();
 
-				while ((o = ois.readObject()) != null) {
+				while (goOn) {
+					o = ois.readObject();
 					if (o instanceof Boolean) {
 						if ((boolean) o) {
 							int filesize = ois.readInt();
@@ -247,7 +251,7 @@ public class Server implements Runnable {
 								controller.commandReceiveMessage(nameClient
 										+ " : " + message, nameClient);
 							} else {
-								o = null;
+								goOn = false;
 							}
 						}
 					}
