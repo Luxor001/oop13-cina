@@ -171,9 +171,12 @@ public class Controller implements ViewObserver {
 		WebsocketHandler.getWebSocketHandler().SendMex(message);
 	}
 
-	public void closeChat() {
+	public void closeChat() throws IOException, EncodeException {
+		if(WebsocketHandler.getWebSocketHandler().isConnected()){
+			ChatMessage closingmessage=new ChatMessage("closing",Type.DISCONNECTING);
+			WebsocketHandler.getWebSocketHandler().SendMex(closingmessage);
+		}
 		model.closeAll();
 		view.closeChat();
 	}
-
 }

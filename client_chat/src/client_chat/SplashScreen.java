@@ -156,36 +156,7 @@ public class SplashScreen {
 			}
 		});
 
-		JButton c=new JButton("Downloads");
-		c.setSize(c.getPreferredSize());
-		c.setLocation(100, 350);
-		pnl_main.add(c);
-
-		c.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					Downloaded down=new Downloaded();
-
-					down.addFile("Radioactive.mp3",100);
-					down.addFile("Heavy Metal Chicken.jpg",100);
-					down.addFile("Hot penguin.por",100);
-					down.addFile("Hot penguin2.por",100);
-					down.updateProgressBar("Radioactive.mp3", 50);
-	//				down.eraseFile("Heavy Metal Chicken.jpg");
-					down.showFrame(true); /*needed*/
-				} catch (BadLocationException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-			}
-		});
-		
+	
 		
 		frame.setResizable(false);
 		frame.setVisible(true);
