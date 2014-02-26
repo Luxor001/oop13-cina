@@ -93,11 +93,13 @@ public class Model implements ModelInterface {
 
 	public void closeAll() {
 		try {
+			keyStoreServer.close();
 			client.close();
 			server.close();
 		} catch (Exception e) {
 
 		}
+
 	}
 
 	public synchronized void closeClient(String name) {

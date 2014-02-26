@@ -168,11 +168,14 @@ public class Client implements Runnable {
 		// leggo quello che mi arriva dal server
 		try {
 
+			boolean goOn = true;
 			Object o;
 			byte[] buffer = new byte[150000];
 			Map<String, FileOutputStream> file = new HashMap<>();
 
-			while ((o = ois.readObject()) != null) {
+			while (goOn) {
+				o = ois.readObject();
+
 				if (o instanceof Boolean) {
 					if ((boolean) o) {
 						int fileSize = ois.readInt();
@@ -209,7 +212,7 @@ public class Client implements Runnable {
 									+ message, nameServer);
 							resetTime = true;
 						} else {
-							o = null;
+							goOn = false;
 						}
 					}
 
