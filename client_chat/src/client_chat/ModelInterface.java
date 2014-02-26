@@ -8,6 +8,8 @@ public interface ModelInterface {
 
 	void sendMessage(String message, String name);
 
+	void showDownloads();
+
 	void sendFile(File file, String name);
 
 	void addNickName(String name, String ip);

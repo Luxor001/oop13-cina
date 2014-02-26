@@ -41,6 +41,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultCaret;
 
 /* SFX Used in this Class:
  * -Snap: for plain text notifications. Creative commons 0 license. 
@@ -57,6 +58,7 @@ public class View extends JFrame implements ViewInterface {
 	final private static int HEIGTH = 400;
 	final private static int HGAP = 10;
 	final private static int VGAP = 10;
+	Downloaded d;
 	private ViewObserver controller;
 
 	public enum sfx {
@@ -67,6 +69,7 @@ public class View extends JFrame implements ViewInterface {
 	private JTabbedPane tabView = new JTabbedPane();
 	private JButton enter = new JButton("Send");
 	private JButton send = new JButton("Send File");
+	private JButton downloads = new JButton("Downloads");
 	private JFileChooser chooser;
 	private JMenu menu_chat = new JMenu("Chat");
 	private JMenu menu_options = new JMenu("Options");
@@ -117,6 +120,9 @@ public class View extends JFrame implements ViewInterface {
 		// add tabview to form
 		this.getContentPane().add(tabView);
 
+		DefaultCaret caret = (DefaultCaret) chat.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
 		/* add the adapter to intercept the exiting operation from the app */
 		this.addWindowListener(new CustomWindowAdapter(this));
 		chat.setLineWrap(true);
@@ -139,6 +145,7 @@ public class View extends JFrame implements ViewInterface {
 
 		south.add(enter);
 		south.add(send);
+		south.add(downloads);
 		// add panel to the form
 		this.add(south, BorderLayout.SOUTH);
 
@@ -199,6 +206,9 @@ public class View extends JFrame implements ViewInterface {
 		chatTmp.setLineWrap(true);
 		chatTmp.setEditable(false);
 
+		DefaultCaret caret = (DefaultCaret) chatTmp.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
 		chatList.add(chatTmp);
 		textList.add(this.getMyText());
 
@@ -253,6 +263,7 @@ public class View extends JFrame implements ViewInterface {
 	private void setAction() {
 		enter.addActionListener(getActionListener());
 		send.addActionListener(getActionListener());
+		downloads.addActionListener(getActionListener());
 		menu_chat.addMouseListener(getMouseListener());
 		menu_options.addMouseListener(getMouseListener());
 		menu_help.addMouseListener(getMouseListener());
@@ -272,6 +283,9 @@ public class View extends JFrame implements ViewInterface {
 					controller.commandCloseTab(e);
 				}
 
+				if (e.getActionCommand().equals("Downloads")) {
+					controller.commandShowDownloads();
+				}
 				if (e.getActionCommand().equals("Send File")) {
 
 					chooser = new JFileChooser();

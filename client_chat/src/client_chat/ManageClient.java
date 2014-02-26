@@ -9,9 +9,9 @@ public class ManageClient {
 
 	List<Client> client = new ArrayList<>();
 	ViewObserver controller;
-	ModelInterface model;
+	Model model;
 
-	public ManageClient(ViewObserver controller, ModelInterface model) {
+	public ManageClient(ViewObserver controller, Model model) {
 		this.controller = controller;
 		this.model = model;
 	}

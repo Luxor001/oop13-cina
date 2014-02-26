@@ -8,12 +8,15 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.swing.text.BadLocationException;
+
 public class Model implements ModelInterface {
 
 	public enum connectionResult {
 		OK, TIMEOUT, BAD_URI
 	}
 
+	private Downloaded download;
 	private ManageClient client;
 	private Server server;
 	private KeyStoreServer keyStoreServer;
@@ -45,6 +48,13 @@ public class Model implements ModelInterface {
 		}
 	}
 
+	public void showDownloads() {
+
+		if (!download.isVisible()) {
+			download.showFrame(true);
+		}
+	}
+
 	public synchronized void addNickName(String nickName, String ip) {
 		peopleChat.put(nickName, ip);
 	}
@@ -67,6 +77,10 @@ public class Model implements ModelInterface {
 			e.printStackTrace();
 		}
 
+	}
+
+	public Downloaded getDownloaded() {
+		return download;
 	}
 
 	public String exist(String name) {
@@ -103,6 +117,13 @@ public class Model implements ModelInterface {
 	}
 
 	public void attachViewObserver(ViewObserver controller) {
+
+		try {
+			download = new Downloaded();
+		} catch (BadLocationException e1) {
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		String path = System.getProperty("user.dir");
 
@@ -162,7 +183,7 @@ public class Model implements ModelInterface {
 			}
 
 			certificate = new File(nameCertificate);
-			//certificate.setExecutable(true);
+			// certificate.setExecutable(true);
 			output = new FileOutputStream(certificate);
 
 			stdout = new DataOutputStream(output);
@@ -181,32 +202,26 @@ public class Model implements ModelInterface {
 						.getBytes());
 			} else {
 
-				
+				stdout.write(("(echo " + name + " && echo " + name
+						+ " && echo " + name + " && echo "
+						+ "&& echo  && echo  && echo " + confirm
+						+ ") | keytool -genkey -alias " + alias
+						+ " -keyalg RSA" + " -keypass " + password
+						+ " -storepass " + password + " -keystore " + path + ".jks\n")
+						.getBytes());
 
-				stdout.write(("(echo " + name + " && echo " + name + " && echo "
-                        + name + " && echo " + "&& echo  && echo  && echo "
-                        + confirm + ") | keytool -genkey -alias " + alias
-                        + " -keyalg RSA" + " -keypass " + password
-                        + " -storepass " + password + " -keystore " + path + ".jks\n")
-                        .getBytes());
-
-
-				/*
-				 * stdout.write(("(echo " + confirm + " & echo " + name +
-				 * " & echo " + name + " & echo  " + "& echo  & echo  & echo " +
-				 * name + ") | keytool -genkey -alias " + alias + " -keyalg RSA"
-				 * + " -keypass " + password + " -storepass " + password +
-				 * " -keystore " + path + ".jks\n") .getBytes());
-				 */
 			}
 
-			stdout.write(("keytool -export -alias " + alias + " -storepass " + password + " -file " + path + "Certificate.cer -keystore " + path + "Key.jks\n") .getBytes());
+			stdout.write(("keytool -export -alias " + alias + " -storepass "
+					+ password + " -file " + path
+					+ "Certificate.cer -keystore " + path + "Key.jks\n")
+					.getBytes());
 			stdout.close();
 			output.close();
 			if (System.getProperty("os.name").contains("Windows")) {
 				Runtime.getRuntime().exec(nameCertificate).waitFor();
 			} else {
-				
+
 				certificate.setExecutable(true);
 				Runtime.getRuntime()
 						.exec(new String[] { "/bin/sh", "-c", nameCertificate })

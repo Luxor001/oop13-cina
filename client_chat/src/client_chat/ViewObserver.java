@@ -8,7 +8,9 @@ import javax.websocket.EncodeException;
 
 public interface ViewObserver {
 
-	void commandSendMessage(/* String message */);
+	void commandSendMessage();
+
+	void commandShowDownloads();
 
 	void commandCloseTab(ActionEvent e);
 

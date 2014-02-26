@@ -26,10 +26,10 @@ public class Server implements Runnable {
 	// list of clients connected to server
 	private List<MessageFromClient> client = new ArrayList<>();
 	private ViewObserver controller;
-	private ModelInterface model;
+	private Model model;
 
-	public Server(ViewObserver controller, ModelInterface model)
-			throws IOException, ClassNotFoundException {
+	public Server(ViewObserver controller, Model model) throws IOException,
+			ClassNotFoundException {
 
 		this.controller = controller;
 		this.model = model;
@@ -161,7 +161,7 @@ public class Server implements Runnable {
 
 	private static class MessageFromClient extends Thread {
 		private ViewObserver controller;
-		private ModelInterface model;
+		private Model model;
 		private ObjectInputStream ois = null;
 		private ObjectOutputStream oos = null;
 		private SSLSocket sslSocket;
@@ -170,15 +170,17 @@ public class Server implements Runnable {
 		private String nameClient = null;
 		private String ip = "";
 		private boolean close = false;
+		private Downloaded download;
 
 		public MessageFromClient(SSLSocket sslSocket, ViewObserver controller,
-				ModelInterface model) {
+				Model model) {
 			this.controller = controller;
 			this.sslSocket = sslSocket;
 			this.model = model;
 			try {
 				ois = new ObjectInputStream(sslSocket.getInputStream());
 				oos = new ObjectOutputStream(sslSocket.getOutputStream());
+				download = model.getDownloaded();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -213,19 +215,22 @@ public class Server implements Runnable {
 				while ((o = ois.readObject()) != null) {
 					if (o instanceof Boolean) {
 						if ((boolean) o) {
+							int filesize = ois.readInt();
 							int step = ois.readInt();
 							String name = ois.readUTF();
-
 							System.out.println("Bytes received from " + name
 									+ " : " + step);
 							ois.readFully(buffer, 0, step);
 							FileOutputStream fileStream = file.get(name);
+
 							if (fileStream == null) {
+								download.addFile(name, filesize);
 								fileStream = new FileOutputStream(new File(
 										System.getProperty("user.dir") + "/"
 												+ name));
 							}
 
+							download.updateProgressBar(name, step);
 							fileStream.write(buffer, 0, step);
 							file.put(name, fileStream);
 							if (step < 1024) {
@@ -235,6 +240,7 @@ public class Server implements Runnable {
 								file.put(name, fileStream);
 								file.remove(name);
 							}
+
 						} else {
 							String message = null;
 							if ((message = (String) ois.readObject()) != null) {
@@ -258,6 +264,9 @@ public class Server implements Runnable {
 				}
 			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 
 		}
@@ -269,6 +278,13 @@ public class Server implements Runnable {
 			FileInputStream fileStream = new FileInputStream(file);
 			byte[] buffer = new byte[step];
 
+			try {
+				download.addFile(name, (int) fileSize);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			System.out.println("File sending");
 			while (fileSize > 0) {
 				fileSize -= step;
@@ -277,9 +293,9 @@ public class Server implements Runnable {
 					fileSize += step;
 					step = (int) fileSize;
 				}
-
+				download.updateProgressBar(name, step);
 				fileStream.read(buffer);
-				sendMessage(buffer, step, name);
+				sendMessage(buffer, (int) file.length(), step, name);
 			}
 
 			System.out.println("File sent");
@@ -302,12 +318,14 @@ public class Server implements Runnable {
 			}
 		}
 
-		public synchronized void sendMessage(byte[] message, int step,
-				String name) throws IOException {
+		public synchronized void sendMessage(byte[] message, int filesize,
+				int step, String name) throws IOException {
 
 			if (!close) {
 
 				oos.writeObject(true);
+				oos.flush();
+				oos.writeInt(filesize);
 				oos.flush();
 				oos.writeInt(step);
 				oos.flush();

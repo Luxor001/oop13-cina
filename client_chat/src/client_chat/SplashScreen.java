@@ -18,7 +18,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
-import javax.swing.text.BadLocationException;
 
 import net.java.balloontip.BalloonTip;
 
@@ -156,37 +155,6 @@ public class SplashScreen {
 			}
 		});
 
-		JButton c=new JButton("Downloads");
-		c.setSize(c.getPreferredSize());
-		c.setLocation(100, 350);
-		pnl_main.add(c);
-
-		c.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					Downloaded down=new Downloaded();
-
-					down.addFile("Radioactive.mp3");
-					down.addFile("Heavy Metal Chicken.jpg");
-					down.addFile("Hot penguin.por");
-					down.addFile("Hot penguin2.por");
-					down.updateProgressBar("Radioactive.mp3", 55);
-					down.eraseFile("Heavy Metal Chicken.jpg");
-					down.showFrame(true); /*needed*/
-				} catch (BadLocationException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-			}
-		});
-		
-		
 		frame.setResizable(false);
 		frame.setVisible(true);
 
@@ -221,7 +189,5 @@ public class SplashScreen {
 				NICKNAME_ALREADY_USED_MESSAGE);
 		bln_invalidnick.setVisible(true);
 	}
-	
-	
 
 }

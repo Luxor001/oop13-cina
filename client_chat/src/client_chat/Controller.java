@@ -30,6 +30,10 @@ public class Controller implements ViewObserver {
 
 	}
 
+	public void commandShowDownloads() {
+		model.showDownloads();
+	}
+
 	public void commandSendMessage() {
 
 		if (this.view.getTabIndex() == 0) {

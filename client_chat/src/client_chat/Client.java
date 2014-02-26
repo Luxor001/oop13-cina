@@ -41,10 +41,11 @@ public class Client implements Runnable {
 	private String nameServer = null;
 	private boolean resetTime = false;
 	private boolean stop = false;
+	private Downloaded download;
 	private CountDownLatch latch = new CountDownLatch(1);
-	ModelInterface model;
+	Model model;
 
-	public Client(String ip, ViewObserver controller, ModelInterface model,
+	public Client(String ip, ViewObserver controller, Model model,
 			String keyStore) throws IOException, ClassNotFoundException {
 
 		String path = System.getProperty("user.dir") + "/" + nameClient
@@ -120,6 +121,7 @@ public class Client implements Runnable {
 			oos = new ObjectOutputStream(sslSocket.getOutputStream());
 			ois = new ObjectInputStream(sslSocket.getInputStream());
 
+			download = model.getDownloaded();
 			sendMessage(nameClient);
 			ois.readObject();
 			nameServer = (String) ois.readObject();
@@ -173,6 +175,7 @@ public class Client implements Runnable {
 			while ((o = ois.readObject()) != null) {
 				if (o instanceof Boolean) {
 					if ((boolean) o) {
+						int fileSize = ois.readInt();
 						int step = ois.readInt();
 						String name = ois.readUTF();
 						ois.readFully(buffer, 0, step);
@@ -180,11 +183,14 @@ public class Client implements Runnable {
 								+ " : " + step);
 						FileOutputStream fileStream = file.get(name);
 						if (fileStream == null) {
+
+							download.addFile(name, fileSize);
 							fileStream = new FileOutputStream(
 									new File(System.getProperty("user.dir")
 											+ "/" + name));
 						}
 
+						download.updateProgressBar(name, step);
 						fileStream.write(buffer, 0, step);
 						file.put(name, fileStream);
 						if (step < 1024) {
@@ -212,6 +218,9 @@ public class Client implements Runnable {
 
 		} catch (IOException | ClassNotFoundException e) {
 
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -242,6 +251,13 @@ public class Client implements Runnable {
 		FileInputStream fileStream = new FileInputStream(file);
 		byte[] buffer = new byte[step];
 
+		try {
+			download.addFile(name, (int) fileSize);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		System.out.println("File sending");
 		while (fileSize > 0) {
 			fileSize -= step;
@@ -251,18 +267,22 @@ public class Client implements Runnable {
 				step = (int) fileSize;
 			}
 
+			download.updateProgressBar(name, step);
 			fileStream.read(buffer);
-			sendMessage(buffer, step, name);
+			sendMessage(buffer, (int) file.length(), step, name);
 		}
 		System.out.println("File sent");
 
 		fileStream.close();
 	}
 
-	public synchronized void sendMessage(byte[] message, int step, String name) {
+	public synchronized void sendMessage(byte[] message, int filesize,
+			int step, String name) {
 		if (sslSocket.isConnected() && !sslSocket.isClosed()) {
 			try {
 				oos.writeObject(true);
+				oos.flush();
+				oos.writeInt(filesize);
 				oos.flush();
 				oos.writeInt(step);
 				oos.flush();
