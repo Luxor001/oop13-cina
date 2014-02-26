@@ -224,7 +224,7 @@ public class WebsocketHandler {
 			}
 
 			controller.commandCreateTab(iptoconnect,
-					WebsocketHandler.DEBUG_NICKNAME + "/" + name
+					System.getProperty("user.dir") + "/" + name
 							+ "ServerKey.jks");
 		}
 
@@ -260,6 +260,14 @@ public class WebsocketHandler {
 
 	public void SendMex(ChatMessage Mex) throws IOException, EncodeException {
 		ClientSession.getBasicRemote().sendObject(Mex);
+	}
+
+	public boolean isConnected() {
+		if (ClientSession != null) {
+			return ClientSession.isOpen();
+		} else {
+			return false;
+		}
 	}
 
 	public static void setController(Controller c) {

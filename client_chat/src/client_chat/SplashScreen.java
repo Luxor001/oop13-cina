@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
+import javax.swing.text.BadLocationException;
 
 import net.java.balloontip.BalloonTip;
 
@@ -155,6 +156,8 @@ public class SplashScreen {
 			}
 		});
 
+	
+		
 		frame.setResizable(false);
 		frame.setVisible(true);
 
@@ -189,5 +192,9 @@ public class SplashScreen {
 				NICKNAME_ALREADY_USED_MESSAGE);
 		bln_invalidnick.setVisible(true);
 	}
+	
+	
+	
+	
 
 }
