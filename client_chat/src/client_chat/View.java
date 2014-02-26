@@ -2,6 +2,7 @@ package client_chat;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -26,6 +27,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -37,11 +39,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.websocket.EncodeException;
 
 /* SFX Used in this Class:
  * -Snap: for plain text notifications. Creative commons 0 license. 
@@ -69,7 +73,6 @@ public class View extends JFrame implements ViewInterface {
 	private JTabbedPane tabView = new JTabbedPane();
 	private JButton enter = new JButton("Send");
 	private JButton send = new JButton("Send File");
-	private JButton downloads = new JButton("Downloads");
 	private JFileChooser chooser;
 	private JMenu menu_chat = new JMenu("Chat");
 	private JMenu menu_options = new JMenu("Options");
@@ -109,8 +112,24 @@ public class View extends JFrame implements ViewInterface {
 
 		JMenuBar menuBar = new JMenuBar();
 
-		menu_options.add(new JMenuItem("Preferences"));
-		menu_chat.add(new JMenuItem("Private chat to.."));
+		
+		JMenuItem menuitem=new JMenuItem("Downloads");
+		menu_options.add(menuitem);
+		menuitem.addActionListener(getActionListener());	
+		menuitem=new JMenuItem("Preferences");
+		menu_options.add(menuitem);
+		menuitem.addActionListener(getActionListener());
+		
+
+		menuitem=new JMenuItem("Chat to..");
+		menu_chat.add(menuitem);
+		menuitem.addActionListener(getActionListener());	
+		menu_chat.add(new JSeparator());		
+		menuitem=new JMenuItem("Exit");
+		menu_chat.add(menuitem);
+		menuitem.addActionListener(getActionListener());	
+
+		
 
 		menuBar.add(menu_chat);
 		menuBar.add(menu_options);
@@ -145,7 +164,6 @@ public class View extends JFrame implements ViewInterface {
 
 		south.add(enter);
 		south.add(send);
-		south.add(downloads);
 		// add panel to the form
 		this.add(south, BorderLayout.SOUTH);
 
@@ -263,7 +281,6 @@ public class View extends JFrame implements ViewInterface {
 	private void setAction() {
 		enter.addActionListener(getActionListener());
 		send.addActionListener(getActionListener());
-		downloads.addActionListener(getActionListener());
 		menu_chat.addMouseListener(getMouseListener());
 		menu_options.addMouseListener(getMouseListener());
 		menu_help.addMouseListener(getMouseListener());
@@ -278,6 +295,11 @@ public class View extends JFrame implements ViewInterface {
 				if (e.getActionCommand().equals("Send")) {
 					controller.commandSendMessage();
 				}
+				if (e.getActionCommand().equals("Exit")) {
+					try {
+						controller.closeChat();
+					} catch (Exception e1) {}
+				}
 
 				if (e.getActionCommand().equals("x")) {
 					controller.commandCloseTab(e);
@@ -285,6 +307,9 @@ public class View extends JFrame implements ViewInterface {
 
 				if (e.getActionCommand().equals("Downloads")) {
 					controller.commandShowDownloads();
+				}
+				if (e.getActionCommand().equals("Preferences")) {
+					System.out.println("Clicked Preferences!");
 				}
 				if (e.getActionCommand().equals("Send File")) {
 

@@ -82,7 +82,7 @@ public class Server implements Runnable {
 
 	}
 
-	public boolean sendMessage(String message, String name) {
+	public synchronized boolean sendMessage(String message, String name) {
 
 		for (int i = 0; i < client.size(); i++) {
 			if (!client.get(i).isClosed() && client.get(i).isConnected()
