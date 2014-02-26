@@ -104,9 +104,9 @@ public class Downloaded {
 		progressbar.setStringPainted(true);
 		progressbar.setLocation(50, 35);
 		progressbar.setSize(200, 15);
-		progressbar.setValue(50);
+		// progressbar.setValue(50);
 		progressbar.setName("progressbar");
-		progressbar.setMaximum(100);
+		// progressbar.setMaximum(100);
 		container.add(progressbar);
 
 		/*
@@ -129,26 +129,23 @@ public class Downloaded {
 		}
 	}
 
-	public boolean updateProgressBar(String filename, int percentage) {
-		JPanel pnl = fileReferences.get(filename);
+	public void updateProgressBar(String filename, int percentage) {
 
+		JPanel pnl = fileReferences.get(filename);
 		if (pnl == null) {
-			return false;
 		} else {
 			for (Component ccommp : pnl.getComponents()) {
 				if (ccommp.getName() == "progressbar") {
 					JProgressBar bar = (JProgressBar) ccommp;
-
 					bar.setValue(bar.getValue() + percentage);
 				}
 
 			}
-			return true;
 		}
 
 	}
 
-	public void addFile(String filename, int max) throws Exception {
+	public synchronized void addFile(String filename, int max) throws Exception {
 		if (fileReferences.get(filename) != null) {
 			throw new Exception("File Already in list, duplicate!");
 		}
@@ -168,7 +165,7 @@ public class Downloaded {
 		}
 	}
 
-	public void eraseFile(String nickname) {
+	public synchronized void eraseFile(String nickname) {
 		JPanel pnl = fileReferences.get(nickname);
 		pnl_main.remove(pnl);
 		fileReferences.remove(nickname);

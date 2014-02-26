@@ -224,7 +224,7 @@ public class WebsocketHandler {
 			}
 
 			controller.commandCreateTab(iptoconnect,
-					WebsocketHandler.DEBUG_NICKNAME + "/" + name
+					System.getProperty("user.dir") + "/" + name
 							+ "ServerKey.jks");
 		}
 
