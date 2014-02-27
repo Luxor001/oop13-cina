@@ -12,6 +12,8 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
 import javax.websocket.ClientEndpoint;
@@ -41,9 +43,11 @@ public class WebsocketHandler {
 																			// +
 																			// Math.random();
 	public static boolean RESET_FLAG_DELETE_ME = false;
-
+	private long PING_INTERVAL_SECONDS=15;
+	
 	public final static Object monitor = 1;
-
+	public Timer timer;
+	
 	private WebsocketHandler() {
 
 	}
@@ -61,18 +65,6 @@ public class WebsocketHandler {
 	@OnOpen
 	public void onOpen(Session session) throws IOException, EncodeException,
 			InterruptedException {
-		// view.writeText("Connected to Channel : \"Main\"",0);
-
-		/*
-		 * waiting for application class to draw the interface, or i will be
-		 * unable to write "Connected" and other funny things..
-		 */
-		/*
-		 * synchronized (WebsocketHandler.class) {
-		 * WebsocketHandler.class.wait(); }
-		 */
-
-		/* controller.showMessageMain("Connected!"); */
 
 		System.out.println("Sending my INITIALIZE message..");
 
@@ -89,6 +81,12 @@ public class WebsocketHandler {
 			SendMex(Message); /* send my request of connection to the server */
 
 			System.out.println("Sent!");
+			
+
+		    timer = new Timer();
+		    timer.schedule(new PingTimer(),PING_INTERVAL_SECONDS*1000,
+		    		PING_INTERVAL_SECONDS*1000);
+			
 		}
 
 	}
@@ -233,6 +231,8 @@ public class WebsocketHandler {
 			controller.commandRefusedChat(message.getAdditionalParams()
 					.getNickname());
 		}
+		
+		
 
 		if (message.getType() == Type.REQUESTEDSENDFILE) {
 
@@ -297,7 +297,7 @@ public class WebsocketHandler {
 		try {
 
 			client.connectToServer(this, null, new URI(
-					"ws://79.32.190.112:8080/ServerWebSocket/websocket"));
+					"ws://192.168.1.3:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));
@@ -312,5 +312,18 @@ public class WebsocketHandler {
 			}
 		}
 		return connectionResult.OK;
+	}
+	
+	public class PingTimer extends TimerTask{
+
+	
+		@Override
+		public void run() {
+			try {
+				WebsocketHandler.getWebSocketHandler().SendMex(new ChatMessage("alive", ChatMessage.Type.PING));
+				System.out.println("PING SENT!");
+			} catch (Exception e) {}
+		}
+		
 	}
 }

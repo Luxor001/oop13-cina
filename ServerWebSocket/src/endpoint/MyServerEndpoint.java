@@ -36,6 +36,7 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	
 	//private static final ArrayList<User> UsersList=new ArrayList<User>();
 	private static final Map<Session,User> UsersList=new HashMap<Session,User>();
+	private int TIMEOUT_SECONDS=45;
 	
 	@OnOpen
 	public void onOpen(Session newSession){ // ## METODO CHIAMATO QUANDO UN CLIENT SI CONNETTE ##
@@ -49,9 +50,12 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	
 	@OnClose
 	public void onClose(Session clientsession) {
+		
 		User user=searchUser(clientsession);
-		if(user != null)
-			UsersList.remove(user);
+		
+		if(user != null){				
+			UsersList.remove(user.GetSession());
+		}
 	}
 
 	@OnMessage
@@ -82,7 +86,7 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 
 			}
 			
-						
+			
 			if(UserVisibility.equals(true)){ /*alerts other clients of new user*/
 				
 				ChatMessage newmessage;
@@ -91,7 +95,7 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 				sendGlobalMex(newmessage);				
 			}
 
-			
+			clientsession.setMaxIdleTimeout(TIMEOUT_SECONDS*1000);
 			if(UserVisibility)
 				UsersList.put(clientsession,new User(UserNickname,State.VISIBLE, clientsession));
 			else
@@ -173,6 +177,7 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	public void contextInitialized(ServletContextEvent sce) { //Launched at the web app starting time.
         System.out.println("#### Inizializing Server for first launch.. ####");
         System.out.println("#### Initialized.. ####");		
+        
 	}  
 	
 
