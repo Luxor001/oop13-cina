@@ -14,11 +14,13 @@ public interface ViewObserver {
 
 	void commandCloseTab(ActionEvent e);
 
-	void commandCreateTab(String ip, String keystore);
+	void commandCreateTab(String ip, String name, String keystore);
 
 	void commandReceiveMessage(String message, String title);
 
 	void commandRemoveUser(String name);
+
+	void commandRefusedChat(String name);
 
 	void commandCloseAll();
 

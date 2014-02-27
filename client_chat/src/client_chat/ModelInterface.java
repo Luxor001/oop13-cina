@@ -26,7 +26,7 @@ public interface ModelInterface {
 
 	void closeServer(String ip);
 
-	void connectToServer(String ip, String keyStore);
+	void connectToServer(String ip, String name, String keyStore);
 
 	WebsocketHandler getSocketHandler();
 }

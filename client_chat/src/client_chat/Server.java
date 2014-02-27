@@ -60,7 +60,6 @@ public class Server implements Runnable {
 		// creo il server
 		sslServerSocket = (SSLServerSocket) sslServerSocketFactory
 				.createServerSocket(9999);
-		sslServerSocket.setReuseAddress(true);
 		sslServerSocket.setNeedClientAuth(false);
 		new Thread(this).start();
 
@@ -195,9 +194,7 @@ public class Server implements Runnable {
 			System.out.println("Porta: " + sslSocket.getPort());
 
 			try {
-				// LOGOUT
-				sendMessage(nameServer);
-				// LOGUT
+
 				ois.readObject();
 				nameClient = (String) ois.readObject();
 				ip = sslSocket.getInetAddress().toString();

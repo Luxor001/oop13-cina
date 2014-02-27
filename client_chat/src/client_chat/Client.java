@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -45,7 +44,7 @@ public class Client implements Runnable {
 	private CountDownLatch latch = new CountDownLatch(1);
 	Model model;
 
-	public Client(String ip, ViewObserver controller, Model model,
+	public Client(String ip, String name, ViewObserver controller, Model model,
 			String keyStore) throws IOException, ClassNotFoundException {
 
 		String path = System.getProperty("user.dir") + "/" + nameClient
@@ -59,6 +58,7 @@ public class Client implements Runnable {
 		this.model = model;
 		this.ip = ip;
 		this.controller = controller;
+		nameServer = name;
 
 		try {
 			// indico il tipo della chiave
@@ -106,11 +106,10 @@ public class Client implements Runnable {
 		try {
 			sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, 9999);
 			sslSocket.startHandshake();
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		} catch (IOException e) {
+			model.addNickName(nameServer, null);
 		}
+
 		System.out.println("** Sono connesso con il server **");
 		System.out.println("IP: " + sslSocket.getInetAddress());
 		System.out.println("Porta: " + sslSocket.getPort());
@@ -123,11 +122,9 @@ public class Client implements Runnable {
 
 			download = model.getDownloaded();
 			sendMessage(nameClient);
-			ois.readObject();
-			nameServer = (String) ois.readObject();
 			model.addNickName(nameServer, sslSocket.getInetAddress().toString());
 
-		} catch (IOException | ClassNotFoundException e1) {
+		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 

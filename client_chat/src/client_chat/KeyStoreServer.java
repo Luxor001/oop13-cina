@@ -18,7 +18,6 @@ public class KeyStoreServer extends Thread {
 		try {
 
 			serverSocket = new ServerSocket(9998);
-			serverSocket.setReuseAddress(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
