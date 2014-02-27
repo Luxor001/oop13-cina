@@ -180,6 +180,7 @@ public class WebsocketHandler {
 				msg.getAdditionalParams().setIP(ip);
 			} else {
 				msg = new ChatMessage("No", Type.NOPRIVATECHAT);
+				msg.getAdditionalParams().setNickname(senderNick);
 			}
 			SendMex(msg);
 		}
@@ -223,9 +224,14 @@ public class WebsocketHandler {
 				e.printStackTrace();
 			}
 
-			controller.commandCreateTab(iptoconnect,
+			controller.commandCreateTab(iptoconnect, name,
 					System.getProperty("user.dir") + "/" + name
 							+ "ServerKey.jks");
+		}
+
+		if (message.getType() == Type.NOPRIVATECHAT) {
+			controller.commandRefusedChat(message.getAdditionalParams()
+					.getNickname());
 		}
 
 		if (message.getType() == Type.REQUESTEDSENDFILE) {

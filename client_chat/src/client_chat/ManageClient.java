@@ -16,7 +16,7 @@ public class ManageClient {
 		this.model = model;
 	}
 
-	public boolean addClient(String ip, String keyStore)
+	public boolean addClient(String ip, String name, String keyStore)
 			throws ClassNotFoundException, IOException {
 
 		for (Client c : client) {
@@ -25,7 +25,7 @@ public class ManageClient {
 			}
 		}
 
-		client.add(new Client(ip, controller, model, keyStore));
+		client.add(new Client(ip, name, controller, model, keyStore));
 		return true;
 	}
 

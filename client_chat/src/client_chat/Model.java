@@ -28,7 +28,7 @@ public class Model implements ModelInterface {
 		if (message != "") {
 			if (!server.sendMessage(message, name)) {
 				if (!client.sendMessage(message, name)) {
-					connectToServer(peopleChat.get(name).substring(1),
+					connectToServer(peopleChat.get(name).substring(1), name,
 							System.getProperty("user.dir") + "/" + name
 									+ "ServerKey.jks");
 					client.sendMessage(message, name);
@@ -40,7 +40,7 @@ public class Model implements ModelInterface {
 	public void sendFile(File file, String name) {
 		if (!server.sendFile(file, name)) {
 			if (!client.sendFile(file, name)) {
-				connectToServer(peopleChat.get(name).substring(1),
+				connectToServer(peopleChat.get(name).substring(1), name,
 						System.getProperty("user.dir") + "/" + name
 								+ "ServerKey.jks");
 				client.sendFile(file, name);
@@ -65,10 +65,11 @@ public class Model implements ModelInterface {
 				+ "ServerKey.jks"));
 	}
 
-	public synchronized void connectToServer(String ip, String keyStore) {
+	public synchronized void connectToServer(String ip, String name,
+			String keyStore) {
 
 		try {
-			client.addClient(ip, keyStore);
+			client.addClient(ip, name, keyStore);
 
 		} catch (ClassNotFoundException e) {
 

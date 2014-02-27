@@ -62,10 +62,11 @@ public class Controller implements ViewObserver {
 		view.closeTab(e);
 	}
 
-	public synchronized void commandCreateTab(String ip, String keyStore) {
+	public synchronized void commandCreateTab(String ip, String name,
+			String keyStore) {
 
 		if (!model.isConnect(ip)) {
-			this.model.connectToServer(ip, keyStore);
+			this.model.connectToServer(ip, name, keyStore);
 		}
 		this.view.createTab(view.getTitle());
 	}
@@ -76,6 +77,11 @@ public class Controller implements ViewObserver {
 
 	public void commandRemoveUser(String name) {
 		this.model.removeNickName(name);
+	}
+
+	public void commandRefusedChat(String name) {
+		this.model.addNickName(name, null);
+		showMessageMain(name + " has refused the request of private chat");
 	}
 
 	public void commandCloseAll() {
@@ -147,17 +153,24 @@ public class Controller implements ViewObserver {
 
 	public synchronized void notifyChatUser() throws IOException,
 			EncodeException {
-		String ip = model.exist(view.getTitle());
+
+		String name = view.getTitle();
+		String ip = model.exist(name);
+
 		if (ip == null) {
+			model.addNickName(name, "pending");
 			ChatMessage message = new ChatMessage("Connect to",
 					Type.REQUESTPRIVATECHAT);
 			ChatMessage.Param params = new ChatMessage.Param();
-			params.setNickname(view.getTitle());
+			params.setNickname(name);
 			message.setAdditionalParams(params);
 			WebsocketHandler.getWebSocketHandler().SendMex(message);
 		} else {
-			commandCreateTab(ip, view.getTitle() + "ServerKey.jks");
+			if (!ip.equals("pending")) {
+				commandCreateTab(ip, name, name + "ServerKey.jks");
+			}
 		}
+
 	}
 
 	public void notifySendFileUser() throws IOException, EncodeException {
