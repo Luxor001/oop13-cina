@@ -43,11 +43,11 @@ public class WebsocketHandler {
 																			// +
 																			// Math.random();
 	public static boolean RESET_FLAG_DELETE_ME = false;
-	private long PING_INTERVAL_SECONDS=15;
-	
+	private long PING_INTERVAL_SECONDS = 15;
+
 	public final static Object monitor = 1;
 	public Timer timer;
-	
+
 	private WebsocketHandler() {
 
 	}
@@ -81,12 +81,11 @@ public class WebsocketHandler {
 			SendMex(Message); /* send my request of connection to the server */
 
 			System.out.println("Sent!");
-			
 
-		    timer = new Timer();
-		    timer.schedule(new PingTimer(),PING_INTERVAL_SECONDS*1000,
-		    		PING_INTERVAL_SECONDS*1000);
-			
+			timer = new Timer();
+			timer.schedule(new PingTimer(), PING_INTERVAL_SECONDS * 1000,
+					PING_INTERVAL_SECONDS * 1000);
+
 		}
 
 	}
@@ -231,8 +230,6 @@ public class WebsocketHandler {
 			controller.commandRefusedChat(message.getAdditionalParams()
 					.getNickname());
 		}
-		
-		
 
 		if (message.getType() == Type.REQUESTEDSENDFILE) {
 
@@ -297,7 +294,7 @@ public class WebsocketHandler {
 		try {
 
 			client.connectToServer(this, null, new URI(
-					"ws://192.168.1.3:8080/ServerWebSocket/websocket"));
+					"ws://79.32.190.112:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));
@@ -313,17 +310,18 @@ public class WebsocketHandler {
 		}
 		return connectionResult.OK;
 	}
-	
-	public class PingTimer extends TimerTask{
 
-	
+	public class PingTimer extends TimerTask {
+
 		@Override
 		public void run() {
 			try {
-				WebsocketHandler.getWebSocketHandler().SendMex(new ChatMessage("alive", ChatMessage.Type.PING));
+				WebsocketHandler.getWebSocketHandler().SendMex(
+						new ChatMessage("alive", ChatMessage.Type.PING));
 				System.out.println("PING SENT!");
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			}
 		}
-		
+
 	}
 }
