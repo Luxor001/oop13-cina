@@ -21,6 +21,7 @@ public class Model implements ModelInterface {
 	private Server server;
 	private KeyStoreServer keyStoreServer;
 	private Map<String, String> peopleChat = new HashMap<>();
+	private Map<String, String> peopleIp = new HashMap<>();
 	private WebsocketHandler sockethandler;
 	private Object lockPeopleChat = new Object();
 
@@ -82,6 +83,10 @@ public class Model implements ModelInterface {
 				+ "ServerKey.jks"));
 	}
 
+	public void addIp(String ip, String name) {
+		peopleIp.put(ip, name);
+	}
+
 	public synchronized void connectToServer(String ip, String name,
 			String keyStore) {
 
@@ -103,6 +108,15 @@ public class Model implements ModelInterface {
 
 	public String exist(String name) {
 		return peopleChat.get(name);
+	}
+
+	public String existIp(String ip) {
+
+		if (peopleChat.containsValue(ip)) {
+			return "exist";
+		}
+
+		return peopleIp.get(ip);
 	}
 
 	public boolean isConnect(String ip) {

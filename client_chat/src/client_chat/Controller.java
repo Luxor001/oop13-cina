@@ -180,6 +180,20 @@ public class Controller implements ViewObserver {
 
 	}
 
+	public void notifyChatUserIp(String ip) {
+		synchronized (lockNotification) {
+			String name = model.existIp(ip);
+
+			if (name == null) {
+				model.addIp(ip, "pending");
+			} else {
+				if (!name.equals("pending")) {
+
+				}
+			}
+		}
+	}
+
 	public void notifySendFileUser() throws IOException, EncodeException {
 
 		ChatMessage message = new ChatMessage("Connect to",

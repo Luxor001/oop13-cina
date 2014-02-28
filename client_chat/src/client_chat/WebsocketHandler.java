@@ -43,11 +43,11 @@ public class WebsocketHandler {
 																			// +
 																			// Math.random();
 	public static boolean RESET_FLAG_DELETE_ME = false;
-	private long PING_INTERVAL_SECONDS=15;
-	
+	private long PING_INTERVAL_SECONDS = 15;
+
 	public final static Object monitor = 1;
 	public Timer timer;
-	
+
 	private WebsocketHandler() {
 
 	}
@@ -81,12 +81,11 @@ public class WebsocketHandler {
 			SendMex(Message); /* send my request of connection to the server */
 
 			System.out.println("Sent!");
-			
 
-		    timer = new Timer();
-		    timer.schedule(new PingTimer(),PING_INTERVAL_SECONDS*1000,
-		    		PING_INTERVAL_SECONDS*1000);
-			
+			timer = new Timer();
+			timer.schedule(new PingTimer(), PING_INTERVAL_SECONDS * 1000,
+					PING_INTERVAL_SECONDS * 1000);
+
 		}
 
 	}
@@ -178,7 +177,7 @@ public class WebsocketHandler {
 				msg.getAdditionalParams().setIP(ip);
 			} else {
 				msg = new ChatMessage("No", Type.NOPRIVATECHAT);
-				msg.getAdditionalParams().setNickname(senderNick);				
+				msg.getAdditionalParams().setNickname(senderNick);
 			}
 			SendMex(msg);
 		}
@@ -232,8 +231,6 @@ public class WebsocketHandler {
 			controller.commandRefusedChat(message.getAdditionalParams()
 					.getNickname());
 		}
-		
-		
 
 		if (message.getType() == Type.REQUESTEDSENDFILE) {
 
@@ -243,8 +240,7 @@ public class WebsocketHandler {
 					.buildChoiceMessageBox(
 							MessageBoxReason.REQUEST_RECEIVE_FILE, senderNick,
 							fileName);
-			
-			
+
 		}
 	}
 
@@ -258,18 +254,17 @@ public class WebsocketHandler {
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason)
 			throws IOException, EncodeException {
-		
-		/*closing connection from the SERVER*/
-		if(closeReason.equals(CloseReason.CloseCodes.CLOSED_ABNORMALLY)){
+
+		/* closing connection from the SERVER */
+		if (closeReason.equals(CloseReason.CloseCodes.CLOSED_ABNORMALLY)) {
 			controller.closeChat();
 			System.out
-			.println("Connection dropped, you might be kicked from the server");
+					.println("Connection dropped, you might be kicked from the server");
 		}
 
+		/* closing connection from the client */
+		if (closeReason.equals(CloseReason.CloseCodes.GOING_AWAY)) {
 
-		/*closing connection from the client*/
-		if(closeReason.equals(CloseReason.CloseCodes.GOING_AWAY)){
-			
 		}
 		// latch.countDown();
 	}
@@ -285,11 +280,13 @@ public class WebsocketHandler {
 			return false;
 		}
 	}
-	
-	public void closeConnection(){
+
+	public void closeConnection() {
 		try {
-			ClientSession.close(new CloseReason(CloseReason.CloseCodes.GOING_AWAY, "normal"));
-		} catch (IOException e) {}
+			ClientSession.close(new CloseReason(
+					CloseReason.CloseCodes.GOING_AWAY, "normal"));
+		} catch (IOException e) {
+		}
 	}
 
 	public static void setController(Controller c) {
@@ -313,7 +310,7 @@ public class WebsocketHandler {
 		try {
 
 			client.connectToServer(this, null, new URI(
-					"ws://localhost:8080/ServerWebSocket/websocket"));
+					"ws://79.32.190.112:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));
@@ -329,10 +326,9 @@ public class WebsocketHandler {
 		}
 		return connectionResult.OK;
 	}
-	
-	public class PingTimer extends TimerTask{
 
-	
+	public class PingTimer extends TimerTask {
+
 		@Override
 		public void run() {
 			try {
@@ -341,14 +337,14 @@ public class WebsocketHandler {
 							new ChatMessage("alive", ChatMessage.Type.PING));
 
 					System.out.println("PING!");
-				}
-				else{
+				} else {
 					System.out.println("Abort!");
 					this.cancel();
-					
+
 				}
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			}
 		}
-		
+
 	}
 }

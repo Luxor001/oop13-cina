@@ -30,6 +30,8 @@ public interface ViewObserver {
 
 	void notifyChatUser(String name) throws IOException, EncodeException;
 
+	void notifyChatUserIp(String ip);
+
 	void notifyFileUser(File file);
 
 	void notifySendFileUser() throws IOException, EncodeException;
