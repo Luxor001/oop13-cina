@@ -16,9 +16,13 @@ public interface ModelInterface {
 
 	void removeNickName(String name);
 
+	void addIp(String ip, String name);
+
 	void closeAll();
 
 	String exist(String name);
+
+	String existIp(String ip);
 
 	boolean isConnect(String ip);
 

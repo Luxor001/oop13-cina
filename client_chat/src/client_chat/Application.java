@@ -12,7 +12,7 @@ public class Application {
 	private static WebsocketHandler web;
 
 	public static void main(String[] args) throws IOException {
-
+		// new View();
 		start();
 	}
 

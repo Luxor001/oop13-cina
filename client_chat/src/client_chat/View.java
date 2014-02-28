@@ -24,6 +24,7 @@ import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -170,6 +171,7 @@ public class View extends JFrame implements ViewInterface {
 		InputStream imgStream = new FileInputStream(new File(icon_path));
 		BufferedImage myImg = ImageIO.read(imgStream);
 		this.setIconImage(myImg);
+		this.setLocationRelativeTo(null);
 		this.setTitle(frame_title);
 
 	}
@@ -318,6 +320,56 @@ public class View extends JFrame implements ViewInterface {
 
 					sendFile();
 				}
+
+				if (e.getActionCommand().equals("Chat to..")) {
+
+					class ChatTo {
+						private JFrame frame = new JFrame();
+						private String invalidIp = "Invalid ip";
+						private JTextArea txtIp = new JTextArea();
+						private JButton chat = new JButton("Chat");
+						private JPanel panel = new JPanel(null);
+
+						public ChatTo() {
+							frame.setTitle("Chat to");
+							frame.setSize(350, 100);
+							frame.setVisible(true);
+							frame.setLocationRelativeTo(null);
+							frame.getContentPane().add(panel);
+							frame.setResizable(false);
+
+							txtIp.setSize(125, 20);
+							txtIp.setLocation(frame.getSize().width / 2 - 102,
+									25);
+							txtIp.setBorder(BorderFactory
+									.createLineBorder(Color.BLACK));
+
+							chat.setSize(50, 20);
+							chat.setLocation(frame.getSize().width / 2 + 50, 25);
+							chat.setBorder(BorderFactory
+									.createLineBorder(Color.BLACK));
+
+							chat.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent e) {
+
+									String ip = txtIp.getText();
+									if (ip.trim().isEmpty()) {
+
+										controller.notifyChatUserIp(ip);
+									}
+
+								}
+
+							});
+
+							panel.add(txtIp);
+							panel.add(chat);
+						}
+
+					}
+					new ChatTo();
+				}
+
 			}
 		};
 	}
@@ -351,14 +403,7 @@ public class View extends JFrame implements ViewInterface {
 					if (e.getComponent() instanceof JMenu) {
 						JMenu menu = (JMenu) e.getComponent();
 
-						switch (menu.getText()) {
-						case "Chat": {
-
-							System.out.println("Private Chat");
-						}
-							break;
-
-						case "Help": {
+						if (menu.getText().equals("Help")) {
 							new Thread() {
 								public void run() {
 									try {
@@ -369,10 +414,6 @@ public class View extends JFrame implements ViewInterface {
 							}.start();
 
 						}
-
-							break;
-						}
-
 					} else {
 						if (e.getComponent() instanceof JTabbedPane) {
 							if (tabView.getBackgroundAt(getTabIndex()) == Color.ORANGE) {
