@@ -14,6 +14,7 @@ public class Controller implements ViewObserver {
 
 	private ViewInterface view = null;
 	private ModelInterface model = null;
+	private Object lockNotification = new Object();
 
 	public enum MessageBoxReason {
 		REQUEST_PRIVATE_CHAT, REQUEST_RECEIVE_FILE, ALERT_CLOSING_WINDOW
@@ -34,7 +35,7 @@ public class Controller implements ViewObserver {
 		model.showDownloads();
 	}
 
-	public void commandSendMessage() {
+	public void commandSendMessage(String message, String name) {
 
 		if (this.view.getTabIndex() == 0) {
 			/*
@@ -49,11 +50,17 @@ public class Controller implements ViewObserver {
 				e.printStackTrace();
 			}
 		} else { /* instead user wants to write on a private chat.. */
-			new Thread() {
-				public void run() {
-					model.sendMessage((view.sendMessage()), view.getTabName());
-				}
-			}.start();
+
+			String ip = model.exist(name);
+			if (ip != null) {
+				model.sendMessage(message, name);
+			} else {
+				commandReceiveMessage(
+						"the user may be disconnected or a new user has just login with the same nickname."
+								+ "in this case, if you want chat with this user ,send a new request of private chat",
+						name);
+			}
+
 		}
 
 	}
@@ -68,7 +75,8 @@ public class Controller implements ViewObserver {
 		if (!model.isConnect(ip)) {
 			this.model.connectToServer(ip, name, keyStore);
 		}
-		this.view.createTab(view.getTitle());
+
+		this.view.createTab(name);
 	}
 
 	public synchronized void commandReceiveMessage(String message, String title) {
@@ -89,7 +97,7 @@ public class Controller implements ViewObserver {
 		this.model.closeAll();
 	}
 
-	public void showMessageMain(String Message) {
+	public synchronized void showMessageMain(String Message) {
 		this.view.showMessageMain(Message);
 	}
 
@@ -147,27 +155,26 @@ public class Controller implements ViewObserver {
 	}
 
 	public void notifyFileUser(File file) {
-
 		model.sendFile(file, view.getTitle());
 	}
 
-	public synchronized void notifyChatUser() throws IOException,
-			EncodeException {
+	public void notifyChatUser(String name) throws IOException, EncodeException {
 
-		String name = view.getTitle();
-		String ip = model.exist(name);
+		synchronized (lockNotification) {
+			String ip = model.exist(name);
 
-		if (ip == null) {
-			model.addNickName(name, "pending");
-			ChatMessage message = new ChatMessage("Connect to",
-					Type.REQUESTPRIVATECHAT);
-			ChatMessage.Param params = new ChatMessage.Param();
-			params.setNickname(name);
-			message.setAdditionalParams(params);
-			WebsocketHandler.getWebSocketHandler().SendMex(message);
-		} else {
-			if (!ip.equals("pending")) {
-				commandCreateTab(ip, name, name + "ServerKey.jks");
+			if (ip == null) {
+				model.addNickName(name, "pending");
+				ChatMessage message = new ChatMessage("Connect to",
+						Type.REQUESTPRIVATECHAT);
+				ChatMessage.Param params = new ChatMessage.Param();
+				params.setNickname(name);
+				message.setAdditionalParams(params);
+				WebsocketHandler.getWebSocketHandler().SendMex(message);
+			} else {
+				if (!ip.equals("pending")) {
+					commandCreateTab(ip, name, name + "ServerKey.jks");
+				}
 			}
 		}
 

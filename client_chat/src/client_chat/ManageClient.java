@@ -7,26 +7,28 @@ import java.util.List;
 
 public class ManageClient {
 
-	List<Client> client = new ArrayList<>();
-	ViewObserver controller;
-	Model model;
+	private List<Client> client = new ArrayList<>();
+	private ViewObserver controller;
+	private Model model;
+	private Object lock = new Object();
 
 	public ManageClient(ViewObserver controller, Model model) {
 		this.controller = controller;
 		this.model = model;
 	}
 
-	public boolean addClient(String ip, String name, String keyStore)
+	public void addClient(String ip, String name, String keyStore)
 			throws ClassNotFoundException, IOException {
-
-		for (Client c : client) {
-			if (c.getIp().equals(ip)) {
-				return false;
+		synchronized (lock) {
+			for (Client c : client) {
+				if (c.getIp().equals(ip)) {
+					return;
+				}
 			}
 		}
 
 		client.add(new Client(ip, name, controller, model, keyStore));
-		return true;
+
 	}
 
 	public boolean isConnect(String ip) {
@@ -42,7 +44,7 @@ public class ManageClient {
 		return false;
 	}
 
-	public boolean sendMessage(String message, String name) {
+	public synchronized boolean sendMessage(String message, String name) {
 
 		if (client != null) {
 			for (Client c : client) {
@@ -55,15 +57,30 @@ public class ManageClient {
 		return false;
 	}
 
-	public boolean sendFile(File file, String name) {
+	public synchronized boolean sendFile(File file, String name) {
 		if (client != null) {
 			for (Client c : client) {
 				if (c.getNameServer().equals(name)) {
-					try {
-						c.sendFile(file);
-					} catch (IOException e) {
-						e.printStackTrace();
+
+					class SendFile extends Thread {
+						File file;
+						Client client;
+
+						public SendFile(File file, Client client) {
+							this.file = file;
+							this.client = client;
+						}
+
+						public void run() {
+							try {
+								client.sendFile(file);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
 					}
+
+					new SendFile(file, c);
 					return true;
 				}
 			}
@@ -71,20 +88,23 @@ public class ManageClient {
 		return false;
 	}
 
-	public void close() {
-
-		if (client != null) {
-			for (Client c : client) {
-				c.close();
+	public synchronized void close() {
+		synchronized (lock) {
+			if (client != null) {
+				for (Client c : client) {
+					c.close();
+				}
 			}
 		}
 	}
 
-	public void closeServer(String ip) {
-		for (int i = 0; i < client.size(); i++) {
-			if (client.get(i).getIp().equals(ip)) {
-				client.remove(i);
-				return;
+	public synchronized void closeServer(String ip) {
+		synchronized (lock) {
+			for (int i = 0; i < client.size(); i++) {
+				if (client.get(i).getIp().equals(ip)) {
+					client.remove(i);
+					return;
+				}
 			}
 		}
 	}

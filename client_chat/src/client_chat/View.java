@@ -209,41 +209,45 @@ public class View extends JFrame implements ViewInterface {
 
 	public void createTab(String title) {
 
-		JTextArea chatTmp = new JTextArea();
-		JPanel textPanelTmp = new JPanel(new BorderLayout(10, 10));
-		JPanel main = new JPanel(new BorderLayout(10, 10));
-		JPanel tab = new JPanel();
+		int index = checkTab(title);
+		if (index == -1) {
+			JTextArea chatTmp = new JTextArea();
+			JPanel textPanelTmp = new JPanel(new BorderLayout(10, 10));
+			JPanel main = new JPanel(new BorderLayout(10, 10));
+			JPanel tab = new JPanel();
 
-		chatTmp.setLineWrap(true);
-		chatTmp.setEditable(false);
+			chatTmp.setLineWrap(true);
+			chatTmp.setEditable(false);
 
-		DefaultCaret caret = (DefaultCaret) chatTmp.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+			DefaultCaret caret = (DefaultCaret) chatTmp.getCaret();
+			caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
-		chatList.add(chatTmp);
-		textList.add(this.getMyText());
+			chatList.add(chatTmp);
+			textList.add(this.getMyText());
 
-		scrollList.add(this.getMyScroll(chatTmp));
+			scrollList.add(this.getMyScroll(chatTmp));
 
-		textPanelTmp
-				.add(textList.get(textList.size() - 1), BorderLayout.CENTER);
+			textPanelTmp.add(textList.get(textList.size() - 1),
+					BorderLayout.CENTER);
 
-		main.add(scrollList.get(textList.size() - 1), BorderLayout.CENTER);
-		main.add(textPanelTmp, BorderLayout.SOUTH);
+			main.add(scrollList.get(textList.size() - 1), BorderLayout.CENTER);
+			main.add(textPanelTmp, BorderLayout.SOUTH);
 
-		tabView.addTab(title, main);
-		tabView.setSelectedIndex(tabView.getTabCount() - 1);
+			tabView.addTab(title, main);
+			tabView.setSelectedIndex(tabView.getTabCount() - 1);
 
-		tab.setOpaque(false);
-		tab.add(new JLabel(title));
-		JButton close = new JButton("x");
-		close.setOpaque(false);
+			tab.setOpaque(false);
+			tab.add(new JLabel(title));
+			JButton close = new JButton("x");
+			close.setOpaque(false);
 
-		close.setContentAreaFilled(false);
-		close.addActionListener(this.getActionListener());
-		tab.add(close);
-		tabView.setTabComponentAt(tabView.getTabCount() - 1, tab);
-
+			close.setContentAreaFilled(false);
+			close.addActionListener(this.getActionListener());
+			tab.add(close);
+			tabView.setTabComponentAt(tabView.getTabCount() - 1, tab);
+		} else {
+			tabView.setSelectedIndex(index);
+		}
 	}
 
 	public void showMessage(String message, String title) {
@@ -286,7 +290,12 @@ public class View extends JFrame implements ViewInterface {
 			public void actionPerformed(ActionEvent e) {
 
 				if (e.getActionCommand().equals("Send")) {
-					controller.commandSendMessage();
+					new Thread() {
+						public void run() {
+							controller.commandSendMessage(sendMessage(),
+									getTabName());
+						}
+					}.start();
 				}
 				if (e.getActionCommand().equals("Exit")) {
 					try {
@@ -330,21 +339,16 @@ public class View extends JFrame implements ViewInterface {
 
 				if (e.getComponent() instanceof JList) {
 					if (e.getClickCount() == 2) {
-						/* check if tab with user already exist.. */
-						int index = checkTab(getTitle());
-						if (index == -1) { // if not..
 
-							new Thread() {
-								public void run() {
-									try {
-										controller.notifyChatUser();
-									} catch (Exception e1) {
-									}
+						new Thread() {
+							public void run() {
+								try {
+									controller.notifyChatUser(getTitle());
+								} catch (Exception e1) {
 								}
-							}.start();
-						} else {
-							tabView.setSelectedIndex(index);
-						}
+							}
+						}.start();
+
 					}
 
 					// check if i click with righ mouse button
@@ -411,7 +415,12 @@ public class View extends JFrame implements ViewInterface {
 
 					e.consume(); // ignore the key pressed
 					if (!textList.get(getTabIndex()).getText().trim().isEmpty()) {
-						controller.commandSendMessage();
+						new Thread() {
+							public void run() {
+								controller.commandSendMessage(sendMessage(),
+										getTabName());
+							}
+						}.start();
 					}
 
 				}
@@ -574,7 +583,7 @@ public class View extends JFrame implements ViewInterface {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-						controller.notifyChatUser();
+						controller.notifyChatUser(getTitle());
 					} catch (Exception e1) {
 					}
 				}

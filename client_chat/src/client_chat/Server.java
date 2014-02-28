@@ -83,7 +83,7 @@ public class Server implements Runnable {
 
 	}
 
-	public boolean sendMessage(String message, String name) {
+	public synchronized boolean sendMessage(String message, String name) {
 
 		for (int i = 0; i < client.size(); i++) {
 			if (!client.get(i).isClosed() && client.get(i).isConnected()
@@ -101,15 +101,31 @@ public class Server implements Runnable {
 		return false;
 	}
 
-	public boolean sendFile(File file, String name) {
+	public synchronized boolean sendFile(File file, String name) {
 		for (int i = 0; i < client.size(); i++) {
 			if (!client.get(i).isClosed() && client.get(i).isConnected()
 					&& client.get(i).getNameClient().equals(name)) {
-				try {
-					client.get(i).sendFile(file);
-				} catch (IOException e) {
-					e.printStackTrace();
+
+				class SendFile extends Thread {
+					private File file;
+					private MessageFromClient client;
+
+					public SendFile(File file, MessageFromClient client) {
+						this.file = file;
+						this.client = client;
+					}
+
+					public void run() {
+						try {
+							client.sendFile(file);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
 				}
+
+				new SendFile(file, client.get(i));
+
 				return true;
 			}
 		}

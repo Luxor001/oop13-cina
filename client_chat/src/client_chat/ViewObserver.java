@@ -8,7 +8,7 @@ import javax.websocket.EncodeException;
 
 public interface ViewObserver {
 
-	void commandSendMessage();
+	void commandSendMessage(String message, String name);
 
 	void commandShowDownloads();
 
@@ -28,7 +28,7 @@ public interface ViewObserver {
 
 	void notifyClosing() throws IOException, EncodeException;
 
-	void notifyChatUser() throws IOException, EncodeException;
+	void notifyChatUser(String name) throws IOException, EncodeException;
 
 	void notifyFileUser(File file);
 

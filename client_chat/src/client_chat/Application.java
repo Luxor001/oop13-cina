@@ -12,12 +12,14 @@ public class Application {
 	private static WebsocketHandler web;
 
 	public static void main(String[] args) throws IOException {
+
 		start();
 	}
 
-	public static void start(){
+	public static void start() {
 		splash = new SplashScreen();
 	}
+
 	public static void chat_initialization() throws IOException {
 
 		web = WebsocketHandler.getWebSocketHandler();

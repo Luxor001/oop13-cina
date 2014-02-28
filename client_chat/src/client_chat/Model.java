@@ -22,16 +22,23 @@ public class Model implements ModelInterface {
 	private KeyStoreServer keyStoreServer;
 	private Map<String, String> peopleChat = new HashMap<>();
 	private WebsocketHandler sockethandler;
+	private Object lockPeopleChat = new Object();
 
-	public synchronized void sendMessage(String message, String name) {
+	public void sendMessage(String message, String name) {
 
 		if (message != "") {
 			if (!server.sendMessage(message, name)) {
 				if (!client.sendMessage(message, name)) {
-					connectToServer(peopleChat.get(name).substring(1), name,
-							System.getProperty("user.dir") + "/" + name
-									+ "ServerKey.jks");
-					client.sendMessage(message, name);
+					String ip;
+					synchronized (lockPeopleChat) {
+						ip = peopleChat.get(name);
+					}
+					if (ip != null) {
+						connectToServer(ip.substring(1), name,
+								System.getProperty("user.dir") + "/" + name
+										+ "ServerKey.jks");
+						client.sendMessage(message, name);
+					}
 				}
 			}
 		}
@@ -40,10 +47,16 @@ public class Model implements ModelInterface {
 	public void sendFile(File file, String name) {
 		if (!server.sendFile(file, name)) {
 			if (!client.sendFile(file, name)) {
-				connectToServer(peopleChat.get(name).substring(1), name,
-						System.getProperty("user.dir") + "/" + name
-								+ "ServerKey.jks");
-				client.sendFile(file, name);
+				String ip;
+				synchronized (lockPeopleChat) {
+					ip = peopleChat.get(name);
+				}
+				if (ip != null) {
+					connectToServer(ip.substring(1), name,
+							System.getProperty("user.dir") + "/" + name
+									+ "ServerKey.jks");
+					client.sendFile(file, name);
+				}
 			}
 		}
 	}
@@ -55,12 +68,16 @@ public class Model implements ModelInterface {
 		}
 	}
 
-	public synchronized void addNickName(String nickName, String ip) {
-		peopleChat.put(nickName, ip);
+	public void addNickName(String nickName, String ip) {
+		synchronized (lockPeopleChat) {
+			peopleChat.put(nickName, ip);
+		}
 	}
 
-	public synchronized void removeNickName(String name) {
-		peopleChat.remove(name);
+	public void removeNickName(String name) {
+		synchronized (lockPeopleChat) {
+			peopleChat.remove(name);
+		}
 		deleteFile(new File(System.getProperty("user.dir") + "/" + name
 				+ "ServerKey.jks"));
 	}
@@ -103,11 +120,11 @@ public class Model implements ModelInterface {
 
 	}
 
-	public synchronized void closeClient(String name) {
+	public void closeClient(String name) {
 		server.closeClient(name);
 	}
 
-	public synchronized void closeServer(String ip) {
+	public void closeServer(String ip) {
 		client.closeServer(ip);
 	}
 
@@ -154,6 +171,7 @@ public class Model implements ModelInterface {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	private void createKeyStore(String name, String alias, String password) {

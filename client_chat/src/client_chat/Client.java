@@ -42,7 +42,8 @@ public class Client implements Runnable {
 	private boolean stop = false;
 	private Downloaded download;
 	private CountDownLatch latch = new CountDownLatch(1);
-	Model model;
+	private Object lock = new Object();
+	private Model model;
 
 	public Client(String ip, String name, ViewObserver controller, Model model,
 			String keyStore) throws IOException, ClassNotFoundException {
@@ -103,11 +104,13 @@ public class Client implements Runnable {
 
 	public void run() {
 
-		try {
-			sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, 9999);
-			sslSocket.startHandshake();
-		} catch (IOException e) {
-			model.addNickName(nameServer, null);
+		synchronized (lock) {
+			try {
+				sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, 9999);
+				sslSocket.startHandshake();
+			} catch (IOException e) {
+				model.addNickName(nameServer, null);
+			}
 		}
 
 		System.out.println("** Sono connesso con il server **");
@@ -276,30 +279,30 @@ public class Client implements Runnable {
 		fileStream.close();
 	}
 
-	public synchronized void sendMessage(byte[] message, int filesize,
-			int step, String name) {
-		if (sslSocket.isConnected() && !sslSocket.isClosed()) {
-			try {
-				oos.writeObject(true);
-				oos.flush();
-				oos.writeInt(filesize);
-				oos.flush();
-				oos.writeInt(step);
-				oos.flush();
-				oos.writeUTF(name);
-				oos.flush();
-				oos.write(message, 0, step);
-				oos.flush();
-				resetTime = true;
-			} catch (IOException e) {
+	public void sendMessage(byte[] message, int filesize, int step, String name) {
+		synchronized (lock) {
+			if (sslSocket.isConnected() && !sslSocket.isClosed()) {
+				try {
+					oos.writeObject(true);
+					oos.flush();
+					oos.writeInt(filesize);
+					oos.flush();
+					oos.writeInt(step);
+					oos.flush();
+					oos.writeUTF(name);
+					oos.flush();
+					oos.write(message, 0, step);
+					oos.flush();
+					resetTime = true;
+				} catch (IOException e) {
+				}
 			}
 		}
 	}
 
-	public synchronized void sendMessage(String message) {
-		int cont = 0;
+	public void sendMessage(String message) {
 
-		while (cont < 5) {
+		synchronized (lock) {
 			if (sslSocket.isConnected() && !sslSocket.isClosed()) {
 				try {
 					resetTime = true;
@@ -307,24 +310,11 @@ public class Client implements Runnable {
 					oos.flush();
 					oos.writeObject(message);
 					oos.flush();
-					cont = 6;
 				} catch (IOException e) {
 				}
-			} else {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+
 			}
-			cont++;
 		}
-
-		if (cont == 5) {
-			controller.commandReceiveMessage("Messaggio non inviato,riprova",
-					getNameServer());
-		}
-
 	}
 
 	public void close() {
