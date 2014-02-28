@@ -29,7 +29,8 @@ public class ChatMessage {
 		NICKNAMEUNAVAIABLE, 
 		REQUESTSENDFILE, 
 		REQUESTEDSENDFILE,
-		RESETFLAG
+		RESETFLAG,
+		PING
 	}
 
 	private Param additionalParams;
