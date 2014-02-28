@@ -316,18 +316,7 @@ public class View extends JFrame implements ViewInterface {
 				}
 				if (e.getActionCommand().equals("Send File")) {
 
-					chooser = new JFileChooser();
-
-					int returnVal = chooser.showDialog(new JButton("Send"),
-							"Send");
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						new Thread() {
-							public void run() {
-								controller.notifyFileUser(chooser
-										.getSelectedFile());
-							}
-						}.start();
-					}
+					sendFile();
 				}
 			}
 		};
@@ -340,14 +329,7 @@ public class View extends JFrame implements ViewInterface {
 				if (e.getComponent() instanceof JList) {
 					if (e.getClickCount() == 2) {
 
-						new Thread() {
-							public void run() {
-								try {
-									controller.notifyChatUser(getTitle());
-								} catch (Exception e1) {
-								}
-							}
-						}.start();
+						privateChat();
 
 					}
 
@@ -572,7 +554,35 @@ public class View extends JFrame implements ViewInterface {
 
 	}
 
-	class PopUpDemo extends JPopupMenu {
+	public void sendFile() {
+
+		chooser = new JFileChooser();
+
+		int returnVal = chooser.showDialog(new JButton("Send"), "Send");
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			new Thread() {
+				public void run() {
+					controller.notifyFileUser(chooser.getSelectedFile());
+				}
+			}.start();
+		}
+
+	}
+
+	public void privateChat() {
+
+		new Thread() {
+			public void run() {
+				try {
+					controller.notifyChatUser(getTitle());
+				} catch (Exception e1) {
+				}
+			}
+		}.start();
+
+	}
+
+	private class PopUpDemo extends JPopupMenu {
 		private JMenuItem anItem;
 
 		public PopUpDemo() {
@@ -582,10 +592,7 @@ public class View extends JFrame implements ViewInterface {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					try {
-						controller.notifyChatUser(getTitle());
-					} catch (Exception e1) {
-					}
+					privateChat();
 				}
 			});
 
@@ -595,10 +602,8 @@ public class View extends JFrame implements ViewInterface {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					try {
-						controller.notifySendFileUser();
-					} catch (Exception e1) {
-					}
+
+					sendFile();
 				}
 			});
 
