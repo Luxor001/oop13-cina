@@ -199,5 +199,6 @@ public class Controller implements ViewObserver {
 		}
 		model.closeAll();
 		view.closeChat();
+		WebsocketHandler.getWebSocketHandler().closeConnection();
 	}
 }

@@ -53,7 +53,8 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 		}
 		if (message.getType() == ChatMessage.Type.NEWUSER
 				|| message.getType() == ChatMessage.Type.USERDISCONNECTED
-				|| message.getType() == ChatMessage.Type.REQUESTPRIVATECHAT) {
+				|| message.getType() == ChatMessage.Type.REQUESTPRIVATECHAT 
+				|| message.getType() == ChatMessage.Type.NOPRIVATECHAT) {
 			builder.add(Json.createObjectBuilder().add("Nickname",
 					param.getNickname()));
 			return builder.build();
@@ -72,12 +73,13 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 			return builder.build();
 		}
 
-		if (message.getType() == ChatMessage.Type.REQUESTSENDFILE) {
+		if(message.getType() == ChatMessage.Type.REQUESTEDSENDFILE || 
+				message.getType() ==  ChatMessage.Type.REQUESTSENDFILE){			
 			builder.add(Json.createObjectBuilder().add("Nickname",
 					param.getNickname()));
 			builder.add(Json.createObjectBuilder().add("FileName",
 					param.getFileName()));
-			return builder.build();
+			return builder.build();		
 		}
 
 		builder.add(Json.createObjectBuilder().add("Visibility",

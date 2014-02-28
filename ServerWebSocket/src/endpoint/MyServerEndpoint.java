@@ -50,11 +50,21 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	
 	@OnClose
 	public void onClose(Session clientsession) {
-		
-		User user=searchUser(clientsession);
-		
-		if(user != null){				
+
+		User user = searchUser(clientsession);
+		if (user != null) {
 			UsersList.remove(user.GetSession());
+			ChatMessage cmessage = new ChatMessage("disconnecting",
+					Type.USERDISCONNECTED);
+			ChatMessage.Param addp = new Param();
+			addp.setNickname(user.GetNickname());
+			cmessage.setAdditionalParams(addp);
+
+			try {
+				sendGlobalMex(cmessage);
+			} catch (Exception e) {
+			}
+
 		}
 	}
 
@@ -156,22 +166,22 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			cmessage.getAdditionalParams().setNickname(agreedinguser.GetNickname());
 			cmessage.getAdditionalParams().setIP(message.getAdditionalParams().getIP());
 			sendMex(cmessage,Targetusr.GetSession());
-		}
-		
+		}			
+		if(message.getType() == Type.NOPRIVATECHAT){			
+			User agreedinguser=searchUser(clientsession); /*SENDER*/
+			User Targetusr=searchUser(message.getAdditionalParams().getNickname()); /*Target*/			
 			
+			ChatMessage cmessage=new ChatMessage("respond",Type.NOPRIVATECHAT);
+			cmessage.getAdditionalParams().setNickname(agreedinguser.GetNickname());
+			sendMex(cmessage,Targetusr.GetSession());
+		}			
 	}
-
-	
-
 	
 	@OnError
 	public void onError(Session clientsession, Throwable aThrowable) {
 		System.out.println("Error : " + clientsession);
 
 	}
-		
-	
-	
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) { //Launched at the web app starting time.

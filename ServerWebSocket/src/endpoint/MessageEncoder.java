@@ -55,12 +55,18 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 			return builder.build();
 		}
 		
-		if(message.getType() == ChatMessage.Type.NEWUSER ||
-				message.getType() == ChatMessage.Type.USERDISCONNECTED ||
-				message.getType() == ChatMessage.Type.REQUESTEDPRIVATECHAT){
-			builder.add(Json.createObjectBuilder().add("Nickname",param.getNickname()));
+
+		if (message.getType() == ChatMessage.Type.NEWUSER
+				|| message.getType() == ChatMessage.Type.USERDISCONNECTED
+				|| message.getType() == ChatMessage.Type.REQUESTEDPRIVATECHAT 
+				|| message.getType() == ChatMessage.Type.NOPRIVATECHAT) {
+			builder.add(Json.createObjectBuilder().add("Nickname",
+					param.getNickname()));
 			return builder.build();
-		}		
+		}
+		
+		
+
 		
 		if (message.getType() == ChatMessage.Type.TEXT) {
 			builder.add(Json.createObjectBuilder().add("Nickname",
@@ -76,7 +82,8 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 			
 		}
 		
-		if(message.getType() == ChatMessage.Type.REQUESTEDSENDFILE){
+		if(message.getType() == ChatMessage.Type.REQUESTEDSENDFILE || 
+				message.getType() ==  ChatMessage.Type.REQUESTSENDFILE){			
 			builder.add(Json.createObjectBuilder().add("Nickname",
 					param.getNickname()));
 			builder.add(Json.createObjectBuilder().add("FileName",

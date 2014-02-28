@@ -178,7 +178,7 @@ public class WebsocketHandler {
 				msg.getAdditionalParams().setIP(ip);
 			} else {
 				msg = new ChatMessage("No", Type.NOPRIVATECHAT);
-				msg.getAdditionalParams().setNickname(senderNick);
+				msg.getAdditionalParams().setNickname(senderNick);				
 			}
 			SendMex(msg);
 		}
@@ -228,6 +228,7 @@ public class WebsocketHandler {
 		}
 
 		if (message.getType() == Type.NOPRIVATECHAT) {
+			System.out.println("NO RECEIVED");
 			controller.commandRefusedChat(message.getAdditionalParams()
 					.getNickname());
 		}
@@ -242,8 +243,8 @@ public class WebsocketHandler {
 					.buildChoiceMessageBox(
 							MessageBoxReason.REQUEST_RECEIVE_FILE, senderNick,
 							fileName);
-
-			System.out.println(choice);
+			
+			
 		}
 	}
 
@@ -257,10 +258,19 @@ public class WebsocketHandler {
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason)
 			throws IOException, EncodeException {
-		System.out
-				.println("Connection dropped, you might be kicked from the server");
-		controller.closeChat();
+		
+		/*closing connection from the SERVER*/
+		if(closeReason.equals(CloseReason.CloseCodes.CLOSED_ABNORMALLY)){
+			controller.closeChat();
+			System.out
+			.println("Connection dropped, you might be kicked from the server");
+		}
 
+
+		/*closing connection from the client*/
+		if(closeReason.equals(CloseReason.CloseCodes.GOING_AWAY)){
+			
+		}
 		// latch.countDown();
 	}
 
@@ -274,6 +284,12 @@ public class WebsocketHandler {
 		} else {
 			return false;
 		}
+	}
+	
+	public void closeConnection(){
+		try {
+			ClientSession.close(new CloseReason(CloseReason.CloseCodes.GOING_AWAY, "normal"));
+		} catch (IOException e) {}
 	}
 
 	public static void setController(Controller c) {
@@ -297,7 +313,7 @@ public class WebsocketHandler {
 		try {
 
 			client.connectToServer(this, null, new URI(
-					"ws://192.168.1.3:8080/ServerWebSocket/websocket"));
+					"ws://localhost:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));
@@ -320,8 +336,17 @@ public class WebsocketHandler {
 		@Override
 		public void run() {
 			try {
-				WebsocketHandler.getWebSocketHandler().SendMex(new ChatMessage("alive", ChatMessage.Type.PING));
-				System.out.println("PING SENT!");
+				if (WebsocketHandler.getWebSocketHandler().isConnected()) {
+					WebsocketHandler.getWebSocketHandler().SendMex(
+							new ChatMessage("alive", ChatMessage.Type.PING));
+
+					System.out.println("PING!");
+				}
+				else{
+					System.out.println("Abort!");
+					this.cancel();
+					
+				}
 			} catch (Exception e) {}
 		}
 		
