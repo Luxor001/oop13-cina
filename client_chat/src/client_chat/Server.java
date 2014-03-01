@@ -103,9 +103,11 @@ public class Server implements Runnable {
 
 	public synchronized boolean sendFile(File file, String name) {
 		for (int i = 0; i < client.size(); i++) {
+			System.out.println("ciao");
 			if (!client.get(i).isClosed() && client.get(i).isConnected()
 					&& client.get(i).getNameClient().equals(name)) {
 
+				System.out.println("bingo");
 				class SendFile extends Thread {
 					private File file;
 					private MessageFromClient client;
@@ -124,7 +126,7 @@ public class Server implements Runnable {
 					}
 				}
 
-				new SendFile(file, client.get(i));
+				new SendFile(file, client.get(i)).start();
 
 				return true;
 			}
@@ -133,10 +135,10 @@ public class Server implements Runnable {
 		return false;
 	}
 
-	public boolean isConnect(String ip) {
+	public synchronized boolean isConnect(String ip) {
 
 		for (int i = 0; i < client.size(); i++) {
-			if (client.get(i).getIp().equals(ip)) {
+			if (client.get(i).getIp().substring(1).equals(ip)) {
 				return (!client.get(i).isClosed())
 						&& client.get(i).isConnected();
 
@@ -215,7 +217,7 @@ public class Server implements Runnable {
 				nameClient = (String) ois.readObject();
 				ip = sslSocket.getInetAddress().toString();
 				model.addNickName(nameClient, sslSocket.getInetAddress()
-						.toString());
+						.toString().substring(1));
 			} catch (IOException | ClassNotFoundException e1) {
 				e1.printStackTrace();
 			}
@@ -366,10 +368,16 @@ public class Server implements Runnable {
 		}
 
 		public boolean isConnected() {
+			if (sslSocket == null) {
+				return false;
+			}
 			return sslSocket.isConnected();
 		}
 
 		public boolean isClosed() {
+			if (sslSocket == null) {
+				return true;
+			}
 			return sslSocket.isClosed();
 		}
 

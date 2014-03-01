@@ -31,10 +31,10 @@ public class ManageClient {
 
 	}
 
-	public boolean isConnect(String ip) {
+	public synchronized boolean isConnect(String ip) {
 
 		for (int i = 0; i < client.size(); i++) {
-			if (client.get(i).getIp().equals(ip)) {
+			if (client.get(i).getIp().substring(1).equals(ip)) {
 				return (!client.get(i).isClosed())
 						&& client.get(i).isConnected();
 
@@ -48,7 +48,8 @@ public class ManageClient {
 
 		if (client != null) {
 			for (Client c : client) {
-				if (c.getNameServer().equals(name)) {
+				if (c.getNameServer().equals(name) && !c.isClosed()
+						&& c.isConnected()) {
 					c.sendMessage(message);
 					return true;
 				}
@@ -60,7 +61,8 @@ public class ManageClient {
 	public synchronized boolean sendFile(File file, String name) {
 		if (client != null) {
 			for (Client c : client) {
-				if (c.getNameServer().equals(name)) {
+				if (c.getNameServer().equals(name) && !c.isClosed()
+						&& c.isConnected()) {
 
 					class SendFile extends Thread {
 						File file;
@@ -80,7 +82,7 @@ public class ManageClient {
 						}
 					}
 
-					new SendFile(file, c);
+					new SendFile(file, c).start();
 					return true;
 				}
 			}

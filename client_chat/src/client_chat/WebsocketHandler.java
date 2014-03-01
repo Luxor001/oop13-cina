@@ -1,15 +1,8 @@
 package client_chat;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.MalformedURLException;
-import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -158,8 +151,8 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDPRIVATECHAT) {
 
-			String ip=getIP();
-			
+			String ip = getIP();
+
 			String senderNick = message.getAdditionalParams().getNickname();
 			int choice = WebsocketHandler.controller.buildChoiceMessageBox(
 					MessageBoxReason.REQUEST_PRIVATE_CHAT, senderNick);
@@ -177,55 +170,29 @@ public class WebsocketHandler {
 		}
 
 		if (message.getType() == Type.YESPRIVATECHAT) {
+
 			/* IP to connect on private chat */
 			String iptoconnect = message.getAdditionalParams().getIP();
-			Socket socket = new Socket(iptoconnect, 9998);
 
-			File file = new File(System.getProperty("user.dir") + "/"
-					+ DEBUG_NICKNAME + "ServerKey.jks");
-			String name = "";
-			try {
+			String name = Client.ObtainKeyStore(iptoconnect, "Web Server");
 
-				ObjectOutputStream oos = new ObjectOutputStream(
-						socket.getOutputStream());
-				ObjectInputStream ois = new ObjectInputStream(
-						socket.getInputStream());
-
-				oos.writeUTF(DEBUG_NICKNAME);
-				oos.flush();
-				name = ois.readUTF();
-				FileInputStream fileStream = new FileInputStream(file);
-				byte[] buffer = new byte[10240];
-				fileStream.read(buffer);
-				oos.write(buffer);
-				File receivedFile = new File(System.getProperty("user.dir")
-						+ "/" + name + "ServerKey.jks");
-				receivedFile.createNewFile();
-				FileOutputStream outStream = new FileOutputStream(receivedFile);
-
-				byte[] bufferReader = new byte[10240];
-				ois.readFully(bufferReader);
-				outStream.write(bufferReader);
-				oos.close();
-				ois.close();
-				socket.close();
-				fileStream.close();
-				outStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+			if (name != null) {
+				controller.commandCreateTab(iptoconnect, name,
+						System.getProperty("user.dir") + "/" + name
+								+ "ServerKey.jks");
+			} else {
+				controller.commandRefusedChat(message.getAdditionalParams()
+						.getNickname());
 			}
 
-			controller.commandCreateTab(iptoconnect, name,
-					System.getProperty("user.dir") + "/" + name
-							+ "ServerKey.jks");
 		}
-		
-		if(message.getType() == Type.YESSENDFILE){
-			int a=0;
-			//message.getAdditionalParams().getIP()
-			//message.getAdditionalParams().getFileName()
-			//message.getAdditionalParams().getNickname()
-			/*CODE HERE*/
+
+		if (message.getType() == Type.YESSENDFILE) {
+			int a = 0;
+			// message.getAdditionalParams().getIP()
+			// message.getAdditionalParams().getFileName()
+			// message.getAdditionalParams().getNickname()
+			/* CODE HERE */
 		}
 
 		if (message.getType() == Type.NOPRIVATECHAT) {
@@ -236,15 +203,15 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDSENDFILE) {
 
-			String ip=getIP();
-			
+			String ip = getIP();
+
 			String senderNick = message.getAdditionalParams().getNickname();
 			String fileName = message.getAdditionalParams().getFileName();
 			int choice = WebsocketHandler.controller
 					.buildChoiceMessageBox(
 							MessageBoxReason.REQUEST_RECEIVE_FILE, senderNick,
 							fileName);
-			
+
 			ChatMessage msg;
 			if (choice == 0) {
 				msg = new ChatMessage("Yes", Type.YESSENDFILE);
@@ -308,13 +275,12 @@ public class WebsocketHandler {
 	public static void setController(Controller c) {
 		controller = c;
 	}
-	
-	public String getIP() throws IOException{
+
+	public String getIP() throws IOException {
 
 		String surl = "http://vallentinsource.com/globalip.php";
 		URL url = new URL(surl);
-		InputStreamReader inpstrmread = new InputStreamReader(
-				url.openStream());
+		InputStreamReader inpstrmread = new InputStreamReader(url.openStream());
 		BufferedReader reader = new BufferedReader(inpstrmread);
 		String ip = reader.readLine();
 		return ip;

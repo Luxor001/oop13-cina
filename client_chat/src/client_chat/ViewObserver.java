@@ -1,7 +1,6 @@
 package client_chat;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.io.IOException;
 
 import javax.websocket.EncodeException;
@@ -15,6 +14,8 @@ public interface ViewObserver {
 	void commandCloseTab(ActionEvent e);
 
 	void commandCreateTab(String ip, String name, String keystore);
+
+	// void commandConnectTo(String ip);
 
 	void commandReceiveMessage(String message, String title);
 
