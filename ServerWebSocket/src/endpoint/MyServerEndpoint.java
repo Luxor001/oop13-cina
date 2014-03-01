@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.json.Json;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.ServerEndpoint;
+
+import com.sun.messaging.jmq.jmsservice.JMSService.MessageAckType;
 
 import endpoint.ChatMessage.Param;
 import endpoint.ChatMessage.Type;
@@ -156,22 +159,30 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			sendMex(cmessage, Targetusr.GetSession());
 		}
 		
-		if(message.getType() == Type.YESPRIVATECHAT){
+		if(message.getType() == Type.YESPRIVATECHAT ||
+				message.getType() == Type.YESSENDFILE){
 			
 			User agreedinguser=searchUser(clientsession); /*SENDER*/
 			User Targetusr=searchUser(message.getAdditionalParams().getNickname()); /*Target*/
 			
 			
-			ChatMessage cmessage=new ChatMessage("respond",Type.YESPRIVATECHAT);
+			ChatMessage cmessage=new ChatMessage("respond",message.getType());
 			cmessage.getAdditionalParams().setNickname(agreedinguser.GetNickname());
 			cmessage.getAdditionalParams().setIP(message.getAdditionalParams().getIP());
+			
+
+			if(message.getType() == ChatMessage.Type.YESSENDFILE){
+				cmessage.getAdditionalParams().setFileName(
+						message.getAdditionalParams().getFileName());
+			}
 			sendMex(cmessage,Targetusr.GetSession());
 		}			
-		if(message.getType() == Type.NOPRIVATECHAT){			
+		if(message.getType() == Type.NOPRIVATECHAT || 
+				message.getType() == Type.NOSENDFILE){			
 			User agreedinguser=searchUser(clientsession); /*SENDER*/
 			User Targetusr=searchUser(message.getAdditionalParams().getNickname()); /*Target*/			
 			
-			ChatMessage cmessage=new ChatMessage("respond",Type.NOPRIVATECHAT);
+			ChatMessage cmessage=new ChatMessage("respond",message.getType());
 			cmessage.getAdditionalParams().setNickname(agreedinguser.GetNickname());
 			sendMex(cmessage,Targetusr.GetSession());
 		}			

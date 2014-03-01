@@ -44,6 +44,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.websocket.EncodeException;
 
 /* SFX Used in this Class:
  * -Snap: for plain text notifications. Creative commons 0 license. 
@@ -603,7 +604,11 @@ public class View extends JFrame implements ViewInterface {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			new Thread() {
 				public void run() {
-					controller.notifyFileUser(chooser.getSelectedFile());
+					try {
+						controller.notifySendFileUser(
+								chooser.getSelectedFile().getName());
+					} catch (Exception e) {		}
+					//controller.notifyFileUser(chooser.getSelectedFile());
 				}
 			}.start();
 		}

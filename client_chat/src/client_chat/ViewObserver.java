@@ -32,9 +32,7 @@ public interface ViewObserver {
 
 	void notifyChatUserIp(String ip);
 
-	void notifyFileUser(File file);
-
-	void notifySendFileUser() throws IOException, EncodeException;
+	void notifySendFileUser(String path) throws IOException, EncodeException;
 
 	public int buildChoiceMessageBox(Controller.MessageBoxReason reason,
 			String... optsender);

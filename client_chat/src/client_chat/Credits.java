@@ -21,8 +21,8 @@ public class Credits {
 			+ "\nAll the private informations (such as IP and private informations) are NOT \nstored in our main server,\n allowing you "
 			+ "to have also an anonimous public chat.\n\nRemember: you and you are the real responsable of your privacy.\nDon't share "
 			+ "your personal informations with anyone in public chat!";
-	private String CREDITS_TXT = "CryptoChat© Version 1.0 Precise Fat Cat\n\n"
-			+ "Copyright© Stefano Belli & Francesco Cozzolino,\nAll right reserved.";
+	private String CREDITS_TXT = "CryptoChat(c) Version 1.0 Precise Fat Cat\n\n"
+			+ "Copyright(c) Stefano Belli & Francesco Cozzolino,\nAll right reserved.";
 
 	public Credits() throws BadLocationException {
 
