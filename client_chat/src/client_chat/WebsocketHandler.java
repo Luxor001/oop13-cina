@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -157,15 +158,8 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDPRIVATECHAT) {
 
-			String surl = "http://vallentinsource.com/globalip.php";
-			URL url = new URL(surl);
-			InputStreamReader inpstrmread = new InputStreamReader(
-					url.openStream());
-			BufferedReader reader = new BufferedReader(inpstrmread);
-			String ip = reader.readLine();
-			/* ## GOT IP (store to private static variable?) ## */
-
-			// BISOGNA CONTROLLARE SE QUESTI JOPTIONPANE NON FERMANO IL THREAD.
+			String ip=getIP();
+			
 			String senderNick = message.getAdditionalParams().getNickname();
 			int choice = WebsocketHandler.controller.buildChoiceMessageBox(
 					MessageBoxReason.REQUEST_PRIVATE_CHAT, senderNick);
@@ -225,6 +219,14 @@ public class WebsocketHandler {
 					System.getProperty("user.dir") + "/" + name
 							+ "ServerKey.jks");
 		}
+		
+		if(message.getType() == Type.YESSENDFILE){
+			int a=0;
+			//message.getAdditionalParams().getIP()
+			//message.getAdditionalParams().getFileName()
+			//message.getAdditionalParams().getNickname()
+			/*CODE HERE*/
+		}
 
 		if (message.getType() == Type.NOPRIVATECHAT) {
 			System.out.println("NO RECEIVED");
@@ -234,12 +236,26 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDSENDFILE) {
 
+			String ip=getIP();
+			
 			String senderNick = message.getAdditionalParams().getNickname();
 			String fileName = message.getAdditionalParams().getFileName();
 			int choice = WebsocketHandler.controller
 					.buildChoiceMessageBox(
 							MessageBoxReason.REQUEST_RECEIVE_FILE, senderNick,
 							fileName);
+			
+			ChatMessage msg;
+			if (choice == 0) {
+				msg = new ChatMessage("Yes", Type.YESSENDFILE);
+				msg.getAdditionalParams().setNickname(senderNick);
+				msg.getAdditionalParams().setIP(ip);
+				msg.getAdditionalParams().setFileName(fileName);
+			} else {
+				msg = new ChatMessage("No", Type.NOSENDFILE);
+				msg.getAdditionalParams().setNickname(senderNick);
+			}
+			SendMex(msg);
 
 		}
 	}
@@ -292,6 +308,17 @@ public class WebsocketHandler {
 	public static void setController(Controller c) {
 		controller = c;
 	}
+	
+	public String getIP() throws IOException{
+
+		String surl = "http://vallentinsource.com/globalip.php";
+		URL url = new URL(surl);
+		InputStreamReader inpstrmread = new InputStreamReader(
+				url.openStream());
+		BufferedReader reader = new BufferedReader(inpstrmread);
+		String ip = reader.readLine();
+		return ip;
+	}
 
 	private static CountDownLatch latch;
 
@@ -310,7 +337,7 @@ public class WebsocketHandler {
 		try {
 
 			client.connectToServer(this, null, new URI(
-					"ws://79.32.190.112:8080/ServerWebSocket/websocket"));
+					"ws://localhost:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));
@@ -345,6 +372,5 @@ public class WebsocketHandler {
 			} catch (Exception e) {
 			}
 		}
-
 	}
 }

@@ -154,10 +154,6 @@ public class Controller implements ViewObserver {
 		return view.buildChoiceMessageBox(message, title, options, iconType);
 	}
 
-	public void notifyFileUser(File file) {
-		model.sendFile(file, view.getTitle());
-	}
-
 	public void notifyChatUser(String name) throws IOException, EncodeException {
 
 		synchronized (lockNotification) {
@@ -194,13 +190,13 @@ public class Controller implements ViewObserver {
 		}
 	}
 
-	public void notifySendFileUser() throws IOException, EncodeException {
+	public void notifySendFileUser(String path) throws IOException, EncodeException {
 
 		ChatMessage message = new ChatMessage("Connect to",
 				Type.REQUESTSENDFILE);
 		ChatMessage.Param params = new ChatMessage.Param();
 		params.setNickname(view.getTitle());
-		params.setFileName("Path"); /* ##INSERT PATH HERE FOR GOD SAKE## */
+		params.setFileName(path);
 		message.setAdditionalParams(params);
 		WebsocketHandler.getWebSocketHandler().SendMex(message);
 	}
