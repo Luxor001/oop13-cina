@@ -24,6 +24,7 @@ public class Model implements ModelInterface {
 	private Map<String, String> peopleIp = new HashMap<>();
 	private WebsocketHandler sockethandler;
 	private Object lockPeopleChat = new Object();
+	private Object lockPeopleIp = new Object();
 
 	public void sendMessage(String message, String name) {
 
@@ -35,9 +36,14 @@ public class Model implements ModelInterface {
 						ip = peopleChat.get(name);
 					}
 					if (ip != null) {
-						connectToServer(ip.substring(1), name,
+						connectToServer(ip, name,
 								System.getProperty("user.dir") + "/" + name
 										+ "ServerKey.jks");
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 						client.sendMessage(message, name);
 					}
 				}
@@ -53,9 +59,13 @@ public class Model implements ModelInterface {
 					ip = peopleChat.get(name);
 				}
 				if (ip != null) {
-					connectToServer(ip.substring(1), name,
-							System.getProperty("user.dir") + "/" + name
-									+ "ServerKey.jks");
+					connectToServer(ip, name, System.getProperty("user.dir")
+							+ "/" + name + "ServerKey.jks");
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 					client.sendFile(file, name);
 				}
 			}
@@ -72,6 +82,7 @@ public class Model implements ModelInterface {
 	public void addNickName(String nickName, String ip) {
 		synchronized (lockPeopleChat) {
 			peopleChat.put(nickName, ip);
+			removeIp(ip);
 		}
 	}
 
@@ -84,7 +95,16 @@ public class Model implements ModelInterface {
 	}
 
 	public void addIp(String ip, String name) {
-		peopleIp.put(ip, name);
+		synchronized (lockPeopleIp) {
+			peopleIp.put(ip, name);
+
+		}
+	}
+
+	public void removeIp(String ip) {
+		synchronized (lockPeopleIp) {
+			peopleIp.remove(ip);
+		}
 	}
 
 	public synchronized void connectToServer(String ip, String name,
@@ -176,7 +196,7 @@ public class Model implements ModelInterface {
 
 		// server will be created at start of programm and pending some clients
 		try {
-			keyStoreServer = new KeyStoreServer();
+			keyStoreServer = new KeyStoreServer(controller);
 			server = new Server(controller, this);
 			client = new ManageClient(controller, this);
 

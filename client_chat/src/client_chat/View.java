@@ -44,7 +44,6 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
-import javax.websocket.EncodeException;
 
 /* SFX Used in this Class:
  * -Snap: for plain text notifications. Creative commons 0 license. 
@@ -330,6 +329,7 @@ public class View extends JFrame implements ViewInterface {
 						private JTextArea txtIp = new JTextArea();
 						private JButton chat = new JButton("Chat");
 						private JPanel panel = new JPanel(null);
+						private String ip = "";
 
 						public ChatTo() {
 							frame.setTitle("Chat to");
@@ -353,11 +353,16 @@ public class View extends JFrame implements ViewInterface {
 							chat.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent e) {
 
-									String ip = txtIp.getText();
-									if (ip.trim().isEmpty()) {
+									ip = txtIp.getText();
+									// if (ip.trim().isEmpty()) {
 
-										controller.notifyChatUserIp(ip);
-									}
+									new Thread() {
+										public void run() {
+											controller.notifyChatUserIp(ip);
+										}
+									}.start();
+									frame.dispose();
+									// }
 
 								}
 
@@ -605,10 +610,11 @@ public class View extends JFrame implements ViewInterface {
 			new Thread() {
 				public void run() {
 					try {
-						controller.notifySendFileUser(
-								chooser.getSelectedFile().getName());
-					} catch (Exception e) {		}
-					//controller.notifyFileUser(chooser.getSelectedFile());
+						controller.notifySendFileUser(chooser.getSelectedFile()
+								.getName());
+					} catch (Exception e) {
+					}
+					// controller.notifyFileUser(chooser.getSelectedFile());
 				}
 			}.start();
 		}

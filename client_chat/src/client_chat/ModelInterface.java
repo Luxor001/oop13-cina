@@ -18,6 +18,8 @@ public interface ModelInterface {
 
 	void addIp(String ip, String name);
 
+	void removeIp(String ip);
+
 	void closeAll();
 
 	String exist(String name);

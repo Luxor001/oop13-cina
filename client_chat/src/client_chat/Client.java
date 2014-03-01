@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -104,31 +105,36 @@ public class Client implements Runnable {
 
 	public void run() {
 
-		synchronized (lock) {
+		synchronized (this) {
 			try {
 				sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, 9999);
 				sslSocket.startHandshake();
 			} catch (IOException e) {
-				model.addNickName(nameServer, null);
+				model.removeNickName(nameServer);
 			}
-		}
 
-		System.out.println("** Sono connesso con il server **");
-		System.out.println("IP: " + sslSocket.getInetAddress());
-		System.out.println("Porta: " + sslSocket.getPort());
-		// inizializzo gli stream che mi permetteranno di inviare e ricevere i
-		// mess ->
+			System.out.println("** Sono connesso con il server **");
+			System.out.println("IP: " + sslSocket.getInetAddress());
+			System.out.println("Porta: " + sslSocket.getPort());
+			// inizializzo gli stream che mi permetteranno di inviare e ricevere
+			// i
+			// mess ->
 
-		try {
-			oos = new ObjectOutputStream(sslSocket.getOutputStream());
-			ois = new ObjectInputStream(sslSocket.getInputStream());
+			try {
+				oos = new ObjectOutputStream(sslSocket.getOutputStream());
+				ois = new ObjectInputStream(sslSocket.getInputStream());
 
-			download = model.getDownloaded();
-			sendMessage(nameClient);
-			model.addNickName(nameServer, sslSocket.getInetAddress().toString());
+				download = model.getDownloaded();
+				oos.writeObject(false);
+				oos.flush();
+				oos.writeObject(nameClient);
+				oos.flush();
+				model.addNickName(nameServer, sslSocket.getInetAddress()
+						.toString().substring(1));
 
-		} catch (IOException e1) {
-			e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 		class Timer extends Thread {
@@ -326,15 +332,74 @@ public class Client implements Runnable {
 		}
 	}
 
+	public static String ObtainKeyStore(String ip, String who) {
+
+		File file = new File(System.getProperty("user.dir") + "/"
+				+ WebsocketHandler.DEBUG_NICKNAME + "ServerKey.jks");
+		String name = "";
+		try {
+
+			Socket socket = new Socket(ip, 9998);
+
+			ObjectOutputStream oos = new ObjectOutputStream(
+					socket.getOutputStream());
+			ObjectInputStream ois = new ObjectInputStream(
+					socket.getInputStream());
+
+			oos.writeUTF(WebsocketHandler.DEBUG_NICKNAME);
+			oos.flush();
+			oos.writeUTF(who);
+			oos.flush();
+			name = ois.readUTF();
+
+			if (name == null) {
+				oos.close();
+				ois.close();
+				socket.close();
+				return name;
+			}
+
+			FileInputStream fileStream = new FileInputStream(file);
+			byte[] buffer = new byte[10240];
+			fileStream.read(buffer);
+			oos.write(buffer);
+			File receivedFile = new File(System.getProperty("user.dir") + "/"
+					+ name + "ServerKey.jks");
+			receivedFile.createNewFile();
+			FileOutputStream outStream = new FileOutputStream(receivedFile);
+
+			byte[] bufferReader = new byte[10240];
+			ois.readFully(bufferReader);
+			outStream.write(bufferReader);
+			oos.close();
+			ois.close();
+			socket.close();
+			fileStream.close();
+			outStream.close();
+
+		} catch (IOException e) {
+			return null;
+		}
+
+		return name;
+	}
+
 	public String getIp() {
 		return ip;
 	}
 
 	public boolean isConnected() {
+
+		if (sslSocket == null) {
+			return false;
+		}
 		return sslSocket.isConnected();
 	}
 
 	public boolean isClosed() {
+		if (sslSocket == null) {
+			return true;
+		}
 		return sslSocket.isClosed();
 	}
 

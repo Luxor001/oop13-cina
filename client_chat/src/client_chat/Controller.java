@@ -1,7 +1,6 @@
 package client_chat;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
@@ -77,7 +76,14 @@ public class Controller implements ViewObserver {
 		}
 
 		this.view.createTab(name);
+
 	}
+
+	/*
+	 * public void commandConnectTo(String ip) {
+	 * 
+	 * }
+	 */
 
 	public synchronized void commandReceiveMessage(String message, String title) {
 		this.view.showMessage(message, title);
@@ -88,7 +94,7 @@ public class Controller implements ViewObserver {
 	}
 
 	public void commandRefusedChat(String name) {
-		this.model.addNickName(name, null);
+		commandRemoveUser(name);
 		showMessageMain(name + " has refused the request of private chat");
 	}
 
@@ -158,7 +164,6 @@ public class Controller implements ViewObserver {
 
 		synchronized (lockNotification) {
 			String ip = model.exist(name);
-
 			if (ip == null) {
 				model.addNickName(name, "pending");
 				ChatMessage message = new ChatMessage("Connect to",
@@ -180,17 +185,28 @@ public class Controller implements ViewObserver {
 		synchronized (lockNotification) {
 			String name = model.existIp(ip);
 
-			if (name == null) {
+			if (name == null || name.equals("exist")) {
 				model.addIp(ip, "pending");
-			} else {
-				if (!name.equals("pending")) {
+				// commandConnectTo(ip);
+				if (!model.isConnect(ip)) {
+					name = Client.ObtainKeyStore(ip, "user");
 
+					if (name != null) {
+						commandCreateTab(ip, name, name + "ServerKey.jks");
+					} else {
+						model.removeIp(ip);
+						showMessageMain(name
+								+ " has refused the request of private chat");
+					}
+				} else {
+					model.removeIp(ip);
 				}
 			}
 		}
 	}
 
-	public void notifySendFileUser(String path) throws IOException, EncodeException {
+	public void notifySendFileUser(String path) throws IOException,
+			EncodeException {
 
 		ChatMessage message = new ChatMessage("Connect to",
 				Type.REQUESTSENDFILE);

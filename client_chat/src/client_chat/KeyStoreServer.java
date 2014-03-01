@@ -9,11 +9,16 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import client_chat.Controller.MessageBoxReason;
+
 public class KeyStoreServer extends Thread {
 
 	private ServerSocket serverSocket;
+	private ViewObserver controller;
 
-	public KeyStoreServer() {
+	public KeyStoreServer(ViewObserver controller) {
+
+		this.controller = controller;
 
 		try {
 
@@ -27,7 +32,7 @@ public class KeyStoreServer extends Thread {
 	public void run() {
 		while (true) {
 			try {
-				new TransferKeyStore(serverSocket.accept()).start();
+				new TransferKeyStore(controller, serverSocket.accept()).start();
 			} catch (IOException e) {
 			}
 		}
@@ -46,10 +51,11 @@ public class KeyStoreServer extends Thread {
 		private Socket socket;
 		private ObjectInputStream ois = null;
 		private ObjectOutputStream oos = null;
+		private ViewObserver controller;
 
-		public TransferKeyStore(Socket socket) {
+		public TransferKeyStore(ViewObserver controller, Socket socket) {
 			this.socket = socket;
-
+			this.controller = controller;
 		}
 
 		public void run() {
@@ -60,10 +66,30 @@ public class KeyStoreServer extends Thread {
 
 				ois = new ObjectInputStream(socket.getInputStream());
 				oos = new ObjectOutputStream(socket.getOutputStream());
-				oos.writeUTF(WebsocketHandler.DEBUG_NICKNAME);
-				oos.flush();
-				System.out.println("Invio file");
+
 				String name = ois.readUTF();
+				String who = ois.readUTF();
+
+				if (who.equals("user")) {
+					int choice = controller.buildChoiceMessageBox(
+							MessageBoxReason.REQUEST_PRIVATE_CHAT, name);
+					if (choice == 0) {
+						oos.writeUTF(WebsocketHandler.DEBUG_NICKNAME);
+						oos.flush();
+					} else {
+						oos.writeObject(null);
+						oos.flush();
+						oos.close();
+						ois.close();
+						socket.close();
+						return;
+					}
+
+				} else {
+					oos.writeUTF(WebsocketHandler.DEBUG_NICKNAME);
+					oos.flush();
+				}
+
 				FileInputStream fileStream = new FileInputStream(file);
 				byte[] buffer = new byte[10240];
 				fileStream.read(buffer);
@@ -84,7 +110,6 @@ public class KeyStoreServer extends Thread {
 				fileStream.close();
 				outStream.close();
 
-				System.out.println("File inviato");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
