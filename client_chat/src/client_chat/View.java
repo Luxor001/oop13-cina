@@ -611,7 +611,7 @@ public class View extends JFrame implements ViewInterface {
 				public void run() {
 					try {
 						controller.notifySendFileUser(chooser.getSelectedFile()
-								.getName());
+								.getAbsolutePath());
 					} catch (Exception e) {
 					}
 					// controller.notifyFileUser(chooser.getSelectedFile());

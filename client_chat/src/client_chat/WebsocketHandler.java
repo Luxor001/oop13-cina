@@ -188,10 +188,23 @@ public class WebsocketHandler {
 		}
 
 		if (message.getType() == Type.YESSENDFILE) {
+			System.out.println(message.getAdditionalParams().getFileName());
 			int a = 0;
-			// message.getAdditionalParams().getIP()
-			// message.getAdditionalParams().getFileName()
-			// message.getAdditionalParams().getNickname()
+			String ip = message.getAdditionalParams().getIP();
+			String filename = message.getAdditionalParams().getFileName();
+			String name = message.getAdditionalParams().getNickname();
+
+			if (controller.exist(name) == null
+					|| controller.existIp(ip) == null) {
+				name = Client.ObtainKeyStore(ip, "Web Server");
+			}
+
+			if (name != null) {
+				controller.sendFile(filename, name);
+			} else {
+				controller.showMessageMain("Error during send of file");
+			}
+
 			/* CODE HERE */
 		}
 
@@ -206,7 +219,8 @@ public class WebsocketHandler {
 			String ip = getIP();
 
 			String senderNick = message.getAdditionalParams().getNickname();
-			String fileName = message.getAdditionalParams().getFileName();
+			String path = message.getAdditionalParams().getFileName();
+			String fileName = path.substring(path.lastIndexOf("\\") + 1);
 			int choice = WebsocketHandler.controller
 					.buildChoiceMessageBox(
 							MessageBoxReason.REQUEST_RECEIVE_FILE, senderNick,
@@ -217,7 +231,7 @@ public class WebsocketHandler {
 				msg = new ChatMessage("Yes", Type.YESSENDFILE);
 				msg.getAdditionalParams().setNickname(senderNick);
 				msg.getAdditionalParams().setIP(ip);
-				msg.getAdditionalParams().setFileName(fileName);
+				msg.getAdditionalParams().setFileName(path);
 			} else {
 				msg = new ChatMessage("No", Type.NOSENDFILE);
 				msg.getAdditionalParams().setNickname(senderNick);
@@ -303,7 +317,7 @@ public class WebsocketHandler {
 		try {
 
 			client.connectToServer(this, null, new URI(
-					"ws://localhost:8080/ServerWebSocket/websocket"));
+					"ws://79.32.190.112:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));
