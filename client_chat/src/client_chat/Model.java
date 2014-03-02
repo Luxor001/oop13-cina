@@ -39,11 +39,10 @@ public class Model implements ModelInterface {
 						connectToServer(ip, name,
 								System.getProperty("user.dir") + "/" + name
 										+ "ServerKey.jks");
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+						/*
+						 * try { Thread.sleep(1000); } catch
+						 * (InterruptedException e) { e.printStackTrace(); }
+						 */
 						client.sendMessage(message, name);
 					}
 				}
@@ -51,9 +50,10 @@ public class Model implements ModelInterface {
 		}
 	}
 
-	public void sendFile(File file, String name) {
-		if (!server.sendFile(file, name)) {
-			if (!client.sendFile(file, name)) {
+	public void sendFile(String path, String name) {
+
+		if (!server.sendFile(path, name)) {
+			if (!client.sendFile(path, name)) {
 				String ip;
 				synchronized (lockPeopleChat) {
 					ip = peopleChat.get(name);
@@ -61,12 +61,11 @@ public class Model implements ModelInterface {
 				if (ip != null) {
 					connectToServer(ip, name, System.getProperty("user.dir")
 							+ "/" + name + "ServerKey.jks");
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					client.sendFile(file, name);
+					/*
+					 * try { Thread.sleep(1000); } catch (InterruptedException
+					 * e) { e.printStackTrace(); }
+					 */
+					client.sendFile(path, name);
 				}
 			}
 		}
@@ -127,16 +126,19 @@ public class Model implements ModelInterface {
 	}
 
 	public String exist(String name) {
-		return peopleChat.get(name);
+		synchronized (lockPeopleChat) {
+			return peopleChat.get(name);
+		}
 	}
 
 	public String existIp(String ip) {
+		synchronized (lockPeopleChat) {
+			if (peopleChat.containsValue(ip)) {
+				return "exist";
+			}
 
-		if (peopleChat.containsValue(ip)) {
-			return "exist";
+			return peopleIp.get(ip);
 		}
-
-		return peopleIp.get(ip);
 	}
 
 	public boolean isConnect(String ip) {

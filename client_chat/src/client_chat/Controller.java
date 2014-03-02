@@ -50,7 +50,7 @@ public class Controller implements ViewObserver {
 			}
 		} else { /* instead user wants to write on a private chat.. */
 
-			String ip = model.exist(name);
+			String ip = exist(name);
 			if (ip != null) {
 				model.sendMessage(message, name);
 			} else {
@@ -62,6 +62,10 @@ public class Controller implements ViewObserver {
 
 		}
 
+	}
+
+	public void sendFile(String path, String name) {
+		model.sendFile(path, name);
 	}
 
 	public synchronized void commandCloseTab(ActionEvent e) {
@@ -79,12 +83,6 @@ public class Controller implements ViewObserver {
 
 	}
 
-	/*
-	 * public void commandConnectTo(String ip) {
-	 * 
-	 * }
-	 */
-
 	public synchronized void commandReceiveMessage(String message, String title) {
 		this.view.showMessage(message, title);
 	}
@@ -101,6 +99,16 @@ public class Controller implements ViewObserver {
 	public void commandCloseAll() {
 
 		this.model.closeAll();
+	}
+
+	public String exist(String name) {
+
+		return model.exist(name);
+	}
+
+	public String existIp(String ip) {
+
+		return model.existIp(ip);
 	}
 
 	public synchronized void showMessageMain(String Message) {
@@ -163,7 +171,7 @@ public class Controller implements ViewObserver {
 	public void notifyChatUser(String name) throws IOException, EncodeException {
 
 		synchronized (lockNotification) {
-			String ip = model.exist(name);
+			String ip = exist(name);
 			if (ip == null) {
 				model.addNickName(name, "pending");
 				ChatMessage message = new ChatMessage("Connect to",
@@ -183,11 +191,10 @@ public class Controller implements ViewObserver {
 
 	public void notifyChatUserIp(String ip) {
 		synchronized (lockNotification) {
-			String name = model.existIp(ip);
+			String name = existIp(ip);
 
 			if (name == null || name.equals("exist")) {
 				model.addIp(ip, "pending");
-				// commandConnectTo(ip);
 				if (!model.isConnect(ip)) {
 					name = Client.ObtainKeyStore(ip, "user");
 

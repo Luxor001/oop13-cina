@@ -44,6 +44,8 @@ public class Client implements Runnable {
 	private Downloaded download;
 	private CountDownLatch latch = new CountDownLatch(1);
 	private Object lock = new Object();
+	private Object lockFile = new Object();
+	private int id = 0;
 	private Model model;
 
 	public Client(String ip, String name, ViewObserver controller, Model model,
@@ -101,11 +103,13 @@ public class Client implements Runnable {
 
 		// stabilisco la connessione con il server
 		new Thread(this).start();
+
 	}
 
 	public void run() {
 
-		synchronized (this) {
+		synchronized (lock) {
+
 			try {
 				sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, 9999);
 				sslSocket.startHandshake();
@@ -177,37 +181,64 @@ public class Client implements Runnable {
 			boolean goOn = true;
 			Object o;
 			byte[] buffer = new byte[150000];
-			Map<String, FileOutputStream> file = new HashMap<>();
+			Map<Pair<String, Integer>, Pair<FileOutputStream, String>> file = new HashMap<>();
 
 			while (goOn) {
 				o = ois.readObject();
 
 				if (o instanceof Boolean) {
 					if ((boolean) o) {
-						int fileSize = ois.readInt();
+						int filesize = ois.readInt();
 						int step = ois.readInt();
-						String name = ois.readUTF();
-						ois.readFully(buffer, 0, step);
-						System.out.println("Bytes received from " + name
-								+ " : " + step);
-						FileOutputStream fileStream = file.get(name);
-						if (fileStream == null) {
 
-							download.addFile(name, fileSize);
-							fileStream = new FileOutputStream(
-									new File(System.getProperty("user.dir")
-											+ "/" + name));
+						@SuppressWarnings("unchecked")
+						Pair<String, Integer> key = (Pair<String, Integer>) ois
+								.readObject();
+						// Pair<String, Integer> key = new Pair<>(namefile, id);
+
+						/*
+						 * System.out.println("Bytes received from " + name +
+						 * " : " + step);
+						 */
+						ois.readFully(buffer, 0, step);
+						Pair<FileOutputStream, String> value = file.get(key);
+
+						if (value == null) {
+
+							String name = key.getFirst().substring(
+									key.getFirst().lastIndexOf("\\") + 1);
+
+							String newName = name;
+							int i = 1;
+							while (new File(System.getProperty("user.dir")
+									+ "/" + newName).exists()) {
+
+								String[] nameExtension = name.split("\\.");
+
+								nameExtension[0] = nameExtension[0] + "(" + i
+										+ ")";
+								newName = nameExtension[0] + "."
+										+ nameExtension[1];
+								i++;
+							}
+
+							download.addFile(newName, filesize);
+							value = new Pair<FileOutputStream, String>(
+									new FileOutputStream(new File(
+											System.getProperty("user.dir")
+													+ "/" + newName)), newName);
 						}
 
-						download.updateProgressBar(name, step);
-						fileStream.write(buffer, 0, step);
-						file.put(name, fileStream);
+						download.updateProgressBar(value.getSecond(), step);
+						value.getFirst().write(buffer, 0, step);
+						file.put(key, value);
 						if (step < 1024) {
-							fileStream.flush();
-							fileStream.close();
-							file.put(name, fileStream);
-							file.remove(name);
-							System.out.println("File received " + name);
+							System.out.println("File received "
+									+ value.getSecond());
+							value.getFirst().flush();
+							value.getFirst().close();
+							file.put(key, value);
+							file.remove(value);
 						}
 						resetTime = true;
 					} else {
@@ -253,12 +284,19 @@ public class Client implements Runnable {
 
 	}
 
-	public void sendFile(File file) throws IOException {
+	public void sendFile(String path) throws IOException {
+		File file = new File(path);
 		String name = file.getName();
 		int step = 150000;
 		long fileSize = file.length();
 		FileInputStream fileStream = new FileInputStream(file);
 		byte[] buffer = new byte[step];
+		Pair<String, Integer> pair;
+
+		synchronized (lockFile) {
+			id++;
+			pair = new Pair<>(path, id);
+		}
 
 		try {
 			download.addFile(name, (int) fileSize);
@@ -275,17 +313,17 @@ public class Client implements Runnable {
 				fileSize += step;
 				step = (int) fileSize;
 			}
-
 			download.updateProgressBar(name, step);
 			fileStream.read(buffer);
-			sendMessage(buffer, (int) file.length(), step, name);
+			sendMessage(buffer, (int) file.length(), step, pair);
 		}
-		System.out.println("File sent");
 
+		System.out.println("File sent");
 		fileStream.close();
 	}
 
-	public void sendMessage(byte[] message, int filesize, int step, String name) {
+	public void sendMessage(byte[] message, int filesize, int step,
+			Pair<String, Integer> pair) {
 		synchronized (lock) {
 			if (sslSocket.isConnected() && !sslSocket.isClosed()) {
 				try {
@@ -295,7 +333,7 @@ public class Client implements Runnable {
 					oos.flush();
 					oos.writeInt(step);
 					oos.flush();
-					oos.writeUTF(name);
+					oos.writeObject(pair);
 					oos.flush();
 					oos.write(message, 0, step);
 					oos.flush();

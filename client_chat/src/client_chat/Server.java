@@ -101,32 +101,31 @@ public class Server implements Runnable {
 		return false;
 	}
 
-	public synchronized boolean sendFile(File file, String name) {
+	public synchronized boolean sendFile(String path, String name) {
 		for (int i = 0; i < client.size(); i++) {
-			System.out.println("ciao");
+
 			if (!client.get(i).isClosed() && client.get(i).isConnected()
 					&& client.get(i).getNameClient().equals(name)) {
 
-				System.out.println("bingo");
 				class SendFile extends Thread {
-					private File file;
+					private String path;
 					private MessageFromClient client;
 
-					public SendFile(File file, MessageFromClient client) {
-						this.file = file;
+					public SendFile(String path, MessageFromClient client) {
+						this.path = path;
 						this.client = client;
 					}
 
 					public void run() {
 						try {
-							client.sendFile(file);
+							client.sendFile(path);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
 					}
 				}
 
-				new SendFile(file, client.get(i)).start();
+				new SendFile(path, client.get(i)).start();
 
 				return true;
 			}
@@ -188,6 +187,8 @@ public class Server implements Runnable {
 		private String nameServer = WebsocketHandler.DEBUG_NICKNAME;
 		private String nameClient = null;
 		private String ip = "";
+		private int id = 0;
+		private Object lock = new Object();
 		private boolean close = false;
 		private Downloaded download;
 
@@ -228,7 +229,7 @@ public class Server implements Runnable {
 				boolean goOn = true;
 				Object o;
 				byte[] buffer = new byte[150000];
-				Map<String, FileOutputStream> file = new HashMap<>();
+				Map<Pair<String, Integer>, Pair<FileOutputStream, String>> file = new HashMap<>();
 
 				while (goOn) {
 					o = ois.readObject();
@@ -236,28 +237,54 @@ public class Server implements Runnable {
 						if ((boolean) o) {
 							int filesize = ois.readInt();
 							int step = ois.readInt();
-							String name = ois.readUTF();
-							System.out.println("Bytes received from " + name
-									+ " : " + step);
+							@SuppressWarnings("unchecked")
+							Pair<String, Integer> key = (Pair<String, Integer>) ois
+									.readObject();
+							/*
+							 * System.out.println("Bytes received from " + name
+							 * + " : " + step);
+							 */
 							ois.readFully(buffer, 0, step);
-							FileOutputStream fileStream = file.get(name);
+							Pair<FileOutputStream, String> value = file
+									.get(key);
 
-							if (fileStream == null) {
-								download.addFile(name, filesize);
-								fileStream = new FileOutputStream(new File(
-										System.getProperty("user.dir") + "/"
-												+ name));
+							if (value == null) {
+
+								String name = key.getFirst().substring(
+										key.getFirst().lastIndexOf("\\") + 1);
+
+								String newName = name;
+								int i = 1;
+								while (new File(System.getProperty("user.dir")
+										+ "/" + newName).exists()) {
+
+									String[] nameExtension = name.split("\\.");
+
+									nameExtension[0] = nameExtension[0] + "("
+											+ i + ")";
+									newName = nameExtension[0] + "."
+											+ nameExtension[1];
+									i++;
+								}
+
+								download.addFile(newName, filesize);
+								value = new Pair<FileOutputStream, String>(
+										new FileOutputStream(new File(
+												System.getProperty("user.dir")
+														+ "/" + newName)),
+										newName);
 							}
 
-							download.updateProgressBar(name, step);
-							fileStream.write(buffer, 0, step);
-							file.put(name, fileStream);
+							download.updateProgressBar(value.getSecond(), step);
+							value.getFirst().write(buffer, 0, step);
+							file.put(key, value);
 							if (step < 1024) {
-								System.out.println("File received " + name);
-								fileStream.flush();
-								fileStream.close();
-								file.put(name, fileStream);
-								file.remove(name);
+								System.out.println("File received "
+										+ value.getSecond());
+								value.getFirst().flush();
+								value.getFirst().close();
+								file.put(key, value);
+								file.remove(value);
 							}
 
 						} else {
@@ -290,12 +317,19 @@ public class Server implements Runnable {
 
 		}
 
-		public void sendFile(File file) throws IOException {
+		public void sendFile(String path) throws IOException {
+			File file = new File(path);
 			String name = file.getName();
 			int step = 150000;
 			long fileSize = file.length();
 			FileInputStream fileStream = new FileInputStream(file);
 			byte[] buffer = new byte[step];
+			Pair<String, Integer> pair;
+
+			synchronized (lock) {
+				id++;
+				pair = new Pair<>(path, id);
+			}
 
 			try {
 				download.addFile(name, (int) fileSize);
@@ -314,7 +348,7 @@ public class Server implements Runnable {
 				}
 				download.updateProgressBar(name, step);
 				fileStream.read(buffer);
-				sendMessage(buffer, (int) file.length(), step, name);
+				sendMessage(buffer, (int) file.length(), step, pair);
 			}
 
 			System.out.println("File sent");
@@ -338,7 +372,7 @@ public class Server implements Runnable {
 		}
 
 		public synchronized void sendMessage(byte[] message, int filesize,
-				int step, String name) throws IOException {
+				int step, Pair<String, Integer> pair) throws IOException {
 
 			if (!close) {
 
@@ -348,7 +382,7 @@ public class Server implements Runnable {
 				oos.flush();
 				oos.writeInt(step);
 				oos.flush();
-				oos.writeUTF(name);
+				oos.writeObject(pair);
 				oos.flush();
 				oos.write(message, 0, step);
 				oos.flush();

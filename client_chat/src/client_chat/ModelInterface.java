@@ -1,6 +1,5 @@
 package client_chat;
 
-import java.io.File;
 
 public interface ModelInterface {
 
@@ -10,7 +9,7 @@ public interface ModelInterface {
 
 	void showDownloads();
 
-	void sendFile(File file, String name);
+	void sendFile(String path, String name);
 
 	void addNickName(String name, String ip);
 

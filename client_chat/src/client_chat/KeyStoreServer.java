@@ -33,6 +33,7 @@ public class KeyStoreServer extends Thread {
 		while (true) {
 			try {
 				new TransferKeyStore(controller, serverSocket.accept()).start();
+
 			} catch (IOException e) {
 			}
 		}

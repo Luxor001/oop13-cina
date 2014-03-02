@@ -1,6 +1,5 @@
 package client_chat;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +24,9 @@ public class ManageClient {
 					return;
 				}
 			}
-		}
 
-		client.add(new Client(ip, name, controller, model, keyStore));
+			client.add(new Client(ip, name, controller, model, keyStore));
+		}
 
 	}
 
@@ -58,31 +57,31 @@ public class ManageClient {
 		return false;
 	}
 
-	public synchronized boolean sendFile(File file, String name) {
+	public synchronized boolean sendFile(String path, String name) {
 		if (client != null) {
 			for (Client c : client) {
 				if (c.getNameServer().equals(name) && !c.isClosed()
 						&& c.isConnected()) {
 
 					class SendFile extends Thread {
-						File file;
+						String path;
 						Client client;
 
-						public SendFile(File file, Client client) {
-							this.file = file;
+						public SendFile(String path, Client client) {
+							this.path = path;
 							this.client = client;
 						}
 
 						public void run() {
 							try {
-								client.sendFile(file);
+								client.sendFile(path);
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
 						}
 					}
 
-					new SendFile(file, c).start();
+					new SendFile(path, c).start();
 					return true;
 				}
 			}
