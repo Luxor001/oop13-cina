@@ -36,10 +36,10 @@ public class WebsocketHandler {
 	public static String DEBUG_NICKNAME = System.getProperty("user.name");// "Lux"
 																			// +
 																			// Math.random();
-	public static boolean VISIBLE_FLAG=true;
+	public static boolean VISIBLE_FLAG = true;
 	public static boolean RESET_FLAG_DELETE_ME = false;
 	private long PING_INTERVAL_SECONDS = 15;
-	public static String UNABLE_VISIBLE_MESSAGE="You can't perform this operation"
+	public static String UNABLE_VISIBLE_MESSAGE = "You can't perform this operation"
 			+ " while you are invisible: please login as visible and repeat"
 			+ " this operation";
 
@@ -155,38 +155,37 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDPRIVATECHAT) {
 
-				final String ip = getIP();
+			final String ip = getIP();
 
-				final String senderNick = message.getAdditionalParams()
-						.getNickname();
+			final String senderNick = message.getAdditionalParams()
+					.getNickname();
 
-				new Thread() {
+			new Thread() {
 
-					public void run() {
+				public void run() {
 
-						int choice = WebsocketHandler.controller
-								.buildChoiceMessageBox(
-										MessageBoxReason.REQUEST_PRIVATE_CHAT,
-										senderNick);
+					int choice = WebsocketHandler.controller
+							.buildChoiceMessageBox(
+									MessageBoxReason.REQUEST_PRIVATE_CHAT,
+									senderNick);
 
-						ChatMessage msg;
-						if (choice == 0) {
-							msg = new ChatMessage("Yes", Type.YESPRIVATECHAT);
-							msg.getAdditionalParams().setNickname(senderNick);
-							msg.getAdditionalParams().setIP(ip);
-						} else {
-							msg = new ChatMessage("No", Type.NOPRIVATECHAT);
-							msg.getAdditionalParams().setNickname(senderNick);
-						}
-						try {
-							SendMex(msg);
-						} catch (Exception e) {
-						}
-					};
+					ChatMessage msg;
+					if (choice == 0) {
+						msg = new ChatMessage("Yes", Type.YESPRIVATECHAT);
+						msg.getAdditionalParams().setNickname(senderNick);
+						msg.getAdditionalParams().setIP(ip);
+					} else {
+						msg = new ChatMessage("No", Type.NOPRIVATECHAT);
+						msg.getAdditionalParams().setNickname(senderNick);
+					}
+					try {
+						SendMex(msg);
+					} catch (Exception e) {
+					}
+				};
 
-				}.start();		
+			}.start();
 
-		
 		}
 
 		if (message.getType() == Type.YESPRIVATECHAT) {
@@ -208,22 +207,22 @@ public class WebsocketHandler {
 		}
 
 		if (message.getType() == Type.YESSENDFILE) {
-				System.out.println(message.getAdditionalParams().getFileName());
-				int a = 0;
-				String ip = message.getAdditionalParams().getIP();
-				String filename = message.getAdditionalParams().getFileName();
-				String name = message.getAdditionalParams().getNickname();
+			System.out.println(message.getAdditionalParams().getFileName());
+			int a = 0;
+			String ip = message.getAdditionalParams().getIP();
+			String filename = message.getAdditionalParams().getFileName();
+			String name = message.getAdditionalParams().getNickname();
 
-				if (controller.exist(name) == null
-						|| controller.existIp(ip) == null) {
-					name = Client.ObtainKeyStore(ip, "Web Server");
-				}
+			if (controller.exist(name) == null
+					|| controller.existIp(ip) == null) {
+				name = Client.ObtainKeyStore(ip, "Web Server");
+			}
 
-				if (name != null) {
-					controller.sendFile(filename, name);
-				} else {
-					controller.showMessageMain("Error during send of file");
-				}
+			if (name != null) {
+				controller.sendFile(filename, name);
+			} else {
+				controller.showMessageMain("Error during send of file");
+			}
 
 		}
 
@@ -235,41 +234,39 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDSENDFILE) {
 
-				
-				final String ip = getIP();
-				final String senderNick = message.getAdditionalParams()
-						.getNickname();
-				final String path = message.getAdditionalParams().getFileName();
-				final String fileName = path
-						.substring(path.lastIndexOf("\\") + 1);
+			final String ip = getIP();
+			final String senderNick = message.getAdditionalParams()
+					.getNickname();
+			final String path = message.getAdditionalParams().getFileName();
+			final String fileName = path.substring(path.lastIndexOf("\\") + 1);
 
-				new Thread() {
+			new Thread() {
 
-					public void run() {
+				public void run() {
 
-						int choice = WebsocketHandler.controller
-								.buildChoiceMessageBox(
-										MessageBoxReason.REQUEST_RECEIVE_FILE,
-										senderNick, fileName);
+					int choice = WebsocketHandler.controller
+							.buildChoiceMessageBox(
+									MessageBoxReason.REQUEST_RECEIVE_FILE,
+									senderNick, fileName);
 
-						ChatMessage msg;
-						if (choice == 0) {
-							msg = new ChatMessage("Yes", Type.YESSENDFILE);
-							msg.getAdditionalParams().setNickname(senderNick);
-							msg.getAdditionalParams().setIP(ip);
-							msg.getAdditionalParams().setFileName(path);
-						} else {
-							msg = new ChatMessage("No", Type.NOSENDFILE);
-							msg.getAdditionalParams().setNickname(senderNick);
-						}
-						try {
-							SendMex(msg);
-						} catch (Exception e) {
-						}
-
+					ChatMessage msg;
+					if (choice == 0) {
+						msg = new ChatMessage("Yes", Type.YESSENDFILE);
+						msg.getAdditionalParams().setNickname(senderNick);
+						msg.getAdditionalParams().setIP(ip);
+						msg.getAdditionalParams().setFileName(path);
+					} else {
+						msg = new ChatMessage("No", Type.NOSENDFILE);
+						msg.getAdditionalParams().setNickname(senderNick);
+					}
+					try {
+						SendMex(msg);
+					} catch (Exception e) {
 					}
 
-				}.start();
+				}
+
+			}.start();
 
 		}
 	}
