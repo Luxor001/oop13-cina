@@ -60,6 +60,7 @@ public class View extends JFrame implements ViewInterface {
 	final private static int HEIGTH = 400;
 	final private static int HGAP = 10;
 	final private static int VGAP = 10;
+	final private static int WIDTH_USERJLIST=130;
 	Downloaded d;
 	private ViewObserver controller;
 
@@ -141,16 +142,15 @@ public class View extends JFrame implements ViewInterface {
 		chat.setLineWrap(true);
 		chat.setEditable(false);
 
-		usersList.addElement("Pippo");
-		usersList.addElement("Pluto");
-		usersList.addElement("Francesco");
 		usersJList = new JList<String>(usersList);
 
+		
 		// set dimension of userList
 		usersJList.setPreferredSize(new Dimension(
-				usersJList.getPreferredSize().width * 2, usersJList
+				WIDTH_USERJLIST, usersJList
 						.getPreferredSize().height));
 
+		usersJList.remove(0);
 		// add to the list a custom TextArea
 		textList.add(this.getMyText());
 		chatList.add(chat);
@@ -594,7 +594,7 @@ public class View extends JFrame implements ViewInterface {
 		}
 	}
 
-	public void closeChat() {
+	public void closeChat() throws IOException {
 
 		this.dispose();
 		Application.start();
