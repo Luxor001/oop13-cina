@@ -1,6 +1,7 @@
 package client_chat;
 
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 
 import client_chat.View.sfx;
 
@@ -33,5 +34,5 @@ public interface ViewInterface {
     
     public void playSound(sfx soundeffect);
     
-    public void closeChat();
+    public void closeChat() throws IOException;
 }

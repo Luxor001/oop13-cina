@@ -16,22 +16,22 @@ public class Application {
 		start();
 	}
 
-	public static void start() {
+	public static void start() throws IOException {
 		splash = new SplashScreen();
 	}
 
 	public static void chat_initialization() throws IOException {
-
+		splash.setFrameEnabled(false);
 		web = WebsocketHandler.getWebSocketHandler();
 		new Thread() {
 			public void run() {
 
 				connectionResult result = null;
 				int userchoice = 0;
+				splash.setVisibilityLoadingCircle(true);
 
 				do {
-
-					splash.setVisibilityLoadingCircle(true);
+					
 					try {
 						result = web.AttemptConnection();
 					} catch (IOException e) {
@@ -46,6 +46,7 @@ public class Application {
 								"Connection Failed", new Object[] {
 										"Reconnect", "Cancel" },
 								JOptionPane.ERROR_MESSAGE);
+						splash.setFrameEnabled(true);
 					}
 				} while ((result == connectionResult.TIMEOUT && userchoice == 0));
 
@@ -72,11 +73,11 @@ public class Application {
 			if (granted == false) {
 				splash.nicknameInvalid();
 				splash.setVisibilityLoadingCircle(false);
+				splash.setFrameEnabled(true);
 				return;
 
 			}
 		}
-
 		splash.setVisibilityLoadingCircle(false);
 		Model m = new Model();
 		Controller c = new Controller();
@@ -91,6 +92,7 @@ public class Application {
 			WebsocketHandler.monitor.notifyAll();
 		}
 		loaded = true;
+		splash.setFrameEnabled(true);
 
 		v.setVisible(true);
 

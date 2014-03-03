@@ -5,8 +5,14 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -41,11 +47,12 @@ public class SplashScreen {
 	private static JButton btn_login;
 	private static JCheckBox chb_visible;
 	private JLabel loadingCircle = new JLabel();
+	private String icon_path = "resources/Icon.png";
 
 	private static int offsetcenter = 30;
 	private static int centerscaling;
 
-	public SplashScreen() {
+	public SplashScreen() throws IOException {
 
 		centerscaling = 120;
 
@@ -54,7 +61,10 @@ public class SplashScreen {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(frameSize.x, frameSize.y);
 		frame.setLocationRelativeTo(null); /* centers jframe on screen. */
-
+		InputStream imgStream = new FileInputStream(new File(icon_path));
+		BufferedImage myImg = ImageIO.read(imgStream);
+		frame.setIconImage(myImg);
+		
 		pnl_main = new JPanel();
 		pnl_main.setLayout(null); /* sorry but i'm in a short */
 		frame.getContentPane().add(pnl_main);
@@ -209,6 +219,11 @@ public class SplashScreen {
 		bln_invalidnick.setVisible(true);
 	}
 	
+	public void setFrameEnabled(boolean enabled){
+		
+		btn_login.setEnabled(enabled);
+		frame.setEnabled(enabled);
+	}
 	
 	
 	
