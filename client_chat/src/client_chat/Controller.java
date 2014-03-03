@@ -40,10 +40,9 @@ public class Controller implements ViewObserver {
 			/*
 			 * if user wants to send a message on general chat
 			 */
-
 			try {
 				WebsocketHandler.getWebSocketHandler().SendMex(
-						new ChatMessage(this.view.sendMessage(), Type.TEXT));
+						new ChatMessage(message, Type.TEXT));
 			} catch (Exception e) {
 
 				e.printStackTrace();
@@ -130,6 +129,8 @@ public class Controller implements ViewObserver {
 
 	public int buildChoiceMessageBox(MessageBoxReason reason,
 			String... optsender) {
+		
+		
 		String message = "";
 		String title = "";
 		Object[] options = null;

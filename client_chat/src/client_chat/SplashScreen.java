@@ -11,6 +11,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -38,6 +39,7 @@ public class SplashScreen {
 	private static JLabel lbl_nickname;
 	private static JTextArea txt_nickname;
 	private static JButton btn_login;
+	private static JCheckBox chb_visible;
 	private JLabel loadingCircle = new JLabel();
 
 	private static int offsetcenter = 30;
@@ -73,12 +75,18 @@ public class SplashScreen {
 		lbl_channel.setSize(lbl_channel.getPreferredSize());
 		lbl_channel.setLocation(CenteredX(lbl_channel), centerscaling);
 		centerscaling += 20;
+
+		chb_visible=new JCheckBox("Visible?",true);
+		chb_visible.setSize(chb_visible.getPreferredSize());
+		chb_visible.setLocation(CenteredX(chb_visible)+90, centerscaling);
+		pnl_main.add(chb_visible);
 		cmb_channel.setSize(cmb_channel.getPreferredSize());
 		cmb_channel.setLocation(CenteredX(cmb_channel), centerscaling);
 		centerscaling += 20;
 		cmb_channel.removeItem("longname");
 		pnl_main.add(lbl_channel);
 		pnl_main.add(cmb_channel);
+		
 
 		centerscaling += 20;
 		lbl_nickname = new JLabel("Nickname");
@@ -132,6 +140,14 @@ public class SplashScreen {
 					}
 
 				}
+			}
+		});
+		
+		chb_visible.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+					WebsocketHandler.VISIBLE_FLAG=chb_visible.isSelected();				
 			}
 		});
 
