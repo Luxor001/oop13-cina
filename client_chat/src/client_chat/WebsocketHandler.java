@@ -39,9 +39,9 @@ public class WebsocketHandler {
 	public static boolean VISIBLE_FLAG=true;
 	public static boolean RESET_FLAG_DELETE_ME = false;
 	private long PING_INTERVAL_SECONDS = 15;
-	private String REFUSED_VISIBLE_MESSAGE="You can't perform this operation"
-			+ "while you are invisible: please log in as visible and repeat"
-			+ "this operation";
+	public static String UNABLE_VISIBLE_MESSAGE="You can't perform this operation"
+			+ " while you are invisible: please login as visible and repeat"
+			+ " this operation";
 
 	public final static Object monitor = 1;
 	public Timer timer;
@@ -155,7 +155,6 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDPRIVATECHAT) {
 
-			if (VISIBLE_FLAG) {
 				final String ip = getIP();
 
 				final String senderNick = message.getAdditionalParams()
@@ -185,10 +184,7 @@ public class WebsocketHandler {
 						}
 					};
 
-				}.start();
-			} else {
-				controller.showMessageMain(REFUSED_VISIBLE_MESSAGE);				
-			}
+				}.start();		
 
 		
 		}
@@ -239,7 +235,7 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDSENDFILE) {
 
-			if (VISIBLE_FLAG) {
+				
 				final String ip = getIP();
 				final String senderNick = message.getAdditionalParams()
 						.getNickname();
@@ -275,10 +271,6 @@ public class WebsocketHandler {
 
 				}.start();
 
-			} else {
-				controller.showMessageMain(REFUSED_VISIBLE_MESSAGE);
-			}
-
 		}
 	}
 
@@ -308,6 +300,14 @@ public class WebsocketHandler {
 	}
 
 	public void SendMex(ChatMessage Mex) throws IOException, EncodeException {
+		if (!VISIBLE_FLAG) {
+			if (Mex.getType() == Type.REQUESTSENDFILE
+					|| Mex.getType() == Type.REQUESTPRIVATECHAT
+					|| Mex.getType() == Type.TEXT) {
+				controller.showMessageMain(UNABLE_VISIBLE_MESSAGE);
+				return;
+			}
+		}
 		ClientSession.getBasicRemote().sendObject(Mex);
 	}
 
