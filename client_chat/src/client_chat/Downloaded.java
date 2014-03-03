@@ -2,12 +2,11 @@ package client_chat;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -21,7 +20,7 @@ import javax.swing.text.BadLocationException;
 
 public class Downloaded {
 
-	private Map<String, JPanel> fileReferences = new HashMap<String, JPanel>();
+	private List<Pair<Pair<String, Integer>, JPanel>> fileReferences = new LinkedList<>();
 
 	private final JPanel pnl_main;
 	private final JFrame frame;
@@ -104,20 +103,11 @@ public class Downloaded {
 		progressbar.setStringPainted(true);
 		progressbar.setLocation(50, 35);
 		progressbar.setSize(200, 15);
-		// progressbar.setValue(50);
+
 		progressbar.setName("progressbar");
-		// progressbar.setMaximum(100);
+
 		container.add(progressbar);
 
-		/*
-		 * JLabel progressbarvalue=new JLabel("50%");
-		 * progressbarvalue.setLocation
-		 * (progressbar.getLocation().x+progressbar.getSize().width+10,
-		 * progressbar.getLocation().y);
-		 * progressbarvalue.setSize(progressbarvalue.getPreferredSize());
-		 * progressbarvalue.setName("progressbarvalue");
-		 * container.add(progressbarvalue);
-		 */
 		container.setPreferredSize(new Dimension(400, 55));
 
 		return container;
@@ -129,8 +119,21 @@ public class Downloaded {
 		}
 	}
 
-	public boolean updateProgressBar(String filename, int percentage) {
-		JPanel pnl = fileReferences.get(filename);
+	public boolean updateProgressBar(Pair<String, Integer> pair, int percentage) {
+		JPanel pnl = null;
+
+		synchronized (this) {
+			for (int i = 0; i < fileReferences.size(); i++) {
+				if (fileReferences.get(i).getFirst().getFirst()
+						.equals(pair.getFirst())
+						&& fileReferences.get(i).getFirst().getSecond() == pair
+								.getSecond()) {
+					pnl = fileReferences.get(i).getSecond();
+					i = fileReferences.size();
+				}
+			}
+		}
+		// fileReferences.get(pair);
 
 		if (pnl != null) {
 			for (Component ccommp : pnl.getComponents()) {
@@ -148,13 +151,10 @@ public class Downloaded {
 
 	}
 
-	public synchronized void addFile(String filename, int max) throws Exception {
-		if (fileReferences.get(filename) != null) {
-			throw new Exception("File Already in list, duplicate!");
-		}
+	public synchronized void addFile(Pair<String, Integer> pair, int max) {
 
-		JPanel local_pnl = buildFilePanel(filename, max);
-		fileReferences.put(filename, local_pnl);
+		JPanel local_pnl = buildFilePanel(pair.getFirst(), max);
+		fileReferences.add(new Pair<>(pair, local_pnl));
 		pnl_main.add(local_pnl);
 		resizeFrame();
 	}
@@ -168,27 +168,20 @@ public class Downloaded {
 		}
 	}
 
-	public synchronized void eraseFile(String nickname) {
-		JPanel pnl = fileReferences.get(nickname);
-		pnl_main.remove(pnl);
-		fileReferences.remove(nickname);
-		redraw_colors();
-		resizeFrame();
-	}
+	/*
+	 * public synchronized void eraseFile(String nickname) { JPanel pnl =
+	 * fileReferences.get(nickname); pnl_main.remove(pnl);
+	 * fileReferences.remove(nickname); redraw_colors(); resizeFrame(); }
+	 */
 
-	private void redraw_colors() {
-		background_color = true;
-		for (JPanel cpanel : fileReferences.values()) {
-
-			if (background_color == false) {
-				cpanel.setBackground(LIGHT_LIGHT_GRAY);
-			} else {
-				cpanel.setBackground(ALMOST_WHITE);
-			}
-			background_color = !background_color;
-		}
-	}
-
+	/*
+	 * private void redraw_colors() { background_color = true; for (JPanel
+	 * cpanel : fileReferences.values()) {
+	 * 
+	 * if (background_color == false) { cpanel.setBackground(LIGHT_LIGHT_GRAY);
+	 * } else { cpanel.setBackground(ALMOST_WHITE); } background_color =
+	 * !background_color; } }
+	 */
 	private void resizeFrame() {
 
 		if (fileReferences.size() == 0) {
@@ -200,19 +193,35 @@ public class Downloaded {
 		}
 	}
 
-	private void clear() {
-		for (Container a : fileReferences.values()) {
-			for (Component child : a.getComponents()) {
+	private synchronized void clear() {
+		int i = 0;
+
+		while (i < fileReferences.size()) {
+			// for (Pair<Pair<String, Integer>, JPanel> pair :
+			// /*fileReferences*/) {
+			JPanel panel = fileReferences.get(i).getSecond();
+			for (Component child : panel.getComponents()) {
 				if (child.getName() == "progressbar") {
 					JProgressBar progress = (JProgressBar) child;
 					if (progress.getValue() == progress.getMaximum()) {
-						pnl_main.remove(a);
-						fileReferences.remove(a);
+
+						pnl_main.remove(panel);
+						fileReferences.remove(i);
+						i--;
 					}
 				}
 			}
+			i++;
+
 		}
-		redraw_colors();
+		/*
+		 * for (Container a : fileReferences.values()) { for (Component child :
+		 * a.getComponents()) { if (child.getName() == "progressbar") {
+		 * JProgressBar progress = (JProgressBar) child; if (progress.getValue()
+		 * == progress.getMaximum()) { pnl_main.remove(a);
+		 * fileReferences.remove(a); } } } }
+		 */
+		// redraw_colors();
 
 		resizeFrame();
 	}

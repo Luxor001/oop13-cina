@@ -191,54 +191,55 @@ public class Client implements Runnable {
 						int filesize = ois.readInt();
 						int step = ois.readInt();
 
-						@SuppressWarnings("unchecked")
 						Pair<String, Integer> key = (Pair<String, Integer>) ois
 								.readObject();
-						// Pair<String, Integer> key = new Pair<>(namefile, id);
 
-						/*
-						 * System.out.println("Bytes received from " + name +
-						 * " : " + step);
-						 */
-						ois.readFully(buffer, 0, step);
-						Pair<FileOutputStream, String> value = file.get(key);
+						if (step != -1) {
+							ois.readFully(buffer, 0, step);
 
-						if (value == null) {
+							Pair<FileOutputStream, String> value = file
+									.get(key);
 
-							String name = key.getFirst().substring(
-									key.getFirst().lastIndexOf("\\") + 1);
+							if (value == null) {
 
-							String newName = name;
-							int i = 1;
-							while (new File(System.getProperty("user.dir")
-									+ "/" + newName).exists()) {
+								String name = key.getFirst().substring(
+										key.getFirst().lastIndexOf("\\") + 1);
 
-								String[] nameExtension = name.split("\\.");
+								String newName = name;
+								int i = 1;
+								while (new File(System.getProperty("user.dir")
+										+ "/" + newName).exists()) {
 
-								nameExtension[0] = nameExtension[0] + "(" + i
-										+ ")";
-								newName = nameExtension[0] + "."
-										+ nameExtension[1];
-								i++;
+									String[] nameExtension = name.split("\\.");
+
+									nameExtension[0] = nameExtension[0] + "("
+											+ i + ")";
+									newName = nameExtension[0] + "."
+											+ nameExtension[1];
+									i++;
+								}
+
+								download.addFile(new Pair<String, Integer>(
+										newName, key.getSecond()), filesize);
+								value = new Pair<FileOutputStream, String>(
+										new FileOutputStream(new File(
+												System.getProperty("user.dir")
+														+ "/" + newName)),
+										newName);
 							}
 
-							download.addFile(newName, filesize);
-							value = new Pair<FileOutputStream, String>(
-									new FileOutputStream(new File(
-											System.getProperty("user.dir")
-													+ "/" + newName)), newName);
-						}
-
-						download.updateProgressBar(value.getSecond(), step);
-						value.getFirst().write(buffer, 0, step);
-						file.put(key, value);
-						if (step < 1024) {
-							System.out.println("File received "
-									+ value.getSecond());
-							value.getFirst().flush();
-							value.getFirst().close();
+							download.updateProgressBar(
+									new Pair<String, Integer>(
+											value.getSecond(), key.getSecond()),
+									step);
+							value.getFirst().write(buffer, 0, step);
 							file.put(key, value);
-							file.remove(value);
+						} else {
+							System.out.println("File received "
+									+ file.get(key).getSecond());
+							file.get(key).getFirst().flush();
+							file.get(key).getFirst().close();
+							file.remove(key);
 						}
 						resetTime = true;
 					} else {
@@ -293,16 +294,15 @@ public class Client implements Runnable {
 		byte[] buffer = new byte[step];
 		Pair<String, Integer> pair;
 
-		synchronized (lockFile) {
+		synchronized (lock) {
 			id++;
 			pair = new Pair<>(path, id);
-		}
-
-		try {
-			download.addFile(name, (int) fileSize);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try {
+				download.addFile(new Pair<String, Integer>(name, id),
+						(int) fileSize);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		System.out.println("File sending");
@@ -313,11 +313,13 @@ public class Client implements Runnable {
 				fileSize += step;
 				step = (int) fileSize;
 			}
-			download.updateProgressBar(name, step);
+			download.updateProgressBar(
+					new Pair<String, Integer>(name, pair.getSecond()), step);
 			fileStream.read(buffer);
 			sendMessage(buffer, (int) file.length(), step, pair);
 		}
 
+		sendMessage(buffer, (int) file.length(), -1, pair);
 		System.out.println("File sent");
 		fileStream.close();
 	}
@@ -335,8 +337,10 @@ public class Client implements Runnable {
 					oos.flush();
 					oos.writeObject(pair);
 					oos.flush();
-					oos.write(message, 0, step);
-					oos.flush();
+					if (step != -1) {
+						oos.write(message, 0, step);
+						oos.flush();
+					}
 					resetTime = true;
 				} catch (IOException e) {
 				}

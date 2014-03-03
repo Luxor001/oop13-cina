@@ -64,7 +64,16 @@ public class Controller implements ViewObserver {
 	}
 
 	public void sendFile(String path, String name) {
-		model.sendFile(path, name);
+		String ip = exist(name);
+		if (ip != null) {
+			model.sendFile(path, name);
+		} else {
+			commandReceiveMessage(
+					"the user may be disconnected or a new user has just login with the same nickname."
+							+ "in this case, if you want chat with this user ,send a new request of private chat",
+					name);
+		}
+
 	}
 
 	public synchronized void commandCloseTab(ActionEvent e) {
@@ -129,8 +138,7 @@ public class Controller implements ViewObserver {
 
 	public int buildChoiceMessageBox(MessageBoxReason reason,
 			String... optsender) {
-		
-		
+
 		String message = "";
 		String title = "";
 		Object[] options = null;
@@ -213,13 +221,13 @@ public class Controller implements ViewObserver {
 		}
 	}
 
-	public void notifySendFileUser(String path) throws IOException,
-			EncodeException {
+	public void notifySendFileUser(String path, String name)
+			throws IOException, EncodeException {
 
 		ChatMessage message = new ChatMessage("Connect to",
 				Type.REQUESTSENDFILE);
 		ChatMessage.Param params = new ChatMessage.Param();
-		params.setNickname(view.getTitle());
+		params.setNickname(name);
 		params.setFileName(path);
 		message.setAdditionalParams(params);
 		WebsocketHandler.getWebSocketHandler().SendMex(message);
