@@ -38,7 +38,7 @@ public class Server implements Runnable {
 
 			KeyStore serverKeys = KeyStore.getInstance("JKS");
 			serverKeys.load(new FileInputStream(System.getProperty("user.dir")
-					+ "/" + WebsocketHandler.DEBUG_NICKNAME + "ServerKey.jks"),
+					+ "/" + WebsocketHandler.NICKNAME + "ServerKey.jks"),
 					null);
 
 			KeyManagerFactory serverKeyManager = KeyManagerFactory
@@ -184,7 +184,7 @@ public class Server implements Runnable {
 		private ObjectOutputStream oos = null;
 		private SSLSocket sslSocket;
 		private String str = null;
-		private String nameServer = WebsocketHandler.DEBUG_NICKNAME;
+		private String nameServer = WebsocketHandler.NICKNAME;
 		private String nameClient = null;
 		private String ip = "";
 		private int id = 0;

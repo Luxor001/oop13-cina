@@ -37,7 +37,7 @@ public class Client implements Runnable {
 	private String str = "";
 	private ViewObserver controller;
 	private String ip;
-	private String nameClient = WebsocketHandler.DEBUG_NICKNAME;
+	private String nameClient = WebsocketHandler.NICKNAME;
 	private String nameServer = null;
 	private boolean resetTime = false;
 	private boolean stop = false;
@@ -346,7 +346,7 @@ public class Client implements Runnable {
 	public static String ObtainKeyStore(String ip, String who) {
 
 		File file = new File(System.getProperty("user.dir") + "/"
-				+ WebsocketHandler.DEBUG_NICKNAME + "ServerKey.jks");
+				+ WebsocketHandler.NICKNAME + "ServerKey.jks");
 		String name = "";
 		try {
 
@@ -357,7 +357,7 @@ public class Client implements Runnable {
 			ObjectInputStream ois = new ObjectInputStream(
 					socket.getInputStream());
 
-			oos.writeUTF(WebsocketHandler.DEBUG_NICKNAME);
+			oos.writeUTF(WebsocketHandler.NICKNAME);
 			oos.flush();
 			oos.writeUTF(who);
 			oos.flush();

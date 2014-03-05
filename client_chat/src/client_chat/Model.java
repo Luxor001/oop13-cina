@@ -79,7 +79,7 @@ public class Model implements ModelInterface {
 	}
 
 	public void showPreferences(){
-		Preferences p=new Preferences();
+		Prefs p=new Prefs();
 	}
 	
 	public void addNickName(String nickName, String ip) {
@@ -196,9 +196,9 @@ public class Model implements ModelInterface {
 			}
 		}
 
-		createKeyStore(WebsocketHandler.DEBUG_NICKNAME, "ServerKey", "password");
+		createKeyStore(WebsocketHandler.NICKNAME, "ServerKey", "password");
 
-		createKeyStore(WebsocketHandler.DEBUG_NICKNAME, "ClientKey", "changeit");
+		createKeyStore(WebsocketHandler.NICKNAME, "ClientKey", "changeit");
 
 		// server will be created at start of programm and pending some clients
 		try {

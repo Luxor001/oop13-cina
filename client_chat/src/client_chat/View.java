@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
@@ -61,6 +62,7 @@ public class View extends JFrame implements ViewInterface {
 	final private static int HGAP = 10;
 	final private static int VGAP = 10;
 	final private static int WIDTH_USERJLIST=130;
+	Preferences prefs=Preferences.systemRoot();
 	Downloaded d;
 	private ViewObserver controller;
 
@@ -183,7 +185,7 @@ public class View extends JFrame implements ViewInterface {
 		String message = textList.get(index).getText();
 		if (!message.equals("")) {
 			chatList.get(index).append(
-					" " + WebsocketHandler.DEBUG_NICKNAME + ": " + message
+					" " + WebsocketHandler.NICKNAME + ": " + message
 							+ "\n");
 			textList.get(index).setText("");
 			textList.get(index).requestFocus();
@@ -269,8 +271,13 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	public void showMessageMain(String message) {
-
-		if (getTabIndex() != 0) {
+		
+		boolean dfsounds=prefs.getBoolean(
+				client_chat.Prefs.PrefType.DEFAULTSOUNDS.toString(),
+				true);
+		
+		
+		if (getTabIndex() != 0 && dfsounds) {
 			tabView.setBackgroundAt(0, Color.ORANGE);
 			playSound(sfx.PLAIN_TEXT);
 		}

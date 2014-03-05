@@ -33,7 +33,7 @@ public class WebsocketHandler {
 
 	static Session ClientSession;
 	private static Controller controller;
-	public static String DEBUG_NICKNAME = System.getProperty("user.name");// "Lux"
+	public static String NICKNAME = System.getProperty("user.name");// "Lux"
 																			// +
 																			// Math.random();
 	public static boolean VISIBLE_FLAG = true;
@@ -74,7 +74,7 @@ public class WebsocketHandler {
 		} else {
 
 			ChatMessage Message = new ChatMessage("hello", Type.INITIALIZE);
-			Message.getAdditionalParams().setNickname(DEBUG_NICKNAME);
+			Message.getAdditionalParams().setNickname(NICKNAME);
 			Message.getAdditionalParams().SetVisibility(VISIBLE_FLAG);
 			SendMex(Message); /* send my request of connection to the server */
 
