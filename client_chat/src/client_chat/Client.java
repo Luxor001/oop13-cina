@@ -108,37 +108,34 @@ public class Client implements Runnable {
 
 	public void run() {
 
-		synchronized (lock) {
+		try {
+			sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, 9999);
+			sslSocket.startHandshake();
+		} catch (IOException e) {
+			model.removeNickName(nameServer);
+		}
 
-			try {
-				sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, 9999);
-				sslSocket.startHandshake();
-			} catch (IOException e) {
-				model.removeNickName(nameServer);
-			}
+		System.out.println("** Sono connesso con il server **");
+		System.out.println("IP: " + sslSocket.getInetAddress());
+		System.out.println("Porta: " + sslSocket.getPort());
+		// inizializzo gli stream che mi permetteranno di inviare e ricevere
+		// i
+		// mess ->
 
-			System.out.println("** Sono connesso con il server **");
-			System.out.println("IP: " + sslSocket.getInetAddress());
-			System.out.println("Porta: " + sslSocket.getPort());
-			// inizializzo gli stream che mi permetteranno di inviare e ricevere
-			// i
-			// mess ->
+		try {
+			oos = new ObjectOutputStream(sslSocket.getOutputStream());
+			ois = new ObjectInputStream(sslSocket.getInputStream());
 
-			try {
-				oos = new ObjectOutputStream(sslSocket.getOutputStream());
-				ois = new ObjectInputStream(sslSocket.getInputStream());
+			download = model.getDownloaded();
+			oos.writeObject(false);
+			oos.flush();
+			oos.writeObject(nameClient);
+			oos.flush();
+			model.addNickName(nameServer, sslSocket.getInetAddress().toString()
+					.substring(1));
 
-				download = model.getDownloaded();
-				oos.writeObject(false);
-				oos.flush();
-				oos.writeObject(nameClient);
-				oos.flush();
-				model.addNickName(nameServer, sslSocket.getInetAddress()
-						.toString().substring(1));
-
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 
 		class Timer extends Thread {
@@ -178,83 +175,63 @@ public class Client implements Runnable {
 		// leggo quello che mi arriva dal server
 		try {
 
-			boolean goOn = true;
 			Object o;
 			byte[] buffer = new byte[150000];
-			Map<Pair<String, Integer>, Pair<FileOutputStream, String>> file = new HashMap<>();
+			Map<Integer, DownloadFile> file = new HashMap<>();
 
-			while (goOn) {
-				o = ois.readObject();
+			while ((o = ois.readObject()) != null) {
+				if (o instanceof ManagementFiles) {
+					ManagementFiles managementFile = (ManagementFiles) o;
 
-				if (o instanceof Boolean) {
-					if ((boolean) o) {
-						int filesize = ois.readInt();
-						int step = ois.readInt();
+					int step = ois.readInt();
+					ois.readFully(buffer, 0, step);
 
-						Pair<String, Integer> key = (Pair<String, Integer>) ois
-								.readObject();
+					DownloadFile value = file.get(managementFile.getIdFile());
 
-						if (step != -1) {
-							ois.readFully(buffer, 0, step);
+					if (value == null) {
 
-							Pair<FileOutputStream, String> value = file
-									.get(key);
+						String name = managementFile.getFileName();
 
-							if (value == null) {
+						String newName = name;
+						int i = 1;
+						while (new File(System.getProperty("user.dir") + "/"
+								+ newName).exists()) {
 
-								String name = key.getFirst().substring(
-										key.getFirst().lastIndexOf("\\") + 1);
+							String[] nameExtension = name.split("\\.");
 
-								String newName = name;
-								int i = 1;
-								while (new File(System.getProperty("user.dir")
-										+ "/" + newName).exists()) {
-
-									String[] nameExtension = name.split("\\.");
-
-									nameExtension[0] = nameExtension[0] + "("
-											+ i + ")";
-									newName = nameExtension[0] + "."
-											+ nameExtension[1];
-									i++;
-								}
-
-								download.addFile(new Pair<String, Integer>(
-										newName, key.getSecond()), filesize);
-								value = new Pair<FileOutputStream, String>(
-										new FileOutputStream(new File(
-												System.getProperty("user.dir")
-														+ "/" + newName)),
-										newName);
-							}
-
-							download.updateProgressBar(
-									new Pair<String, Integer>(
-											value.getSecond(), key.getSecond()),
-									step);
-							value.getFirst().write(buffer, 0, step);
-							file.put(key, value);
-						} else {
-							System.out.println("File received "
-									+ file.get(key).getSecond());
-							file.get(key).getFirst().flush();
-							file.get(key).getFirst().close();
-							file.remove(key);
+							nameExtension[0] = nameExtension[0] + "(" + i + ")";
+							newName = nameExtension[0] + "." + nameExtension[1];
+							i++;
 						}
-						resetTime = true;
-					} else {
 
-						String message = null;
-						if ((message = (String) ois.readObject()) != null) {
-							controller.commandReceiveMessage(nameServer + " : "
-									+ message, nameServer);
-							resetTime = true;
-						} else {
-							goOn = false;
-						}
+						download.addFile(nameServer,
+								managementFile.getIdFile(), newName,
+								managementFile.getFileSize());
+
+						value = new DownloadFile(
+								new FileOutputStream(new File(
+										System.getProperty("user.dir") + "/"
+												+ newName)));
 					}
 
+					download.updateProgressBar(nameServer,
+							managementFile.getIdFile(), step);
+					value.write(buffer, 0, step);
+					value.incrementSize(step);
+					file.put(managementFile.getIdFile(), value);
+
+					if (value.getSize() == managementFile.getFileSize()) {
+						System.out.println("File received "
+								+ managementFile.getFileName());
+						file.get(managementFile.getIdFile()).close();
+						file.remove(managementFile.getIdFile());
+					}
+				} else {
+					controller.commandReceiveMessage(nameServer + " : "
+							+ (String) o, nameServer);
 				}
+
+				resetTime = true;
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
@@ -289,17 +266,17 @@ public class Client implements Runnable {
 		File file = new File(path);
 		String name = file.getName();
 		int step = 150000;
+		byte[] buffer = new byte[step];
 		long fileSize = file.length();
 		FileInputStream fileStream = new FileInputStream(file);
-		byte[] buffer = new byte[step];
-		Pair<String, Integer> pair;
+
+		ManagementFiles managementFile;
 
 		synchronized (lock) {
 			id++;
-			pair = new Pair<>(path, id);
+			managementFile = new ManagementFiles(name, id, (int) fileSize);
 			try {
-				download.addFile(new Pair<String, Integer>(name, id),
-						(int) fileSize);
+				download.addFile(nameClient, id, name, (int) fileSize);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -312,57 +289,49 @@ public class Client implements Runnable {
 			if (fileSize < 0) {
 				fileSize += step;
 				step = (int) fileSize;
+				fileSize = 0;
 			}
-			download.updateProgressBar(
-					new Pair<String, Integer>(name, pair.getSecond()), step);
+
+			download.updateProgressBar(nameClient, managementFile.getIdFile(),
+					step);
+
 			fileStream.read(buffer);
-			sendMessage(buffer, (int) file.length(), step, pair);
+			sendMessage(managementFile, buffer, step);
 		}
 
-		sendMessage(buffer, (int) file.length(), -1, pair);
 		System.out.println("File sent");
 		fileStream.close();
 	}
 
-	public void sendMessage(byte[] message, int filesize, int step,
-			Pair<String, Integer> pair) {
-		synchronized (lock) {
-			if (sslSocket.isConnected() && !sslSocket.isClosed()) {
-				try {
-					oos.writeObject(true);
-					oos.flush();
-					oos.writeInt(filesize);
-					oos.flush();
-					oos.writeInt(step);
-					oos.flush();
-					oos.writeObject(pair);
-					oos.flush();
-					if (step != -1) {
-						oos.write(message, 0, step);
-						oos.flush();
-					}
-					resetTime = true;
-				} catch (IOException e) {
-				}
-			}
+	public synchronized void sendMessage(ManagementFiles file, byte[] message,
+			int step) throws IOException {
+
+		if (sslSocket.isConnected() && !sslSocket.isClosed()) {
+			oos.writeObject(file);
+			oos.flush();
+
+			oos.writeInt(step);
+			oos.flush();
+			oos.write(message, 0, step);
+			oos.flush();
+
+			resetTime = true;
 		}
+
 	}
 
-	public void sendMessage(String message) {
+	public synchronized void sendMessage(Object message) {
 
-		synchronized (lock) {
-			if (sslSocket.isConnected() && !sslSocket.isClosed()) {
-				try {
-					resetTime = true;
-					oos.writeObject(false);
-					oos.flush();
-					oos.writeObject(message);
-					oos.flush();
-				} catch (IOException e) {
-				}
-
+		if (sslSocket.isConnected() && !sslSocket.isClosed()) {
+			try {
+				resetTime = true;
+				oos.writeObject(message);
+				oos.flush();
+			} catch (IOException e) {
 			}
+
 		}
+
 	}
 
 	public void close() {

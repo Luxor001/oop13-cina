@@ -226,84 +226,64 @@ public class Server implements Runnable {
 			// leggo quello che mi arriva dal client
 			try {
 
-				boolean goOn = true;
 				Object o;
 				byte[] buffer = new byte[150000];
-				Map<Pair<String, Integer>, Pair<FileOutputStream, String>> file = new HashMap<>();
+				Map<Integer, DownloadFile> file = new HashMap<>();
 
-				while (goOn) {
-					o = ois.readObject();
-					if (o instanceof Boolean) {
-						if ((boolean) o) {
-							int filesize = ois.readInt();
-							int step = ois.readInt();
+				while ((o = ois.readObject()) != null) {
+					if (o instanceof ManagementFiles) {
+						ManagementFiles managementFile = (ManagementFiles) o;
 
-							Pair<String, Integer> key = (Pair<String, Integer>) ois
-									.readObject();
+						int step = ois.readInt();
+						ois.readFully(buffer, 0, step);
 
-							if (step != -1) {
-								ois.readFully(buffer, 0, step);
+						DownloadFile value = file.get(managementFile
+								.getIdFile());
 
-								Pair<FileOutputStream, String> value = file
-										.get(key);
+						if (value == null) {
 
-								if (value == null) {
+							String name = managementFile.getFileName();
 
-									String name = key.getFirst()
-											.substring(
-													key.getFirst().lastIndexOf(
-															"\\") + 1);
+							String newName = name;
+							int i = 1;
+							while (new File(System.getProperty("user.dir")
+									+ "/" + newName).exists()) {
 
-									String newName = name;
-									int i = 1;
-									while (new File(
-											System.getProperty("user.dir")
-													+ "/" + newName).exists()) {
+								String[] nameExtension = name.split("\\.");
 
-										String[] nameExtension = name
-												.split("\\.");
-
-										nameExtension[0] = nameExtension[0]
-												+ "(" + i + ")";
-										newName = nameExtension[0] + "."
-												+ nameExtension[1];
-										i++;
-									}
-
-									download.addFile(new Pair<String, Integer>(
-											newName, key.getSecond()), filesize);
-									value = new Pair<FileOutputStream, String>(
-											new FileOutputStream(
-													new File(
-															System.getProperty("user.dir")
-																	+ "/"
-																	+ newName)),
-											newName);
-								}
-
-								download.updateProgressBar(
-										new Pair<String, Integer>(value
-												.getSecond(), key.getSecond()),
-										step);
-								value.getFirst().write(buffer, 0, step);
-								file.put(key, value);
-							} else {
-								System.out.println("File received "
-										+ file.get(key).getSecond());
-								file.get(key).getFirst().flush();
-								file.get(key).getFirst().close();
-								file.remove(key);
+								nameExtension[0] = nameExtension[0] + "(" + i
+										+ ")";
+								newName = nameExtension[0] + "."
+										+ nameExtension[1];
+								i++;
 							}
 
-						} else {
-							String message = null;
-							if ((message = (String) ois.readObject()) != null) {
-								controller.commandReceiveMessage(nameClient
-										+ " : " + message, nameClient);
-							} else {
-								goOn = false;
-							}
+							download.addFile(nameClient,
+									managementFile.getIdFile(), newName,
+									managementFile.getFileSize());
+
+							value = new DownloadFile(new FileOutputStream(
+									new File(System.getProperty("user.dir")
+											+ "/" + newName)));
 						}
+
+						download.updateProgressBar(nameClient,
+								managementFile.getIdFile(), step);
+
+						value.write(buffer, 0, step);
+						value.incrementSize(step);
+
+						file.put(managementFile.getIdFile(), value);
+
+						if (value.getSize() == managementFile.getFileSize()) {
+							System.out.println("File received "
+									+ managementFile.getFileName());
+							file.get(managementFile.getIdFile()).close();
+							file.remove(managementFile.getIdFile());
+						}
+					} else {
+						controller.commandReceiveMessage(nameClient + " : "
+								+ (String) o, nameClient);
 					}
 				}
 
@@ -329,17 +309,17 @@ public class Server implements Runnable {
 			File file = new File(path);
 			String name = file.getName();
 			int step = 150000;
+			byte[] buffer = new byte[step];
 			long fileSize = file.length();
 			FileInputStream fileStream = new FileInputStream(file);
-			byte[] buffer = new byte[step];
-			Pair<String, Integer> pair;
+
+			ManagementFiles managementFile;
 
 			synchronized (lock) {
 				id++;
-				pair = new Pair<>(path, id);
+				managementFile = new ManagementFiles(name, id, (int) fileSize);
 				try {
-					download.addFile(new Pair<String, Integer>(name, id),
-							(int) fileSize);
+					download.addFile(nameServer, id, name, (int) fileSize);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -352,13 +332,16 @@ public class Server implements Runnable {
 				if (fileSize < 0) {
 					fileSize += step;
 					step = (int) fileSize;
+					fileSize = 0;
 				}
-				download.updateProgressBar(
-						new Pair<String, Integer>(name, pair.getSecond()), step);
+
+				download.updateProgressBar(nameServer,
+						managementFile.getIdFile(), step);
+
 				fileStream.read(buffer);
-				sendMessage(buffer, (int) file.length(), step, pair);
+				sendMessage(managementFile, buffer, step);
 			}
-			sendMessage(buffer, (int) file.length(), -1, pair);
+
 			System.out.println("File sent");
 			fileStream.close();
 		}
@@ -366,10 +349,6 @@ public class Server implements Runnable {
 		public synchronized void sendMessage(Object message) throws IOException {
 
 			if (!close) {
-
-				oos.writeObject(false);
-				oos.flush();
-
 				oos.writeObject(message);
 				oos.flush();
 			}
@@ -379,23 +358,18 @@ public class Server implements Runnable {
 			}
 		}
 
-		public synchronized void sendMessage(byte[] message, int filesize,
-				int step, Pair<String, Integer> pair) throws IOException {
+		public synchronized void sendMessage(ManagementFiles file,
+				byte[] message, int step) throws IOException {
 
 			if (!close) {
 
-				oos.writeObject(true);
+				oos.writeObject(file);
 				oos.flush();
-				oos.writeInt(filesize);
-				oos.flush();
+
 				oos.writeInt(step);
 				oos.flush();
-				oos.writeObject(pair);
+				oos.write(message, 0, step);
 				oos.flush();
-				if (step != -1) {
-					oos.write(message, 0, step);
-					oos.flush();
-				}
 			}
 
 			if (message == null) {
