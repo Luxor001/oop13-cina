@@ -11,6 +11,8 @@ public interface ViewObserver {
 
 	void commandShowDownloads();
 
+	void commandShowPreferences();
+	
 	void commandCloseTab(ActionEvent e);
 
 	void commandCreateTab(String ip, String name, String keystore);

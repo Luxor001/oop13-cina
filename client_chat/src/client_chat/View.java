@@ -314,7 +314,7 @@ public class View extends JFrame implements ViewInterface {
 					controller.commandShowDownloads();
 				}
 				if (e.getActionCommand().equals("Preferences")) {
-					System.out.println("Clicked Preferences!");
+					controller.commandShowPreferences();
 				}
 				if (e.getActionCommand().equals("Send File")) {
 
