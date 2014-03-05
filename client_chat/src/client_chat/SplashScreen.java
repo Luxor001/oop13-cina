@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -51,6 +52,7 @@ public class SplashScreen {
 
 	private static int offsetcenter = 30;
 	private static int centerscaling;
+	Preferences prefs=Preferences.systemRoot();
 
 	public SplashScreen() throws IOException {
 
@@ -86,7 +88,9 @@ public class SplashScreen {
 		lbl_channel.setLocation(CenteredX(lbl_channel), centerscaling);
 		centerscaling += 20;
 
-		chb_visible=new JCheckBox("Visible?",true);
+		boolean choice=prefs.getBoolean(
+				client_chat.Prefs.PrefType.DEFAULTVISIBILITY.toString(), true);
+		chb_visible=new JCheckBox("Visible?",choice);
 		chb_visible.setSize(chb_visible.getPreferredSize());
 		chb_visible.setLocation(CenteredX(chb_visible)+90, centerscaling);
 		pnl_main.add(chb_visible);
@@ -108,7 +112,10 @@ public class SplashScreen {
 		txt_nickname.setSize(txt_nickname.getSize().width,
 				txt_nickname.getSize().height + 5);
 		txt_nickname.setLocation(CenteredX(txt_nickname), centerscaling);
-		txt_nickname.setText(System.getProperty("user.name"));
+		
+		String dfnickname=prefs.get(
+				client_chat.Prefs.PrefType.DEFAULTNICKNAME.toString(), System.getProperty("user.name"));
+		txt_nickname.setText(dfnickname);
 
 		centerscaling += 20;
 		Border border = BorderFactory.createLineBorder(Color.BLACK);
@@ -143,7 +150,7 @@ public class SplashScreen {
 					bln_invalidnick.setVisible(true);
 				} else {
 					try {
-						WebsocketHandler.DEBUG_NICKNAME = txt_nickname
+						WebsocketHandler.NICKNAME = txt_nickname
 								.getText();
 						Application.chat_initialization();
 					} catch (IOException e1) {
@@ -186,7 +193,6 @@ public class SplashScreen {
 		
 		frame.setResizable(false);
 		frame.setVisible(true);
-
 	}
 
 	public int CenteredX(Component a) {
