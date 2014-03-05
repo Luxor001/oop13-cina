@@ -78,6 +78,10 @@ public class Model implements ModelInterface {
 		}
 	}
 
+	public void showPreferences(){
+		Preferences p=new Preferences();
+	}
+	
 	public void addNickName(String nickName, String ip) {
 		synchronized (lockPeopleChat) {
 			peopleChat.put(nickName, ip);
