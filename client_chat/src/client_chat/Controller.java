@@ -33,6 +33,10 @@ public class Controller implements ViewObserver {
 	public void commandShowDownloads() {
 		model.showDownloads();
 	}
+	
+	public void commandShowPreferences(){
+		model.showPreferences();
+	}
 
 	public void commandSendMessage(String message, String name) {
 

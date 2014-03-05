@@ -9,6 +9,8 @@ public interface ModelInterface {
 
 	void showDownloads();
 
+	void showPreferences();
+	
 	void sendFile(String path, String name);
 
 	void addNickName(String name, String ip);
