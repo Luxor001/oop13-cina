@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.text.BadLocationException;
@@ -127,13 +128,6 @@ public class Downloaded {
 		JPanel pnl = null;
 
 		synchronized (this) {
-
-			/*
-			 * for (int i = 0; i < fileReferences.size(); i++) { if
-			 * (fileReferences.get(i).getFirst().getFirst().equals(user) &&
-			 * fileReferences.get(i).getFirst().getSecond() == id) { pnl =
-			 * fileReferences.get(i).getSecond(); i = fileReferences.size(); } }
-			 */
 			String key = user + id;
 			pnl = fileReferences.get(key);
 		}
@@ -165,6 +159,14 @@ public class Downloaded {
 
 	public boolean showFrame(boolean show) {
 		if (fileReferences.size() == 0) {
+			JFrame emptyframe=new JFrame();
+			emptyframe.setSize(new Dimension(350,200));
+			emptyframe.setLocationRelativeTo(null);
+			emptyframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			emptyframe.setVisible(true);
+			JOptionPane.showMessageDialog(emptyframe,"No file to show!",
+					"Error!",JOptionPane.ERROR_MESSAGE);
+			emptyframe.dispose();
 			return false;
 		} else {
 			frame.setVisible(show);
@@ -172,20 +174,6 @@ public class Downloaded {
 		}
 	}
 
-	/*
-	 * public synchronized void eraseFile(String nickname) { JPanel pnl =
-	 * fileReferences.get(nickname); pnl_main.remove(pnl);
-	 * fileReferences.remove(nickname); redraw_colors(); resizeFrame(); }
-	 */
-
-	/*
-	 * private void redraw_colors() { background_color = true; for (JPanel
-	 * cpanel : fileReferences.values()) {
-	 * 
-	 * if (background_color == false) { cpanel.setBackground(LIGHT_LIGHT_GRAY);
-	 * } else { cpanel.setBackground(ALMOST_WHITE); } background_color =
-	 * !background_color; } }
-	 */
 	private void resizeFrame() {
 
 		if (fileReferences.size() == 0) {
@@ -200,18 +188,6 @@ public class Downloaded {
 	private synchronized void clear() {
 
 		int i = 0;
-
-		/*
-		 * while (i < fileReferences.size()) { JPanel panel =
-		 * fileReferences.get(i).getSecond(); for (Component child :
-		 * panel.getComponents()) { if (child.getName() == "progressbar") {
-		 * JProgressBar progress = (JProgressBar) child; if (progress.getValue()
-		 * == progress.getMaximum()) {
-		 * 
-		 * pnl_main.remove(panel); fileReferences.remove(i); i--; } } } i++;
-		 * 
-		 * }
-		 */
 
 		for (Container a : fileReferences.values()) {
 			for (Component child : a.getComponents()) {

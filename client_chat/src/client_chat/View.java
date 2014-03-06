@@ -62,7 +62,7 @@ public class View extends JFrame implements ViewInterface {
 	final private static int HGAP = 10;
 	final private static int VGAP = 10;
 	final private static int WIDTH_USERJLIST=130;
-	Preferences prefs=Preferences.systemRoot();
+	Preferences prefs=Preferences.userRoot();
 	Downloaded d;
 	private ViewObserver controller;
 
@@ -409,8 +409,10 @@ public class View extends JFrame implements ViewInterface {
 
 						Rectangle rSelection = usersJList.getCellBounds(sIndex,
 								sIndex + 1);
+						if(rSelection != null){						
 						// centerx allows to have a small offset
 						a.doPop(e, (int) rSelection.getCenterX(), rSelection.y);
+						}
 					}
 				} else {
 					if (e.getComponent() instanceof JMenu) {
@@ -667,6 +669,7 @@ public class View extends JFrame implements ViewInterface {
 			});
 
 			anItem = new JMenuItem("Poke");
+			anItem.setEnabled(false);
 			add(anItem);
 			anItem.addActionListener(new ActionListener() {
 

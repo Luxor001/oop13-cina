@@ -52,7 +52,7 @@ public class SplashScreen {
 
 	private static int offsetcenter = 30;
 	private static int centerscaling;
-	Preferences prefs=Preferences.systemRoot();
+	Preferences prefs=Preferences.userRoot();
 
 	public SplashScreen() throws IOException {
 
