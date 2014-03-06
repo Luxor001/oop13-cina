@@ -1,7 +1,11 @@
 package client_chat;
 
+import it.sauronsoftware.junique.AlreadyLockedException;
+import it.sauronsoftware.junique.JUnique;
+
 import java.io.IOException;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import client_chat.Model.connectionResult;
@@ -10,10 +14,31 @@ public class Application {
 
 	private static SplashScreen splash;
 	private static WebsocketHandler web;
+	private static String programName="cryptochat";
+	private static String ERROR_DUPLICATE_STRING="Only one instance of Cryptochat"
+			+ "\n can be run at time";
 
 	public static void main(String[] args) throws IOException {
 		// new View();
-		start();
+		
+		boolean alreadyRunning;
+		try {
+			JUnique.acquireLock(programName);
+			alreadyRunning = false;
+		} catch (AlreadyLockedException e) {
+			alreadyRunning = true;
+		}
+		if (!alreadyRunning) {
+			
+			start();
+			// Start sequence here
+		}
+		else{
+			JOptionPane.showMessageDialog(new JFrame(), 
+					ERROR_DUPLICATE_STRING,"Error!",JOptionPane.WARNING_MESSAGE);
+		}
+		
+		
 	}
 
 	public static void start() throws IOException {

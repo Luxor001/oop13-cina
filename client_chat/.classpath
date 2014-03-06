@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="lib/jersey-container-grizzly2-http.jar"/>
 	<classpathentry kind="lib" path="lib/nucleus-grizzly-all.jar"/>
 	<classpathentry kind="lib" path="lib/balloontip-1.2.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/junique-1.0.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
