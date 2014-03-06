@@ -79,6 +79,7 @@ public class Model implements ModelInterface {
 	}
 
 	public void showPreferences(){
+		@SuppressWarnings("unused")
 		Prefs p=new Prefs();
 	}
 	

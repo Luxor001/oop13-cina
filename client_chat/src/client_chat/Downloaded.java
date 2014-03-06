@@ -79,6 +79,7 @@ public class Downloaded {
 
 	private JPanel buildFilePanel(String fileName, int max) {
 
+	
 		JPanel container = new JPanel();
 		container.setAlignmentX(Component.LEFT_ALIGNMENT);
 		container.setMaximumSize(new Dimension(400, 55));

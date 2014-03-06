@@ -183,7 +183,6 @@ public class Server implements Runnable {
 		private ObjectInputStream ois = null;
 		private ObjectOutputStream oos = null;
 		private SSLSocket sslSocket;
-		private String str = null;
 		private String nameServer = WebsocketHandler.NICKNAME;
 		private String nameClient = null;
 		private String ip = "";
