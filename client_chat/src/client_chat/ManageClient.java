@@ -10,10 +10,12 @@ public class ManageClient {
 	private ViewObserver controller;
 	private Model model;
 	private Object lock = new Object();
+	private String password;
 
-	public ManageClient(ViewObserver controller, Model model) {
+	public ManageClient(ViewObserver controller, Model model, String password) {
 		this.controller = controller;
 		this.model = model;
+		this.password = password;
 	}
 
 	public void addClient(String ip, String name, String keyStore)
@@ -25,7 +27,8 @@ public class ManageClient {
 				}
 			}
 
-			client.add(new Client(ip, name, controller, model, keyStore));
+			client.add(new Client(ip, name, password, controller, model,
+					keyStore));
 		}
 
 	}

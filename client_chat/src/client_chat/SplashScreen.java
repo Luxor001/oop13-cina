@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.prefs.Preferences;
@@ -26,7 +25,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
-import javax.swing.text.BadLocationException;
 
 import net.java.balloontip.BalloonTip;
 
@@ -52,7 +50,7 @@ public class SplashScreen {
 
 	private static int offsetcenter = 30;
 	private static int centerscaling;
-	Preferences prefs=Preferences.userRoot();
+	Preferences prefs = Preferences.userRoot();
 
 	public SplashScreen() throws IOException {
 
@@ -66,7 +64,7 @@ public class SplashScreen {
 		InputStream imgStream = new FileInputStream(new File(icon_path));
 		BufferedImage myImg = ImageIO.read(imgStream);
 		frame.setIconImage(myImg);
-		
+
 		pnl_main = new JPanel();
 		pnl_main.setLayout(null); /* sorry but i'm in a short */
 		frame.getContentPane().add(pnl_main);
@@ -88,11 +86,11 @@ public class SplashScreen {
 		lbl_channel.setLocation(CenteredX(lbl_channel), centerscaling);
 		centerscaling += 20;
 
-		boolean choice=prefs.getBoolean(
+		boolean choice = prefs.getBoolean(
 				client_chat.Prefs.PrefType.DEFAULTVISIBILITY.toString(), true);
-		chb_visible=new JCheckBox("Visible?",choice);
+		chb_visible = new JCheckBox("Visible?", choice);
 		chb_visible.setSize(chb_visible.getPreferredSize());
-		chb_visible.setLocation(CenteredX(chb_visible)+90, centerscaling);
+		chb_visible.setLocation(CenteredX(chb_visible) + 90, centerscaling);
 		pnl_main.add(chb_visible);
 		cmb_channel.setSize(cmb_channel.getPreferredSize());
 		cmb_channel.setLocation(CenteredX(cmb_channel), centerscaling);
@@ -100,7 +98,6 @@ public class SplashScreen {
 		cmb_channel.removeItem("longname");
 		pnl_main.add(lbl_channel);
 		pnl_main.add(cmb_channel);
-		
 
 		centerscaling += 20;
 		lbl_nickname = new JLabel("Nickname");
@@ -112,9 +109,10 @@ public class SplashScreen {
 		txt_nickname.setSize(txt_nickname.getSize().width,
 				txt_nickname.getSize().height + 5);
 		txt_nickname.setLocation(CenteredX(txt_nickname), centerscaling);
-		
-		String dfnickname=prefs.get(
-				client_chat.Prefs.PrefType.DEFAULTNICKNAME.toString(), System.getProperty("user.name"));
+
+		String dfnickname = prefs.get(
+				client_chat.Prefs.PrefType.DEFAULTNICKNAME.toString(),
+				System.getProperty("user.name"));
 		txt_nickname.setText(dfnickname);
 
 		centerscaling += 20;
@@ -150,8 +148,8 @@ public class SplashScreen {
 					bln_invalidnick.setVisible(true);
 				} else {
 					try {
-						WebsocketHandler.NICKNAME = txt_nickname
-								.getText();
+						User.setNickName(txt_nickname.getText());
+						// WebsocketHandler.NICKNAME = txt_nickname.getText();
 						Application.chat_initialization();
 					} catch (IOException e1) {
 					}
@@ -159,12 +157,12 @@ public class SplashScreen {
 				}
 			}
 		});
-		
+
 		chb_visible.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-					WebsocketHandler.VISIBLE_FLAG=chb_visible.isSelected();				
+				WebsocketHandler.VISIBLE_FLAG = chb_visible.isSelected();
 			}
 		});
 
@@ -189,8 +187,6 @@ public class SplashScreen {
 			}
 		});
 
-	
-		
 		frame.setResizable(false);
 		frame.setVisible(true);
 	}
@@ -224,14 +220,11 @@ public class SplashScreen {
 				NICKNAME_ALREADY_USED_MESSAGE);
 		bln_invalidnick.setVisible(true);
 	}
-	
-	public void setFrameEnabled(boolean enabled){
-		
+
+	public void setFrameEnabled(boolean enabled) {
+
 		btn_login.setEnabled(enabled);
 		frame.setEnabled(enabled);
 	}
-	
-	
-	
 
 }

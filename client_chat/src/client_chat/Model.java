@@ -78,11 +78,11 @@ public class Model implements ModelInterface {
 		}
 	}
 
-	public void showPreferences(){
+	public void showPreferences() {
 		@SuppressWarnings("unused")
-		Prefs p=new Prefs();
+		Prefs p = new Prefs();
 	}
-	
+
 	public void addNickName(String nickName, String ip) {
 		synchronized (lockPeopleChat) {
 			peopleChat.put(nickName, ip);
@@ -197,15 +197,15 @@ public class Model implements ModelInterface {
 			}
 		}
 
-		createKeyStore(WebsocketHandler.NICKNAME, "ServerKey", "password");
+		String serverPsw = createKeyStore(User.getNickName(), "ServerKey");
 
-		createKeyStore(WebsocketHandler.NICKNAME, "ClientKey", "changeit");
+		String clientPsw = createKeyStore(User.getNickName(), "ClientKey");
 
 		// server will be created at start of programm and pending some clients
 		try {
 			keyStoreServer = new KeyStoreServer(controller);
-			server = new Server(controller, this);
-			client = new ManageClient(controller, this);
+			server = new Server(controller, this, serverPsw);
+			client = new ManageClient(controller, this, clientPsw);
 
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -215,35 +215,35 @@ public class Model implements ModelInterface {
 
 	}
 
-	private void createKeyStore(String name, String alias, String password) {
-		try {
+	private String createKeyStore(String name, String alias) {
 
-			String language = Locale.getDefault().getLanguage();
+		String language = Locale.getDefault().getLanguage();
+		String password = name + ((int) Math.random() * 100);
+		File certificate;
+		String path = System.getProperty("user.dir") + "/" + name + alias;
+		String nameCertificate;
+		String confirm = "";
+		// creo un file bat
+		FileOutputStream output;
+		DataOutputStream stdout;
 
-			File certificate;
-			String path = System.getProperty("user.dir") + "/" + name + alias;
-			String nameCertificate;
-			String confirm = "";
-			// creo un file bat
-			FileOutputStream output;
-			DataOutputStream stdout;
-
-			if (System.getProperty("os.name").contains("Windows")) {
-				nameCertificate = path + "Certificate.bat";
-				if (language.equals("it")) {
-					confirm = "si";
-				} else {
-					confirm = "yes";
-				}
+		if (System.getProperty("os.name").contains("Windows")) {
+			nameCertificate = path + "Certificate.bat";
+			if (language.equals("it")) {
+				confirm = "si";
 			} else {
-				nameCertificate = path + "Certificate.sh";
-				if (language.equals("it")) {
-					confirm = "s";
-				} else {
-					confirm = "y";
-				}
+				confirm = "yes";
 			}
+		} else {
+			nameCertificate = path + "Certificate.sh";
+			if (language.equals("it")) {
+				confirm = "s";
+			} else {
+				confirm = "y";
+			}
+		}
 
+		try {
 			certificate = new File(nameCertificate);
 			// certificate.setExecutable(true);
 			output = new FileOutputStream(certificate);
@@ -296,6 +296,8 @@ public class Model implements ModelInterface {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+
+		return password;
 	}
 
 	public WebsocketHandler getSocketHandler() {

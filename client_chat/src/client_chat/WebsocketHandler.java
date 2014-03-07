@@ -1,11 +1,8 @@
 package client_chat;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
@@ -33,9 +30,9 @@ public class WebsocketHandler {
 
 	static Session ClientSession;
 	private static Controller controller;
-	public static String NICKNAME = System.getProperty("user.name");// "Lux"
-																			// +
-																			// Math.random();
+	// public static String NICKNAME = System.getProperty("user.name");// "Lux"
+	// +
+	// Math.random();
 	public static boolean VISIBLE_FLAG = true;
 	public static boolean RESET_FLAG_DELETE_ME = false;
 	private long PING_INTERVAL_SECONDS = 15;
@@ -74,7 +71,8 @@ public class WebsocketHandler {
 		} else {
 
 			ChatMessage Message = new ChatMessage("hello", Type.INITIALIZE);
-			Message.getAdditionalParams().setNickname(NICKNAME);
+			Message.getAdditionalParams().setNickname(User.getNickName());
+			// Message.getAdditionalParams().setNickname(NICKNAME);
 			Message.getAdditionalParams().SetVisibility(VISIBLE_FLAG);
 			SendMex(Message); /* send my request of connection to the server */
 
@@ -155,7 +153,7 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDPRIVATECHAT) {
 
-			final String ip = getIP();
+			final String ip = User.getIp();
 
 			final String senderNick = message.getAdditionalParams()
 					.getNickname();
@@ -234,7 +232,7 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDSENDFILE) {
 
-			final String ip = getIP();
+			final String ip = User.getIp();
 			final String senderNick = message.getAdditionalParams()
 					.getNickname();
 			final String path = message.getAdditionalParams().getFileName();
@@ -328,15 +326,14 @@ public class WebsocketHandler {
 		controller = c;
 	}
 
-	public String getIP() throws IOException {
-
-		String surl = "http://vallentinsource.com/globalip.php";
-		URL url = new URL(surl);
-		InputStreamReader inpstrmread = new InputStreamReader(url.openStream());
-		BufferedReader reader = new BufferedReader(inpstrmread);
-		String ip = reader.readLine();
-		return ip;
-	}
+	/*
+	 * public String getIP() throws IOException {
+	 * 
+	 * String surl = "http://vallentinsource.com/globalip.php"; URL url = new
+	 * URL(surl); InputStreamReader inpstrmread = new
+	 * InputStreamReader(url.openStream()); BufferedReader reader = new
+	 * BufferedReader(inpstrmread); String ip = reader.readLine(); return ip; }
+	 */
 
 	private static CountDownLatch latch;
 

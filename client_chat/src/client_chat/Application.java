@@ -14,13 +14,13 @@ public class Application {
 
 	private static SplashScreen splash;
 	private static WebsocketHandler web;
-	private static String programName="cryptochat";
-	private static String ERROR_DUPLICATE_STRING="Only one instance of Cryptochat"
+	private static String programName = "Cryptochat";
+	private static String ERROR_DUPLICATE_STRING = "Only one instance of Cryptochat"
 			+ "\n can be run at time";
 
 	public static void main(String[] args) throws IOException {
 		// new View();
-		
+
 		boolean alreadyRunning;
 		try {
 			JUnique.acquireLock(programName);
@@ -29,16 +29,12 @@ public class Application {
 			alreadyRunning = true;
 		}
 		if (!alreadyRunning) {
-			
-			start();
-			// Start sequence here
+
+			start(); // Start sequence here } else{
+			JOptionPane.showMessageDialog(new JFrame(), ERROR_DUPLICATE_STRING,
+					"Error!", JOptionPane.WARNING_MESSAGE);
 		}
-		else{
-			JOptionPane.showMessageDialog(new JFrame(), 
-					ERROR_DUPLICATE_STRING,"Error!",JOptionPane.WARNING_MESSAGE);
-		}
-		
-		
+
 	}
 
 	public static void start() throws IOException {
@@ -56,7 +52,7 @@ public class Application {
 				splash.setVisibilityLoadingCircle(true);
 
 				do {
-					
+
 					try {
 						result = web.AttemptConnection();
 					} catch (IOException e) {

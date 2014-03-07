@@ -79,7 +79,6 @@ public class Downloaded {
 
 	private JPanel buildFilePanel(String fileName, int max) {
 
-	
 		JPanel container = new JPanel();
 		container.setAlignmentX(Component.LEFT_ALIGNMENT);
 		container.setMaximumSize(new Dimension(400, 55));
@@ -160,13 +159,13 @@ public class Downloaded {
 
 	public boolean showFrame(boolean show) {
 		if (fileReferences.size() == 0) {
-			JFrame emptyframe=new JFrame();
-			emptyframe.setSize(new Dimension(350,200));
+			JFrame emptyframe = new JFrame();
+			emptyframe.setSize(new Dimension(350, 200));
 			emptyframe.setLocationRelativeTo(null);
 			emptyframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			emptyframe.setVisible(true);
-			JOptionPane.showMessageDialog(emptyframe,"No file to show!",
-					"Error!",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(emptyframe, "No file to show!",
+					"Error!", JOptionPane.ERROR_MESSAGE);
 			emptyframe.dispose();
 			return false;
 		} else {
