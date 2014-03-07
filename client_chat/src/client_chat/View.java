@@ -42,6 +42,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
@@ -61,8 +62,8 @@ public class View extends JFrame implements ViewInterface {
 	final private static int HEIGTH = 400;
 	final private static int HGAP = 10;
 	final private static int VGAP = 10;
-	final private static int WIDTH_USERJLIST=130;
-	Preferences prefs=Preferences.userRoot();
+	final private static int WIDTH_USERJLIST = 130;
+	Preferences prefs = Preferences.userRoot();
 	Downloaded d;
 	private ViewObserver controller;
 
@@ -146,13 +147,14 @@ public class View extends JFrame implements ViewInterface {
 
 		usersJList = new JList<String>(usersList);
 
-		
+		usersJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 		// set dimension of userList
-		usersJList.setPreferredSize(new Dimension(
-				WIDTH_USERJLIST, usersJList
-						.getPreferredSize().height));
+		usersJList.setPreferredSize(new Dimension(WIDTH_USERJLIST, usersJList
+				.getPreferredSize().height));
 
 		usersJList.remove(0);
+
 		// add to the list a custom TextArea
 		textList.add(this.getMyText());
 		chatList.add(chat);
@@ -185,8 +187,7 @@ public class View extends JFrame implements ViewInterface {
 		String message = textList.get(index).getText();
 		if (!message.equals("")) {
 			chatList.get(index).append(
-					" " + WebsocketHandler.NICKNAME + ": " + message
-							+ "\n");
+					" " + User.getNickName() + ": " + message + "\n");
 			textList.get(index).setText("");
 			textList.get(index).requestFocus();
 		}
@@ -271,12 +272,10 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	public void showMessageMain(String message) {
-		
-		boolean dfsounds=prefs.getBoolean(
-				client_chat.Prefs.PrefType.DEFAULTSOUNDS.toString(),
-				true);
-		
-		
+
+		boolean dfsounds = prefs.getBoolean(
+				client_chat.Prefs.PrefType.DEFAULTSOUNDS.toString(), true);
+
 		if (getTabIndex() != 0 && dfsounds) {
 			tabView.setBackgroundAt(0, Color.ORANGE);
 			playSound(sfx.PLAIN_TEXT);
@@ -325,7 +324,9 @@ public class View extends JFrame implements ViewInterface {
 				}
 				if (e.getActionCommand().equals("Send File")) {
 
-					sendFile();
+					if (!getTabName().equals("Main")) {
+						sendFile(true);
+					}
 				}
 
 				if (e.getActionCommand().equals("Chat to..")) {
@@ -409,9 +410,10 @@ public class View extends JFrame implements ViewInterface {
 
 						Rectangle rSelection = usersJList.getCellBounds(sIndex,
 								sIndex + 1);
-						if(rSelection != null){						
-						// centerx allows to have a small offset
-						a.doPop(e, (int) rSelection.getCenterX(), rSelection.y);
+						if (rSelection != null) {
+							// centerx allows to have a small offset
+							a.doPop(e, (int) rSelection.getCenterX(),
+									rSelection.y);
 						}
 					}
 				} else {
@@ -610,7 +612,7 @@ public class View extends JFrame implements ViewInterface {
 
 	}
 
-	public void sendFile() {
+	public void sendFile(final boolean clickFromButton) {
 
 		chooser = new JFileChooser();
 
@@ -619,11 +621,16 @@ public class View extends JFrame implements ViewInterface {
 			new Thread() {
 				public void run() {
 					try {
+						String name = "";
+						if (clickFromButton) {
+							name = getTabName();
+						} else {
+							name = getTitle();
+						}
 						controller.notifySendFileUser(chooser.getSelectedFile()
-								.getAbsolutePath(), getTabName());
+								.getAbsolutePath(), name);
 					} catch (Exception e) {
 					}
-					// controller.notifyFileUser(chooser.getSelectedFile());
 				}
 			}.start();
 		}
@@ -664,7 +671,7 @@ public class View extends JFrame implements ViewInterface {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
-					sendFile();
+					sendFile(false);
 				}
 			});
 

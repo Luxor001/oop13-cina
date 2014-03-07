@@ -29,31 +29,30 @@ import javax.net.ssl.TrustManagerFactory;
  per questo motivo sono presenti indirizzi ip,porte,percorsi assoluti inseriti in modo manuale
  dal programmatore*/
 
-public class Client implements Runnable {
+public class Client extends SendReceiveFile implements Runnable {
 	private SSLSocketFactory sslSocketFactory = null;
 	private SSLSocket sslSocket = null;
 	private ObjectOutputStream oos = null;
 	private ObjectInputStream ois = null;
-	private String str = "";
 	private ViewObserver controller;
 	private String ip;
-	private String nameClient = WebsocketHandler.NICKNAME;
+	private String nameClient = User.getNickName();
 	private String nameServer = null;
 	private boolean resetTime = false;
 	private boolean stop = false;
 	private Downloaded download;
 	private CountDownLatch latch = new CountDownLatch(1);
 	private Object lock = new Object();
-	private Object lockFile = new Object();
 	private int id = 0;
 	private Model model;
 
-	public Client(String ip, String name, ViewObserver controller, Model model,
-			String keyStore) throws IOException, ClassNotFoundException {
+	public Client(String ip, String name, String password,
+			ViewObserver controller, Model model, String keyStore)
+			throws IOException, ClassNotFoundException {
 
 		String path = System.getProperty("user.dir") + "/" + nameClient
 				+ "ClientKey.jks";
-		char[] passphrase = "changeit".toCharArray();
+		char[] passphrase = password.toCharArray();
 		KeyStore keystore;
 		TrustManagerFactory tmf;
 		SSLContext context;
@@ -127,8 +126,6 @@ public class Client implements Runnable {
 			ois = new ObjectInputStream(sslSocket.getInputStream());
 
 			download = model.getDownloaded();
-			oos.writeObject(false);
-			oos.flush();
 			oos.writeObject(nameClient);
 			oos.flush();
 			model.addNickName(nameServer, sslSocket.getInetAddress().toString()
@@ -176,56 +173,12 @@ public class Client implements Runnable {
 		try {
 
 			Object o;
-			byte[] buffer = new byte[150000];
 			Map<Integer, DownloadFile> file = new HashMap<>();
 
 			while ((o = ois.readObject()) != null) {
 				if (o instanceof ManagementFiles) {
-					ManagementFiles managementFile = (ManagementFiles) o;
 
-					int step = ois.readInt();
-					ois.readFully(buffer, 0, step);
-
-					DownloadFile value = file.get(managementFile.getIdFile());
-
-					if (value == null) {
-
-						String name = managementFile.getFileName();
-
-						String newName = name;
-						int i = 1;
-						while (new File(System.getProperty("user.dir") + "/"
-								+ newName).exists()) {
-
-							String[] nameExtension = name.split("\\.");
-
-							nameExtension[0] = nameExtension[0] + "(" + i + ")";
-							newName = nameExtension[0] + "." + nameExtension[1];
-							i++;
-						}
-
-						download.addFile(nameServer,
-								managementFile.getIdFile(), newName,
-								managementFile.getFileSize());
-
-						value = new DownloadFile(
-								new FileOutputStream(new File(
-										System.getProperty("user.dir") + "/"
-												+ newName)));
-					}
-
-					download.updateProgressBar(nameServer,
-							managementFile.getIdFile(), step);
-					value.write(buffer, 0, step);
-					value.incrementSize(step);
-					file.put(managementFile.getIdFile(), value);
-
-					if (value.getSize() == managementFile.getFileSize()) {
-						System.out.println("File received "
-								+ managementFile.getFileName());
-						file.get(managementFile.getIdFile()).close();
-						file.remove(managementFile.getIdFile());
-					}
+					receiveFile(o, nameServer, ois, download, file);
 				} else {
 					controller.commandReceiveMessage(nameServer + " : "
 							+ (String) o, nameServer);
@@ -263,44 +216,21 @@ public class Client implements Runnable {
 	}
 
 	public void sendFile(String path) throws IOException {
-		File file = new File(path);
-		String name = file.getName();
-		int step = 150000;
-		byte[] buffer = new byte[step];
-		long fileSize = file.length();
-		FileInputStream fileStream = new FileInputStream(file);
 
+		File file = new File(path);
 		ManagementFiles managementFile;
 
+		controller.commandReceiveMessage("File sending", nameClient);
 		synchronized (lock) {
 			id++;
-			managementFile = new ManagementFiles(name, id, (int) fileSize);
-			try {
-				download.addFile(nameClient, id, name, (int) fileSize);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+
+			managementFile = new ManagementFiles(file.getName(), id,
+					(int) file.length());
 		}
 
-		System.out.println("File sending");
-		while (fileSize > 0) {
-			fileSize -= step;
+		super.sendFile(file, nameClient, managementFile, download);
 
-			if (fileSize < 0) {
-				fileSize += step;
-				step = (int) fileSize;
-				fileSize = 0;
-			}
-
-			download.updateProgressBar(nameClient, managementFile.getIdFile(),
-					step);
-
-			fileStream.read(buffer);
-			sendMessage(managementFile, buffer, step);
-		}
-
-		System.out.println("File sent");
-		fileStream.close();
+		controller.commandReceiveMessage("File sent", nameClient);
 	}
 
 	public synchronized void sendMessage(ManagementFiles file, byte[] message,
@@ -346,7 +276,7 @@ public class Client implements Runnable {
 	public static String ObtainKeyStore(String ip, String who) {
 
 		File file = new File(System.getProperty("user.dir") + "/"
-				+ WebsocketHandler.NICKNAME + "ServerKey.jks");
+				+ User.getNickName() + "ServerKey.jks");
 		String name = "";
 		try {
 
@@ -357,7 +287,7 @@ public class Client implements Runnable {
 			ObjectInputStream ois = new ObjectInputStream(
 					socket.getInputStream());
 
-			oos.writeUTF(WebsocketHandler.NICKNAME);
+			oos.writeUTF(User.getNickName());
 			oos.flush();
 			oos.writeUTF(who);
 			oos.flush();

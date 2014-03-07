@@ -62,7 +62,7 @@ public class KeyStoreServer extends Thread {
 		public void run() {
 
 			File file = new File(System.getProperty("user.dir") + "/"
-					+ WebsocketHandler.NICKNAME + "ServerKey.jks");
+					+ User.getNickName() + "ServerKey.jks");
 			try {
 
 				ois = new ObjectInputStream(socket.getInputStream());
@@ -75,7 +75,7 @@ public class KeyStoreServer extends Thread {
 					int choice = controller.buildChoiceMessageBox(
 							MessageBoxReason.REQUEST_PRIVATE_CHAT, name);
 					if (choice == 0) {
-						oos.writeUTF(WebsocketHandler.NICKNAME);
+						oos.writeUTF(User.getNickName());
 						oos.flush();
 					} else {
 						oos.writeObject(null);
@@ -87,7 +87,7 @@ public class KeyStoreServer extends Thread {
 					}
 
 				} else {
-					oos.writeUTF(WebsocketHandler.NICKNAME);
+					oos.writeUTF(User.getNickName());
 					oos.flush();
 				}
 
