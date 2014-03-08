@@ -187,6 +187,7 @@ public class Server implements Runnable {
 		private String nameClient = null;
 		private String ip = "";
 		private int id = 0;
+		private int port;
 		private Object lock = new Object();
 		private boolean close = false;
 		private Downloaded download;
@@ -214,9 +215,10 @@ public class Server implements Runnable {
 			try {
 
 				nameClient = (String) ois.readObject();
+				port = ois.readInt();
 				ip = sslSocket.getInetAddress().toString();
 				model.addNickName(nameClient, sslSocket.getInetAddress()
-						.toString().substring(1));
+						.toString().substring(1), port);
 			} catch (IOException | ClassNotFoundException e1) {
 				e1.printStackTrace();
 			}
@@ -310,7 +312,7 @@ public class Server implements Runnable {
 		}
 
 		public String getIp() {
-			return ip;
+			return ip + ":" + port;
 		}
 
 		public boolean isConnected() {
