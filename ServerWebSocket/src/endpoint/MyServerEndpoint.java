@@ -1,27 +1,18 @@
 package endpoint;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-import javax.json.Json;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.http.HttpServletRequest;
-import javax.websocket.CloseReason;
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.ServerEndpoint;
-
-import com.sun.messaging.jmq.jmsservice.JMSService.MessageAckType;
 
 import endpoint.ChatMessage.Param;
 import endpoint.ChatMessage.Type;
@@ -169,6 +160,8 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			ChatMessage cmessage=new ChatMessage("respond",message.getType());
 			cmessage.getAdditionalParams().setNickname(agreedinguser.GetNickname());
 			cmessage.getAdditionalParams().setIP(message.getAdditionalParams().getIP());
+			cmessage.getAdditionalParams().setSSLPort(message.getAdditionalParams().getSSLPort());
+			cmessage.getAdditionalParams().setKEYPort(message.getAdditionalParams().getKEYPort());
 			
 
 			if(message.getType() == ChatMessage.Type.YESSENDFILE){

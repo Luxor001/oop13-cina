@@ -84,6 +84,10 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 			if(message.getType() == ChatMessage.Type.YESSENDFILE){
 				builder.add(Json.createObjectBuilder().add("FileName", param.getFileName()));
 			}
+			
+
+			builder.add(Json.createObjectBuilder().add("SSLPort", param.getSSLPort()));
+			builder.add(Json.createObjectBuilder().add("KEYPort", param.getKEYPort()));
 			return builder.build();
 			
 		}

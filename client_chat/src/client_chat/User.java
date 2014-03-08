@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.prefs.Preferences;
 
 public class User {
 
@@ -11,7 +12,13 @@ public class User {
 	private static String IPUSER = null;
 	private static int PORTKEYSTORE = 0;
 	private static int PORTSSL = 0;
+	private static Preferences prefs=Preferences.userRoot();
+	
+	private enum PrefType {
+		DEFAULTNICKNAME, DEFAULTPATH, DEFAULTVISIBILITY, DEFAULTSOUNDS
+	}
 
+	
 	public static void setNickName(String name) {
 		NICKNAME = name;
 	}
@@ -53,4 +60,12 @@ public class User {
 	public static int getPortSSL() {
 		return PORTSSL;
 	}
+	
+	public static boolean getVisibility(){
+
+		return prefs.getBoolean(
+				PrefType.DEFAULTVISIBILITY.toString(), true);
+	}
+	
+	
 }

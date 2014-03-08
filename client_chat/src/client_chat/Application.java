@@ -19,7 +19,6 @@ public class Application {
 			+ "\n can be run at time";
 
 	public static void main(String[] args) throws IOException {
-		// new View();
 
 		boolean alreadyRunning;
 		try {
@@ -29,8 +28,10 @@ public class Application {
 			alreadyRunning = true;
 		}
 		if (!alreadyRunning) {
-
 			start(); // Start sequence here } else{
+		}
+		else{
+
 			JOptionPane.showMessageDialog(new JFrame(), ERROR_DUPLICATE_STRING,
 					"Error!", JOptionPane.WARNING_MESSAGE);
 		}
@@ -101,10 +102,12 @@ public class Application {
 		}
 		splash.setVisibilityLoadingCircle(false);
 		Model m = new Model();
+		m.setSocketPorts();
 		Controller c = new Controller();
 		View v = new View();
 		c.setView(v);
 		c.setModel(m);
+		
 
 		WebsocketHandler.setController(c);
 

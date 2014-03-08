@@ -144,8 +144,10 @@ public class Prefs {
 		JLabel lbl_defaultvisibility = new JLabel("Visible at Login");
 		pnl_defaultvisibility.add(lbl_defaultvisibility);
 		chk_visibility = new JCheckBox();
-		boolean dfvisibility = prefs.getBoolean(
-				Prefs.PrefType.DEFAULTVISIBILITY.toString(), true);
+		
+		boolean dfvisibility=User.getVisibility();
+		/*boolean dfvisibility = prefs.getBoolean(
+				Prefs.PrefType.DEFAULTVISIBILITY.toString(), true);*/
 		chk_visibility.setSelected(dfvisibility);
 		pnl_defaultvisibility.add(chk_visibility);
 
