@@ -28,24 +28,22 @@ public class Model implements ModelInterface {
 
 	public void sendMessage(String message, String name) {
 
-		if (message != "") {
-			if (!server.sendMessage(message, name)) {
-				if (!client.sendMessage(message, name)) {
-					String ip;
-					synchronized (lockPeopleChat) {
-						ip = peopleChat.get(name);
-					}
-					if (ip != null) {
-						connectToServer(ip, name,
-								System.getProperty("user.dir") + "/" + name
-										+ "ServerKey.jks");
-						/*
-						 * try { Thread.sleep(1000); } catch
-						 * (InterruptedException e) { e.printStackTrace(); }
-						 */
-						client.sendMessage(message, name);
-					}
+		if (!server.sendMessage(message, name)) {
+			if (!client.sendMessage(message, name)) {
+				String ip;
+				synchronized (lockPeopleChat) {
+					ip = peopleChat.get(name);
 				}
+				String[] ipPort = ip.split(":");
+				connectToServer(ipPort[0], Integer.parseInt(ipPort[1]), name,
+						System.getProperty("user.dir") + "/" + name
+								+ "ServerKey.jks");
+				/*
+				 * try { Thread.sleep(1000); } catch (InterruptedException e) {
+				 * e.printStackTrace(); }
+				 */
+				client.sendMessage(message, name);
+
 			}
 		}
 	}
@@ -58,15 +56,16 @@ public class Model implements ModelInterface {
 				synchronized (lockPeopleChat) {
 					ip = peopleChat.get(name);
 				}
-				if (ip != null) {
-					connectToServer(ip, name, System.getProperty("user.dir")
-							+ "/" + name + "ServerKey.jks");
-					/*
-					 * try { Thread.sleep(1000); } catch (InterruptedException
-					 * e) { e.printStackTrace(); }
-					 */
-					client.sendFile(path, name);
-				}
+				String[] ipPort = ip.split(":");
+				connectToServer(ipPort[0], Integer.parseInt(ipPort[1]), name,
+						System.getProperty("user.dir") + "/" + name
+								+ "ServerKey.jks");
+				/*
+				 * try { Thread.sleep(1000); } catch (InterruptedException e) {
+				 * e.printStackTrace(); }
+				 */
+				client.sendFile(path, name);
+
 			}
 		}
 	}
@@ -83,10 +82,10 @@ public class Model implements ModelInterface {
 		Prefs p = new Prefs();
 	}
 
-	public void addNickName(String nickName, String ip) {
+	public void addNickName(String nickName, String ip, int port) {
 		synchronized (lockPeopleChat) {
-			peopleChat.put(nickName, ip);
-			removeIp(ip);
+			peopleChat.put(nickName, ip + ":" + port);
+			removeIp(ip, port);
 		}
 	}
 
@@ -98,24 +97,24 @@ public class Model implements ModelInterface {
 				+ "ServerKey.jks"));
 	}
 
-	public void addIp(String ip, String name) {
+	public void addIp(String ip, int port, String name) {
 		synchronized (lockPeopleIp) {
-			peopleIp.put(ip, name);
+			peopleIp.put(ip + ":" + port, name);
 
 		}
 	}
 
-	public void removeIp(String ip) {
+	public void removeIp(String ip, int port) {
 		synchronized (lockPeopleIp) {
-			peopleIp.remove(ip);
+			peopleIp.remove(ip + ":" + port);
 		}
 	}
 
-	public synchronized void connectToServer(String ip, String name,
+	public synchronized void connectToServer(String ip, int port, String name,
 			String keyStore) {
 
 		try {
-			client.addClient(ip, name, keyStore);
+			client.addClient(ip, port, name, keyStore);
 
 		} catch (ClassNotFoundException e) {
 
@@ -136,18 +135,19 @@ public class Model implements ModelInterface {
 		}
 	}
 
-	public String existIp(String ip) {
+	public String existIp(String ip, int port) {
 		synchronized (lockPeopleChat) {
-			if (peopleChat.containsValue(ip)) {
+			if (peopleChat.containsValue(ip + ":" + port)) {
 				return "exist";
 			}
 
-			return peopleIp.get(ip);
+			return peopleIp.get(ip + ":" + port);
 		}
 	}
 
-	public boolean isConnect(String ip) {
-		return server.isConnect(ip) || client.isConnect(ip);
+	public boolean isConnect(String ip, int port) {
+		return server.isConnect(ip + ":" + port)
+				|| client.isConnect(ip + ":" + port);
 	}
 
 	public void closeAll() {
@@ -165,8 +165,8 @@ public class Model implements ModelInterface {
 		server.closeClient(name);
 	}
 
-	public void closeServer(String ip) {
-		client.closeServer(ip);
+	public void closeServer(String name) {
+		client.closeServer(name);
 	}
 
 	private void deleteFile(File file) {
@@ -217,8 +217,11 @@ public class Model implements ModelInterface {
 
 	private String createKeyStore(String name, String alias) {
 
+		String character = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890@";
+
 		String language = Locale.getDefault().getLanguage();
-		String password = name + ((int) Math.random() * 100);
+		String password = "";
+		String concatenate = "";
 		File certificate;
 		String path = System.getProperty("user.dir") + "/" + name + alias;
 		String nameCertificate;
@@ -227,8 +230,14 @@ public class Model implements ModelInterface {
 		FileOutputStream output;
 		DataOutputStream stdout;
 
+		for (int i = 0; i < 8; i++) {
+			int index = (int) (Math.random() * character.length());
+			password += character.charAt(index);
+		}
+
 		if (System.getProperty("os.name").contains("Windows")) {
 			nameCertificate = path + "Certificate.bat";
+			concatenate = " & ";
 			if (language.equals("it")) {
 				confirm = "si";
 			} else {
@@ -236,6 +245,7 @@ public class Model implements ModelInterface {
 			}
 		} else {
 			nameCertificate = path + "Certificate.sh";
+			concatenate = " && ";
 			if (language.equals("it")) {
 				confirm = "s";
 			} else {
@@ -255,24 +265,13 @@ public class Model implements ModelInterface {
 			stdout.write(System.getProperty("java.home").getBytes());
 			stdout.write("\n".getBytes());
 
-			if (System.getProperty("os.name").contains("Windows")) {
-				stdout.write(("(echo " + name + " & echo " + name + " & echo "
-						+ name + " & echo " + "& echo  & echo  & echo "
-						+ confirm + ") | keytool -genkey -alias " + alias
-						+ " -keyalg RSA" + " -keypass " + password
-						+ " -storepass " + password + " -keystore " + path + ".jks\n")
-						.getBytes());
-			} else {
-
-				stdout.write(("(echo " + name + " && echo " + name
-						+ " && echo " + name + " && echo "
-						+ "&& echo  && echo  && echo " + confirm
-						+ ") | keytool -genkey -alias " + alias
-						+ " -keyalg RSA" + " -keypass " + password
-						+ " -storepass " + password + " -keystore " + path + ".jks\n")
-						.getBytes());
-
-			}
+			stdout.write(("(echo " + name + concatenate + "echo " + name
+					+ concatenate + "echo " + name + concatenate + "echo "
+					+ concatenate + "echo " + concatenate + "echo "
+					+ concatenate + "echo " + confirm
+					+ ") | keytool -genkey -alias " + alias + " -keyalg RSA"
+					+ " -keypass " + password + " -storepass " + password
+					+ " -keystore " + path + ".jks\n").getBytes());
 
 			stdout.write(("keytool -export -alias " + alias + " -storepass "
 					+ password + " -file " + path

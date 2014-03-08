@@ -1,6 +1,5 @@
 package client_chat;
 
-
 public interface ModelInterface {
 
 	void attachViewObserver(ViewObserver controller);
@@ -10,30 +9,30 @@ public interface ModelInterface {
 	void showDownloads();
 
 	void showPreferences();
-	
+
 	void sendFile(String path, String name);
 
-	void addNickName(String name, String ip);
+	void addNickName(String name, String ip, int port);
 
 	void removeNickName(String name);
 
-	void addIp(String ip, String name);
+	void addIp(String ip, int port, String name);
 
-	void removeIp(String ip);
+	void removeIp(String ip, int port);
 
 	void closeAll();
 
 	String exist(String name);
 
-	String existIp(String ip);
+	String existIp(String ip, int port);
 
-	boolean isConnect(String ip);
+	boolean isConnect(String ip, int port);
 
 	void closeClient(String name);
 
-	void closeServer(String ip);
+	void closeServer(String name);
 
-	void connectToServer(String ip, String name, String keyStore);
+	void connectToServer(String ip, int port, String name, String keyStore);
 
 	WebsocketHandler getSocketHandler();
 }

@@ -191,7 +191,8 @@ public class WebsocketHandler {
 			/* IP to connect on private chat */
 			String iptoconnect = message.getAdditionalParams().getIP();
 
-			String name = Client.ObtainKeyStore(iptoconnect, "Web Server");
+			String name = Client
+					.ObtainKeyStore(iptoconnect,, "Web Server");
 
 			if (name != null) {
 				controller.commandCreateTab(iptoconnect, name,

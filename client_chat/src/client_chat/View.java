@@ -374,7 +374,8 @@ public class View extends JFrame implements ViewInterface {
 
 									new Thread() {
 										public void run() {
-											controller.notifyChatUserIp(ip);
+											controller.notifyChatUserIp(ip,
+													9998);
 										}
 									}.start();
 									frame.dispose();
