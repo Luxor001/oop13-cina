@@ -273,8 +273,7 @@ public class View extends JFrame implements ViewInterface {
 
 	public void showMessageMain(String message) {
 
-		boolean dfsounds = prefs.getBoolean(
-				client_chat.Prefs.PrefType.DEFAULTSOUNDS.toString(), true);
+		boolean dfsounds = User.getStoredSounds();
 
 		if (getTabIndex() != 0 && dfsounds) {
 			tabView.setBackgroundAt(0, Color.ORANGE);

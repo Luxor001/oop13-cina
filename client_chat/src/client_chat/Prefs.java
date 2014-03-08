@@ -29,14 +29,7 @@ public class Prefs {
 	private JCheckBox chk_sounds;
 	private JTextArea txt_defaultdownloadloc;
 	private JTextArea txt_defaultnick;
-	private JCheckBox chk_visibility;
-
-	enum PrefType {
-		DEFAULTNICKNAME, DEFAULTPATH, DEFAULTVISIBILITY, DEFAULTSOUNDS
-	}
-
-	Preferences prefs = Preferences.userRoot();
-
+	private JCheckBox chk_visibility;	
 	public Prefs() {
 		frame = new JFrame();
 		frame = new JFrame();
@@ -64,8 +57,8 @@ public class Prefs {
 		pnl_loc.setMinimumSize(new Dimension(400, 20));
 		pnl_loc.setAlignmentX(0f);
 
-		String dfaddress = prefs.get(Prefs.PrefType.DEFAULTPATH.toString(),
-				"address..");
+		
+		String dfaddress = User.getStoredPath();
 		txt_defaultdownloadloc = new JTextArea(dfaddress);
 		txt_defaultdownloadloc.setMinimumSize(new Dimension(300, 15));
 		txt_defaultdownloadloc.setEnabled(false);
@@ -84,8 +77,7 @@ public class Prefs {
 				int returnVal = fc.showDialog(btn_directory, "Select");
 
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					prefs.put(Prefs.PrefType.DEFAULTPATH.toString(), fc
-							.getSelectedFile().toString());
+					User.setStoredPath(fc.getSelectedFile().toString());
 					txt_defaultdownloadloc.setText(fc.getSelectedFile()
 							.toString());
 				}
@@ -103,8 +95,8 @@ public class Prefs {
 		JLabel lbl_sounds = new JLabel("Enable/Disable sounds");
 		pnl_sounds.add(lbl_sounds);
 		chk_sounds = new JCheckBox();
-		boolean dfsounds = prefs.getBoolean(
-				Prefs.PrefType.DEFAULTSOUNDS.toString(), true);
+		
+		boolean dfsounds = User.getStoredSounds();
 		chk_sounds.setSelected(dfsounds);
 		pnl_sounds.add(chk_sounds);
 
@@ -127,8 +119,7 @@ public class Prefs {
 		txt_defaultnick.setMinimumSize(new Dimension(100, 20));
 		txt_defaultnick.setMaximumSize(new Dimension(100, 20));
 
-		dfaddress = prefs.get(Prefs.PrefType.DEFAULTNICKNAME.toString(),
-				User.getNickName());
+		dfaddress = User.getStoredNickname();
 		txt_defaultnick.setText(dfaddress);
 		pnl_defaultnick.add(txt_defaultnick);
 
@@ -145,15 +136,11 @@ public class Prefs {
 		pnl_defaultvisibility.add(lbl_defaultvisibility);
 		chk_visibility = new JCheckBox();
 		
-		boolean dfvisibility=User.getVisibility();
-		/*boolean dfvisibility = prefs.getBoolean(
-				Prefs.PrefType.DEFAULTVISIBILITY.toString(), true);*/
+		boolean dfvisibility=User.getStoredVisibility();
 		chk_visibility.setSelected(dfvisibility);
 		pnl_defaultvisibility.add(chk_visibility);
 
 		pnl_main.add(pnl_defaultvisibility);
-
-		prefs.put("value", "2");
 
 		frame.addWindowListener(new CustomWindowAdapter(frame));
 		frame.setVisible(true);
@@ -170,20 +157,11 @@ public class Prefs {
 		// implement windowClosing method
 		public void windowClosing(WindowEvent e) {
 
-			prefs.put(Prefs.PrefType.DEFAULTNICKNAME.toString(),
-					txt_defaultnick.getText());
-			prefs.put(Prefs.PrefType.DEFAULTPATH.toString(),
-					txt_defaultdownloadloc.getText());
-			prefs.putBoolean(Prefs.PrefType.DEFAULTSOUNDS.toString(),
-					chk_sounds.isSelected());
-			prefs.putBoolean(Prefs.PrefType.DEFAULTVISIBILITY.toString(),
-					chk_visibility.isSelected());
+			User.setStoredNickname(txt_defaultnick.getText());
+			User.setStoredPath(txt_defaultdownloadloc.getText());
+			User.setStoredSounds(chk_sounds.isSelected());
+			User.setStoredVisibility(chk_visibility.isSelected());
 
 		}
 	}
 }
-
-/*
- * Preferences pref=Preferences.systemRoot(); String dfaddress=prefs.get(
- * Preferences.PrefType.DEFAULTPATH.toString(), "address..");
- */

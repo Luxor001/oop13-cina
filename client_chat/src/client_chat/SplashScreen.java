@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,7 +52,6 @@ public class SplashScreen {
 
 	private static int offsetcenter = 30;
 	private static int centerscaling;
-	Preferences prefs = Preferences.userRoot();
 
 	public SplashScreen() throws IOException {
 
@@ -86,8 +87,7 @@ public class SplashScreen {
 		lbl_channel.setLocation(CenteredX(lbl_channel), centerscaling);
 		centerscaling += 20;
 
-		boolean choice = prefs.getBoolean(
-				client_chat.Prefs.PrefType.DEFAULTVISIBILITY.toString(), true);
+		boolean choice = User.getStoredVisibility();
 		chb_visible = new JCheckBox("Visible?", choice);
 		chb_visible.setSize(chb_visible.getPreferredSize());
 		chb_visible.setLocation(CenteredX(chb_visible) + 90, centerscaling);
@@ -110,10 +110,30 @@ public class SplashScreen {
 				txt_nickname.getSize().height + 5);
 		txt_nickname.setLocation(CenteredX(txt_nickname), centerscaling);
 
-		String dfnickname = prefs.get(
-				client_chat.Prefs.PrefType.DEFAULTNICKNAME.toString(),
-				System.getProperty("user.name"));
+		String dfnickname = User.getStoredNickname();
 		txt_nickname.setText(dfnickname);
+		
+		/*check if user has entered an invalid char..*/
+		txt_nickname.addKeyListener(new KeyListener() {			
+			@Override
+			public void keyTyped(KeyEvent e) {
+			  String  invalidChars = "\\/:*?\"<>|";
+				char keypressed = e.getKeyChar();
+			  
+				for(char c:invalidChars.toCharArray()){
+					if(c == keypressed){
+						e.consume();
+					}
+				}			  
+			}
+			/*useless methods i must declare ç_ç*/
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}			
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+		});
 
 		centerscaling += 20;
 		Border border = BorderFactory.createLineBorder(Color.BLACK);
@@ -136,11 +156,13 @@ public class SplashScreen {
 		loadingCircle.setLocation(5, 5);
 		pnl_main.add(loadingCircle);
 		loadingCircle.setVisible(false);
-
+		
+	
 		btn_login.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {				
+				
 				if (txt_nickname.getText().equals("")
 						|| txt_nickname.getText().length() > 12) {
 					BalloonTip bln_invalidnick = new BalloonTip(txt_nickname,
