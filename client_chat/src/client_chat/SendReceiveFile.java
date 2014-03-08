@@ -6,9 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Map;
-import java.util.prefs.Preferences;
-
-import client_chat.Prefs.PrefType;
 
 public abstract class SendReceiveFile {
 
@@ -76,9 +73,7 @@ public abstract class SendReceiveFile {
 
 				String newName = nameFile;
 				int i = 1;
-				Preferences pref = Preferences.systemRoot();
-				String dfaddress = pref.get(PrefType.DEFAULTPATH.toString(),
-						"address..");
+				String dfaddress=User.getStoredPath();
 
 				while (new File(dfaddress + "/" + newName).exists()) {
 

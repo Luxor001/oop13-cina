@@ -61,11 +61,44 @@ public class User {
 		return PORTSSL;
 	}
 	
-	public static boolean getVisibility(){
-
+	
+	
+	public static String getStoredNickname(){
+		return prefs.get(
+				PrefType.DEFAULTNICKNAME.toString(),
+				System.getProperty("user.name"));
+	}
+	public static void setStoredNickname(String nick){
+		prefs.put(
+				PrefType.DEFAULTNICKNAME.toString(), nick);
+	}
+	
+	public static boolean getStoredVisibility(){
 		return prefs.getBoolean(
 				PrefType.DEFAULTVISIBILITY.toString(), true);
 	}
+	public static void setStoredVisibility(boolean choice){
+		prefs.putBoolean(
+				PrefType.DEFAULTVISIBILITY.toString(), true);
+	}
 	
+	public static boolean getStoredSounds(){
+		return prefs.getBoolean(
+				PrefType.DEFAULTSOUNDS.toString(), true);
+	}
+	public static void setStoredSounds(boolean choice){
+		prefs.putBoolean(
+				PrefType.DEFAULTSOUNDS.toString(), true);
+	}
+	
+	public static String getStoredPath(){
+		return prefs.get(
+				PrefType.DEFAULTPATH.toString(), 
+				System.getProperty("user.dir"));
+	}
+	public static void setStoredPath(String path){
+		prefs.put(
+				PrefType.DEFAULTPATH.toString(), path);
+	}
 	
 }
