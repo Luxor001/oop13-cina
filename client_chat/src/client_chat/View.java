@@ -147,12 +147,20 @@ public class View extends JFrame implements ViewInterface {
 
 		usersJList = new JList<String>(usersList);
 
+		JScrollPane scroll = new JScrollPane(usersJList);
+		// scroll.setAutoscrolls(true);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scroll.setPreferredSize(new Dimension(WIDTH_USERJLIST, usersJList
+				.getPreferredSize().height));
+
 		usersJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		// set dimension of userList
-		usersJList.setPreferredSize(new Dimension(WIDTH_USERJLIST, usersJList
-				.getPreferredSize().height));
 
+		/*
+		 * usersJList.setPreferredSize(new Dimension(WIDTH_USERJLIST, usersJList
+		 * .getPreferredSize().height));
+		 */
 		usersJList.remove(0);
 
 		// add to the list a custom TextArea
@@ -168,7 +176,7 @@ public class View extends JFrame implements ViewInterface {
 		textPanel.add(textList.get(0), BorderLayout.CENTER);
 		mainPanel.add(scrollList.get(0), BorderLayout.CENTER);
 		mainPanel.add(textPanel, BorderLayout.SOUTH);
-		mainPanel.add(new JPanel().add(usersJList), BorderLayout.EAST);
+		mainPanel.add(new JPanel().add(scroll), BorderLayout.EAST);
 
 		tabView.addTab("Main", mainPanel);
 
@@ -365,7 +373,8 @@ public class View extends JFrame implements ViewInterface {
 
 									new Thread() {
 										public void run() {
-											controller.notifyChatUserIp(ip);
+											controller.notifyChatUserIp(ip,
+													9998);
 										}
 									}.start();
 									frame.dispose();
