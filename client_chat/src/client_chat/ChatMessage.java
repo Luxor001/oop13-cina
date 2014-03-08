@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * @(#)ChatMessage.java        1.0 02/12/2013
  *
  * Belli Stefano 0000652935, Cozzolino Francesco 0000xxxxxxx
- * 
+ *
  */
 
 /* Class that describes the actual messages sent from (and to) the users
@@ -19,20 +19,7 @@ public class ChatMessage {
 		INITIALIZE, /* Used to Registry a new user to the channel */
 		CONNECTIONGRANTED, TEXT, /* Duh. */
 		NEWUSER, /* Needed to tell to server there's a new boy in town */
-		USERDISCONNECTED, 
-		USERLIST,
-		DISCONNECTING, 
-		REQUESTPRIVATECHAT, 
-		REQUESTEDPRIVATECHAT, 
-		YESPRIVATECHAT,
-		NOPRIVATECHAT, 
-		NICKNAMEUNAVAIABLE, 
-		REQUESTSENDFILE, 
-		REQUESTEDSENDFILE,
-		YESSENDFILE,
-		NOSENDFILE,
-		RESETFLAG,
-		PING
+		USERDISCONNECTED, USERLIST, DISCONNECTING, REQUESTPRIVATECHAT, REQUESTEDPRIVATECHAT, YESPRIVATECHAT, NOPRIVATECHAT, NICKNAMEUNAVAIABLE, REQUESTSENDFILE, REQUESTEDSENDFILE, YESSENDFILE, NOSENDFILE, RESETFLAG, PING
 	}
 
 	private Param additionalParams;
@@ -163,18 +150,21 @@ public class ChatMessage {
 		public String getFileName() {
 			return fileName;
 		}
-		
-		/*Those will be deleted in the final version of the app*/
-		public void setSSLPort(String port){
-			this.SSLPort=port;
+
+		/* Those will be deleted in the final version of the app */
+		public void setSSLPort(String port) {
+			this.SSLPort = port;
 		}
-		public String getSSLPort(){
+
+		public String getSSLPort() {
 			return SSLPort;
 		}
-		public void setKEYPort(String port){
-			this.KEYPort=port;
+
+		public void setKEYPort(String port) {
+			this.KEYPort = port;
 		}
-		public String getKEYPort(){
+
+		public String getKEYPort() {
 			return KEYPort;
 		}
 	}

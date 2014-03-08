@@ -172,8 +172,10 @@ public class WebsocketHandler {
 						msg = new ChatMessage("Yes", Type.YESPRIVATECHAT);
 						msg.getAdditionalParams().setNickname(senderNick);
 						msg.getAdditionalParams().setIP(ip);
-						msg.getAdditionalParams().setSSLPort(User.getPortSSL()+"");
-						msg.getAdditionalParams().setKEYPort(User.getPortKeyStore()+"");
+						msg.getAdditionalParams().setSSLPort(
+								User.getPortSSL() + "");
+						msg.getAdditionalParams().setKEYPort(
+								User.getPortKeyStore() + "");
 					} else {
 						msg = new ChatMessage("No", Type.NOPRIVATECHAT);
 						msg.getAdditionalParams().setNickname(senderNick);
@@ -190,14 +192,20 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.YESPRIVATECHAT) {
 
-			System.out.println("RECEIVED PORT SSL:"+message.getAdditionalParams().getSSLPort());
-			System.out.println("RECEIVED PORT KEY:"+message.getAdditionalParams().getKEYPort());
+			System.out.println("RECEIVED PORT SSL:"
+					+ message.getAdditionalParams().getSSLPort());
+			System.out.println("RECEIVED PORT KEY:"
+					+ message.getAdditionalParams().getKEYPort());
 			/* IP to connect on private chat */
 			String iptoconnect = message.getAdditionalParams().getIP();
-			String name = Client.ObtainKeyStore(iptoconnect, "Web Server");
+			String portKey = message.getAdditionalParams().getKEYPort();
+			String name = Client.ObtainKeyStore(iptoconnect,
+					Integer.parseInt(portKey), "Web Server");
 
 			if (name != null) {
-				controller.commandCreateTab(iptoconnect, name,
+				String port = message.getAdditionalParams().getKEYPort();
+				controller.commandCreateTab(iptoconnect,
+						Integer.parseInt(port), name,
 						System.getProperty("user.dir") + "/" + name
 								+ "ServerKey.jks");
 			} else {
@@ -209,23 +217,34 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.YESSENDFILE) {
 
-			System.out.println("RECEIVED PORT SSL:"+message.getAdditionalParams().getSSLPort());
-			System.out.println("RECEIVED PORT KEY:"+message.getAdditionalParams().getKEYPort());
+			System.out.println("RECEIVED PORT SSL:"
+					+ message.getAdditionalParams().getSSLPort());
+			System.out.println("RECEIVED PORT KEY:"
+					+ message.getAdditionalParams().getKEYPort());
 			System.out.println(message.getAdditionalParams().getFileName());
 			int a = 0;
 			String ip = message.getAdditionalParams().getIP();
 			String filename = message.getAdditionalParams().getFileName();
 			String name = message.getAdditionalParams().getNickname();
 
-			if (controller.exist(name) == null
-					|| controller.existIp(ip) == null) {
-				name = Client.ObtainKeyStore(ip, "Web Server");
+			if (controller.exist(name) == null) {
+				String portKey = message.getAdditionalParams().getKEYPort();
+				name = Client.ObtainKeyStore(ip, Integer.parseInt(portKey),
+						"Web Server");
+				if (name != null) {
+					String iptoconnect = message.getAdditionalParams().getIP();
+					String port = message.getAdditionalParams().getKEYPort();
+					controller.commandCreateTab(iptoconnect,
+							Integer.parseInt(port), name,
+							System.getProperty("user.dir") + "/" + name
+									+ "ServerKey.jks");
+				} else {
+					controller.showMessageMain("Error during send of file");
+				}
 			}
 
 			if (name != null) {
 				controller.sendFile(filename, name);
-			} else {
-				controller.showMessageMain("Error during send of file");
 			}
 
 		}
@@ -259,8 +278,10 @@ public class WebsocketHandler {
 						msg.getAdditionalParams().setNickname(senderNick);
 						msg.getAdditionalParams().setIP(ip);
 						msg.getAdditionalParams().setFileName(path);
-						msg.getAdditionalParams().setSSLPort(User.getPortSSL()+"");
-						msg.getAdditionalParams().setKEYPort(User.getPortKeyStore()+"");
+						msg.getAdditionalParams().setSSLPort(
+								User.getPortSSL() + "");
+						msg.getAdditionalParams().setKEYPort(
+								User.getPortKeyStore() + "");
 					} else {
 						msg = new ChatMessage("No", Type.NOSENDFILE);
 						msg.getAdditionalParams().setNickname(senderNick);
