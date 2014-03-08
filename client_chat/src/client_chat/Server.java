@@ -241,14 +241,14 @@ public class Server implements Runnable {
 				}
 
 				if (!close) {
+					model.closeClient(nameClient);
+
 					sendMessage(null);
 				}
 				oos.close();
 				ois.close();
 				sslSocket.close();
-				if (!close) {
-					model.closeClient(nameClient);
-				}
+
 			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
