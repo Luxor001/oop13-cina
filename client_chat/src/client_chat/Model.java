@@ -1,13 +1,23 @@
 package client_chat;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.text.BadLocationException;
 
 public class Model implements ModelInterface {
@@ -302,5 +312,63 @@ public class Model implements ModelInterface {
 
 	public WebsocketHandler getSocketHandler() {
 		return sockethandler;
+	}
+	
+	public void setSocketPorts() throws IOException{		
+		
+		File file = new File("config/config.conf");
+		FileInputStream fis = null;
+		BufferedInputStream bis = null;
+		BufferedReader dis = null;
+		if (!file.exists()) {
+		
+			/*if config directory doesn't exist, create it*/
+			if(!new File("config").exists()){
+				new File("config").mkdir();
+			}
+			FileWriter outFile = new FileWriter(file);
+			PrintWriter out = new PrintWriter(outFile);
+
+			out.println("#SET SOCKET PORTS AFTER THE ':'");			
+			out.println("#YOU SHOULD OBIVOUSLY OPEN THEM ON YOUR ROUTER SETTINGS");			
+			out.println("SSLPort:9999");			
+			out.println("KEYPort:9998");
+			out.close();
+			JOptionPane.showMessageDialog(new JFrame(), "Socket Ports are not set.\n "
+					+ "Please edit file Config/config.conf accordingly");
+			System.exit(0);
+			
+		} else {/*file exist, open it up*/
+
+			try {
+				FileReader freader=new FileReader(file);
+				BufferedReader reader=new BufferedReader(freader);
+				
+				String line;
+				while ((line=reader.readLine()) != null) {
+					
+					
+					String[] split;
+					if(line.contains("SSLPort")){
+						split=line.split(":");
+						int ssl=Integer.parseInt(split[1]);
+						User.setPortSSL(ssl);
+					}
+					if(line.contains("KEYPort")){
+						split=line.split(":");
+						int key=Integer.parseInt(split[1]);
+						User.setPortKeyStore(key);
+					}
+				}				
+				freader.close();
+				reader.close();
+			} catch (Exception e) {
+
+				JOptionPane.showMessageDialog(new JFrame(), "An error occurred. \n"
+						+ "Your config file may be corrupt");
+				System.exit(0);
+				
+			}
+		}
 	}
 }

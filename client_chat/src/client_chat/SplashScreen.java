@@ -166,26 +166,6 @@ public class SplashScreen {
 			}
 		});
 
-		JButton b = new JButton("Reset");
-		b.setSize(b.getPreferredSize());
-		b.setLocation(10, 350);
-		pnl_main.add(b);
-
-		b.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				WebsocketHandler.RESET_FLAG_DELETE_ME = true;
-				WebsocketHandler w = WebsocketHandler.getWebSocketHandler();
-				try {
-					w.AttemptConnection();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
-			}
-		});
 
 		frame.setResizable(false);
 		frame.setVisible(true);

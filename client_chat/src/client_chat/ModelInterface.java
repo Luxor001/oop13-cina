@@ -1,5 +1,7 @@
 package client_chat;
 
+import java.io.IOException;
+
 
 public interface ModelInterface {
 
@@ -36,4 +38,6 @@ public interface ModelInterface {
 	void connectToServer(String ip, String name, String keyStore);
 
 	WebsocketHandler getSocketHandler();
+	
+	public void setSocketPorts() throws IOException;
 }

@@ -110,6 +110,8 @@ public class ChatMessage {
 		private ArrayList<String> usersList = new ArrayList<String>();
 		private String ip;
 		private String fileName;
+		private String SSLPort;
+		private String KEYPort;
 
 		public Param() {
 
@@ -160,6 +162,20 @@ public class ChatMessage {
 
 		public String getFileName() {
 			return fileName;
+		}
+		
+		/*Those will be deleted in the final version of the app*/
+		public void setSSLPort(String port){
+			this.SSLPort=port;
+		}
+		public String getSSLPort(){
+			return SSLPort;
+		}
+		public void setKEYPort(String port){
+			this.KEYPort=port;
+		}
+		public String getKEYPort(){
+			return KEYPort;
 		}
 	}
 }

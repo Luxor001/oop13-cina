@@ -95,7 +95,13 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 						additionalParams.appendUser(array.getString(i2));
 					}
 				}
-				
+
+				if(currObject.containsKey("SSLPort")){
+					additionalParams.setSSLPort(currObject.getString("SSLPort"));					
+				}
+				if(currObject.containsKey("KEYPort")){
+					additionalParams.setKEYPort(currObject.getString("KEYPort"));					
+				}
 				if(currObject.containsKey("ip")){
 						additionalParams.setIP(currObject.getString("ip"));					
 				}

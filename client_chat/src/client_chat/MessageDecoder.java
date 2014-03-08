@@ -87,6 +87,13 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 					additionalParams.setFileName(currObject
 							.getString("FileName"));
 				}
+
+				if(currObject.containsKey("SSLPort")){
+					additionalParams.setSSLPort(currObject.getString("SSLPort"));					
+				}
+				if(currObject.containsKey("KEYPort")){
+					additionalParams.setKEYPort(currObject.getString("KEYPort"));					
+				}
 			}
 		return additionalParams;
 	}
