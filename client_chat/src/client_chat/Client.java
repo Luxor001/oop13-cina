@@ -36,6 +36,7 @@ public class Client extends SendReceiveFile implements Runnable {
 	private ObjectInputStream ois = null;
 	private ViewObserver controller;
 	private String ip;
+	private int port;
 	private String nameClient = User.getNickName();
 	private String nameServer = null;
 	private boolean resetTime = false;
@@ -46,7 +47,7 @@ public class Client extends SendReceiveFile implements Runnable {
 	private int id = 0;
 	private Model model;
 
-	public Client(String ip, String name, String password,
+	public Client(String ip, int port, String name, String password,
 			ViewObserver controller, Model model, String keyStore)
 			throws IOException, ClassNotFoundException {
 
@@ -60,6 +61,7 @@ public class Client extends SendReceiveFile implements Runnable {
 
 		this.model = model;
 		this.ip = ip;
+		this.port = port;
 		this.controller = controller;
 		nameServer = name;
 
@@ -108,7 +110,7 @@ public class Client extends SendReceiveFile implements Runnable {
 	public void run() {
 
 		try {
-			sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, 9999);
+			sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, port);
 			sslSocket.startHandshake();
 		} catch (IOException e) {
 			model.removeNickName(nameServer);
@@ -128,8 +130,10 @@ public class Client extends SendReceiveFile implements Runnable {
 			download = model.getDownloaded();
 			oos.writeObject(nameClient);
 			oos.flush();
+			oos.writeInt(9999);
+			oos.flush();
 			model.addNickName(nameServer, sslSocket.getInetAddress().toString()
-					.substring(1));
+					.substring(1), port);
 
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -205,7 +209,7 @@ public class Client extends SendReceiveFile implements Runnable {
 			sslSocket.close();
 
 			if (!stop) {
-				model.closeServer(getIp());
+				model.closeServer(nameServer);
 			}
 
 			latch.countDown();
@@ -273,14 +277,14 @@ public class Client extends SendReceiveFile implements Runnable {
 		}
 	}
 
-	public static String ObtainKeyStore(String ip, String who) {
+	public static String ObtainKeyStore(String ip, int port, String who) {
 
 		File file = new File(System.getProperty("user.dir") + "/"
 				+ User.getNickName() + "ServerKey.jks");
 		String name = "";
 		try {
 
-			Socket socket = new Socket(ip, 9998);
+			Socket socket = new Socket(ip, port);
 
 			ObjectOutputStream oos = new ObjectOutputStream(
 					socket.getOutputStream());
@@ -326,7 +330,7 @@ public class Client extends SendReceiveFile implements Runnable {
 	}
 
 	public String getIp() {
-		return ip;
+		return ip + ":" + port;
 	}
 
 	public boolean isConnected() {
