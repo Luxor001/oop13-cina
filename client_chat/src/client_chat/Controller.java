@@ -33,8 +33,8 @@ public class Controller implements ViewObserver {
 	public void commandShowDownloads() {
 		model.showDownloads();
 	}
-	
-	public void commandShowPreferences(){
+
+	public void commandShowPreferences() {
 		model.showPreferences();
 	}
 
@@ -84,11 +84,11 @@ public class Controller implements ViewObserver {
 		view.closeTab(e);
 	}
 
-	public synchronized void commandCreateTab(String ip, String name,
+	public synchronized void commandCreateTab(String ip, int port, String name,
 			String keyStore) {
 
-		if (!model.isConnect(ip)) {
-			this.model.connectToServer(ip, name, keyStore);
+		if (!model.isConnect(ip, port)) {
+			this.model.connectToServer(ip, port, name, keyStore);
 		}
 
 		this.view.createTab(name);
@@ -118,9 +118,9 @@ public class Controller implements ViewObserver {
 		return model.exist(name);
 	}
 
-	public String existIp(String ip) {
+	public String existIp(String ip, int port) {
 
-		return model.existIp(ip);
+		return model.existIp(ip, port);
 	}
 
 	public synchronized void showMessageMain(String Message) {
@@ -186,7 +186,7 @@ public class Controller implements ViewObserver {
 		synchronized (lockNotification) {
 			String ip = exist(name);
 			if (ip == null) {
-				model.addNickName(name, "pending");
+				model.addNickName(name, "pending", 0);
 				ChatMessage message = new ChatMessage("Connect to",
 						Type.REQUESTPRIVATECHAT);
 				ChatMessage.Param params = new ChatMessage.Param();
@@ -194,32 +194,34 @@ public class Controller implements ViewObserver {
 				message.setAdditionalParams(params);
 				WebsocketHandler.getWebSocketHandler().SendMex(message);
 			} else {
-				if (!ip.equals("pending")) {
-					commandCreateTab(ip, name, name + "ServerKey.jks");
+				if (!ip.equals("pending:0")) {
+					String[] ipPort = ip.split(":");
+					commandCreateTab(ipPort[0], Integer.parseInt(ipPort[1]),
+							name, name + "ServerKey.jks");
 				}
 			}
 		}
 
 	}
 
-	public void notifyChatUserIp(String ip) {
+	public void notifyChatUserIp(String ip, int port) {
 		synchronized (lockNotification) {
-			String name = existIp(ip);
+			String name = existIp(ip, port);
 
 			if (name == null || name.equals("exist")) {
-				model.addIp(ip, "pending");
-				if (!model.isConnect(ip)) {
-					name = Client.ObtainKeyStore(ip, "user");
+				model.addIp(ip, port, "pending");
+				if (!model.isConnect(ip, port)) {
+					name = Client.ObtainKeyStore(ip, port, "user");
 
 					if (name != null) {
-						commandCreateTab(ip, name, name + "ServerKey.jks");
+						commandCreateTab(ip, port, name, name + "ServerKey.jks");
 					} else {
-						model.removeIp(ip);
+						model.removeIp(ip, port);
 						showMessageMain(name
 								+ " has refused the request of private chat");
 					}
 				} else {
-					model.removeIp(ip);
+					model.removeIp(ip, port);
 				}
 			}
 		}

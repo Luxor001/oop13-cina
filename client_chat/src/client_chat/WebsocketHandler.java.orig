@@ -1,17 +1,8 @@
 package client_chat;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
@@ -39,15 +30,19 @@ public class WebsocketHandler {
 
 	static Session ClientSession;
 	private static Controller controller;
-	public static String DEBUG_NICKNAME = System.getProperty("user.name");// "Lux"
-																			// +
-																			// Math.random();
+	// public static String NICKNAME = System.getProperty("user.name");// "Lux"
+	// +
+	// Math.random();
+	public static boolean VISIBLE_FLAG = true;
 	public static boolean RESET_FLAG_DELETE_ME = false;
-	private long PING_INTERVAL_SECONDS=15;
-	
+	private long PING_INTERVAL_SECONDS = 15;
+	public static String UNABLE_VISIBLE_MESSAGE = "You can't perform this operation"
+			+ " while you are invisible: please login as visible and repeat"
+			+ " this operation";
+
 	public final static Object monitor = 1;
 	public Timer timer;
-	
+
 	private WebsocketHandler() {
 
 	}
@@ -76,17 +71,17 @@ public class WebsocketHandler {
 		} else {
 
 			ChatMessage Message = new ChatMessage("hello", Type.INITIALIZE);
-			Message.getAdditionalParams().setNickname(DEBUG_NICKNAME);
-			Message.getAdditionalParams().SetVisibility(true);
+			Message.getAdditionalParams().setNickname(User.getNickName());
+			// Message.getAdditionalParams().setNickname(NICKNAME);
+			Message.getAdditionalParams().SetVisibility(VISIBLE_FLAG);
 			SendMex(Message); /* send my request of connection to the server */
 
 			System.out.println("Sent!");
-			
 
-		    timer = new Timer();
-		    timer.schedule(new PingTimer(),PING_INTERVAL_SECONDS*1000,
-		    		PING_INTERVAL_SECONDS*1000);
-			
+			timer = new Timer();
+			timer.schedule(new PingTimer(), PING_INTERVAL_SECONDS * 1000,
+					PING_INTERVAL_SECONDS * 1000);
+
 		}
 
 	}
@@ -158,73 +153,81 @@ public class WebsocketHandler {
 
 		if (message.getType() == Type.REQUESTEDPRIVATECHAT) {
 
-			String surl = "http://vallentinsource.com/globalip.php";
-			URL url = new URL(surl);
-			InputStreamReader inpstrmread = new InputStreamReader(
-					url.openStream());
-			BufferedReader reader = new BufferedReader(inpstrmread);
-			String ip = reader.readLine();
-			/* ## GOT IP (store to private static variable?) ## */
+			final String ip = User.getIp();
 
-			// BISOGNA CONTROLLARE SE QUESTI JOPTIONPANE NON FERMANO IL THREAD.
-			String senderNick = message.getAdditionalParams().getNickname();
-			int choice = WebsocketHandler.controller.buildChoiceMessageBox(
-					MessageBoxReason.REQUEST_PRIVATE_CHAT, senderNick);
+			final String senderNick = message.getAdditionalParams()
+					.getNickname();
 
-			ChatMessage msg;
-			if (choice == 0) {
-				msg = new ChatMessage("Yes", Type.YESPRIVATECHAT);
-				msg.getAdditionalParams().setNickname(senderNick);
-				msg.getAdditionalParams().setIP(ip);
-			} else {
-				msg = new ChatMessage("No", Type.NOPRIVATECHAT);
-				msg.getAdditionalParams().setNickname(senderNick);				
-			}
-			SendMex(msg);
+			new Thread() {
+
+				public void run() {
+
+					int choice = WebsocketHandler.controller
+							.buildChoiceMessageBox(
+									MessageBoxReason.REQUEST_PRIVATE_CHAT,
+									senderNick);
+
+					ChatMessage msg;
+					if (choice == 0) {
+						msg = new ChatMessage("Yes", Type.YESPRIVATECHAT);
+						msg.getAdditionalParams().setNickname(senderNick);
+						msg.getAdditionalParams().setIP(ip);
+						msg.getAdditionalParams().setSSLPort(User.getPortSSL()+"");
+						msg.getAdditionalParams().setKEYPort(User.getPortKeyStore()+"");
+					} else {
+						msg = new ChatMessage("No", Type.NOPRIVATECHAT);
+						msg.getAdditionalParams().setNickname(senderNick);
+					}
+					try {
+						SendMex(msg);
+					} catch (Exception e) {
+					}
+				};
+
+			}.start();
+
 		}
 
 		if (message.getType() == Type.YESPRIVATECHAT) {
+
+			System.out.println("RECEIVED PORT SSL:"+message.getAdditionalParams().getSSLPort());
+			System.out.println("RECEIVED PORT KEY:"+message.getAdditionalParams().getKEYPort());
 			/* IP to connect on private chat */
 			String iptoconnect = message.getAdditionalParams().getIP();
-			Socket socket = new Socket(iptoconnect, 9998);
+			String name = Client.ObtainKeyStore(iptoconnect, "Web Server");
 
-			File file = new File(System.getProperty("user.dir") + "/"
-					+ DEBUG_NICKNAME + "ServerKey.jks");
-			String name = "";
-			try {
-
-				ObjectOutputStream oos = new ObjectOutputStream(
-						socket.getOutputStream());
-				ObjectInputStream ois = new ObjectInputStream(
-						socket.getInputStream());
-
-				oos.writeUTF(DEBUG_NICKNAME);
-				oos.flush();
-				name = ois.readUTF();
-				FileInputStream fileStream = new FileInputStream(file);
-				byte[] buffer = new byte[10240];
-				fileStream.read(buffer);
-				oos.write(buffer);
-				File receivedFile = new File(System.getProperty("user.dir")
-						+ "/" + name + "ServerKey.jks");
-				receivedFile.createNewFile();
-				FileOutputStream outStream = new FileOutputStream(receivedFile);
-
-				byte[] bufferReader = new byte[10240];
-				ois.readFully(bufferReader);
-				outStream.write(bufferReader);
-				oos.close();
-				ois.close();
-				socket.close();
-				fileStream.close();
-				outStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+			if (name != null) {
+				controller.commandCreateTab(iptoconnect, name,
+						System.getProperty("user.dir") + "/" + name
+								+ "ServerKey.jks");
+			} else {
+				controller.commandRefusedChat(message.getAdditionalParams()
+						.getNickname());
 			}
 
-			controller.commandCreateTab(iptoconnect, name,
-					System.getProperty("user.dir") + "/" + name
-							+ "ServerKey.jks");
+		}
+
+		if (message.getType() == Type.YESSENDFILE) {
+
+			System.out.println("RECEIVED PORT SSL:"+message.getAdditionalParams().getSSLPort());
+			System.out.println("RECEIVED PORT KEY:"+message.getAdditionalParams().getKEYPort());
+			System.out.println(message.getAdditionalParams().getFileName());
+			int a = 0;
+			String ip = message.getAdditionalParams().getIP();
+			String filename = message.getAdditionalParams().getFileName();
+			String name = message.getAdditionalParams().getNickname();
+
+			if (controller.exist(name) == null
+					|| controller.existIp(ip) == null) {
+				name = Client.ObtainKeyStore(ip, "Web Server");
+			}
+
+			if (name != null) {
+				controller.sendFile(filename, name);
+			} else {
+				controller.showMessageMain("Error during send of file");
+			}
+
 		}
 
 		if (message.getType() == Type.NOPRIVATECHAT) {
@@ -232,19 +235,45 @@ public class WebsocketHandler {
 			controller.commandRefusedChat(message.getAdditionalParams()
 					.getNickname());
 		}
-		
-		
 
 		if (message.getType() == Type.REQUESTEDSENDFILE) {
 
-			String senderNick = message.getAdditionalParams().getNickname();
-			String fileName = message.getAdditionalParams().getFileName();
-			int choice = WebsocketHandler.controller
-					.buildChoiceMessageBox(
-							MessageBoxReason.REQUEST_RECEIVE_FILE, senderNick,
-							fileName);
-			
-			
+			final String ip = User.getIp();
+			final String senderNick = message.getAdditionalParams()
+					.getNickname();
+			final String path = message.getAdditionalParams().getFileName();
+			final String fileName = path.substring(path.lastIndexOf("\\") + 1);
+
+			new Thread() {
+
+				public void run() {
+
+					int choice = WebsocketHandler.controller
+							.buildChoiceMessageBox(
+									MessageBoxReason.REQUEST_RECEIVE_FILE,
+									senderNick, fileName);
+
+					ChatMessage msg;
+					if (choice == 0) {
+						msg = new ChatMessage("Yes", Type.YESSENDFILE);
+						msg.getAdditionalParams().setNickname(senderNick);
+						msg.getAdditionalParams().setIP(ip);
+						msg.getAdditionalParams().setFileName(path);
+						msg.getAdditionalParams().setSSLPort(User.getPortSSL()+"");
+						msg.getAdditionalParams().setKEYPort(User.getPortKeyStore()+"");
+					} else {
+						msg = new ChatMessage("No", Type.NOSENDFILE);
+						msg.getAdditionalParams().setNickname(senderNick);
+					}
+					try {
+						SendMex(msg);
+					} catch (Exception e) {
+					}
+
+				}
+
+			}.start();
+
 		}
 	}
 
@@ -258,23 +287,30 @@ public class WebsocketHandler {
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason)
 			throws IOException, EncodeException {
-		
-		/*closing connection from the SERVER*/
-		if(closeReason.equals(CloseReason.CloseCodes.CLOSED_ABNORMALLY)){
+
+		/* closing connection from the SERVER */
+		if (closeReason.equals(CloseReason.CloseCodes.CLOSED_ABNORMALLY)) {
 			controller.closeChat();
 			System.out
-			.println("Connection dropped, you might be kicked from the server");
+					.println("Connection dropped, you might be kicked from the server");
 		}
 
+		/* closing connection from the client */
+		if (closeReason.equals(CloseReason.CloseCodes.GOING_AWAY)) {
 
-		/*closing connection from the client*/
-		if(closeReason.equals(CloseReason.CloseCodes.GOING_AWAY)){
-			
 		}
 		// latch.countDown();
 	}
 
 	public void SendMex(ChatMessage Mex) throws IOException, EncodeException {
+		if (!VISIBLE_FLAG) {
+			if (Mex.getType() == Type.REQUESTSENDFILE
+					|| Mex.getType() == Type.REQUESTPRIVATECHAT
+					|| Mex.getType() == Type.TEXT) {
+				controller.showMessageMain(UNABLE_VISIBLE_MESSAGE);
+				return;
+			}
+		}
 		ClientSession.getBasicRemote().sendObject(Mex);
 	}
 
@@ -285,16 +321,27 @@ public class WebsocketHandler {
 			return false;
 		}
 	}
-	
-	public void closeConnection(){
+
+	public void closeConnection() {
 		try {
-			ClientSession.close(new CloseReason(CloseReason.CloseCodes.GOING_AWAY, "normal"));
-		} catch (IOException e) {}
+			ClientSession.close(new CloseReason(
+					CloseReason.CloseCodes.GOING_AWAY, "normal"));
+		} catch (IOException e) {
+		}
 	}
 
 	public static void setController(Controller c) {
 		controller = c;
 	}
+
+	/*
+	 * public String getIP() throws IOException {
+	 * 
+	 * String surl = "http://vallentinsource.com/globalip.php"; URL url = new
+	 * URL(surl); InputStreamReader inpstrmread = new
+	 * InputStreamReader(url.openStream()); BufferedReader reader = new
+	 * BufferedReader(inpstrmread); String ip = reader.readLine(); return ip; }
+	 */
 
 	private static CountDownLatch latch;
 
@@ -313,7 +360,7 @@ public class WebsocketHandler {
 		try {
 
 			client.connectToServer(this, null, new URI(
-					"ws://localhost:8080/ServerWebSocket/websocket"));
+					"ws://192.168.1.16:8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));
@@ -329,10 +376,9 @@ public class WebsocketHandler {
 		}
 		return connectionResult.OK;
 	}
-	
-	public class PingTimer extends TimerTask{
 
-	
+	public class PingTimer extends TimerTask {
+
 		@Override
 		public void run() {
 			try {
@@ -341,14 +387,13 @@ public class WebsocketHandler {
 							new ChatMessage("alive", ChatMessage.Type.PING));
 
 					System.out.println("PING!");
-				}
-				else{
+				} else {
 					System.out.println("Abort!");
 					this.cancel();
-					
+
 				}
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			}
 		}
-		
 	}
 }

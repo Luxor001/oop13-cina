@@ -12,10 +12,10 @@ public interface ViewObserver {
 	void commandShowDownloads();
 
 	void commandShowPreferences();
-	
+
 	void commandCloseTab(ActionEvent e);
 
-	void commandCreateTab(String ip, String name, String keystore);
+	void commandCreateTab(String ip, int port, String name, String keystore);
 
 	// void commandConnectTo(String ip);
 
@@ -33,7 +33,7 @@ public interface ViewObserver {
 
 	void notifyChatUser(String name) throws IOException, EncodeException;
 
-	void notifyChatUserIp(String ip);
+	void notifyChatUserIp(String ip, int port);
 
 	void notifySendFileUser(String path, String name) throws IOException,
 			EncodeException;

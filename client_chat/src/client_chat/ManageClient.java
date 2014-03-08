@@ -9,7 +9,6 @@ public class ManageClient {
 	private List<Client> client = new ArrayList<>();
 	private ViewObserver controller;
 	private Model model;
-	private Object lock = new Object();
 	private String password;
 
 	public ManageClient(ViewObserver controller, Model model, String password) {
@@ -18,25 +17,18 @@ public class ManageClient {
 		this.password = password;
 	}
 
-	public void addClient(String ip, String name, String keyStore)
+	public void addClient(String ip, int port, String name, String keyStore)
 			throws ClassNotFoundException, IOException {
-		synchronized (lock) {
-			for (Client c : client) {
-				if (c.getIp().equals(ip)) {
-					return;
-				}
-			}
 
-			client.add(new Client(ip, name, password, controller, model,
-					keyStore));
-		}
+		client.add(new Client(ip, port, name, password, controller, model,
+				keyStore));
 
 	}
 
 	public synchronized boolean isConnect(String ip) {
 
 		for (int i = 0; i < client.size(); i++) {
-			if (client.get(i).getIp().substring(1).equals(ip)) {
+			if (client.get(i).getIp().equals(ip)) {
 				return (!client.get(i).isClosed())
 						&& client.get(i).isConnected();
 
@@ -93,23 +85,21 @@ public class ManageClient {
 	}
 
 	public synchronized void close() {
-		synchronized (lock) {
-			if (client != null) {
-				for (Client c : client) {
-					c.close();
-				}
+		if (client != null) {
+			for (Client c : client) {
+				c.close();
 			}
 		}
 	}
 
-	public synchronized void closeServer(String ip) {
-		synchronized (lock) {
-			for (int i = 0; i < client.size(); i++) {
-				if (client.get(i).getIp().equals(ip)) {
-					client.remove(i);
-					return;
-				}
+	public synchronized void closeServer(String name) {
+		for (int i = 0; i < client.size(); i++) {
+
+			if (client.get(i).getNameServer().equals(name)) {
+				client.remove(i);
+				return;
 			}
 		}
+
 	}
 }
