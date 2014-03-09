@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
 
 public class Downloaded {
@@ -45,7 +46,11 @@ public class Downloaded {
 				new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 		pnl_main = new JPanel();
 		pnl_main.setBackground(Color.WHITE);
-		frame.getContentPane().add(pnl_main);
+
+		frame.getContentPane().add(
+				new JScrollPane(pnl_main,
+						JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+						JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
 		BoxLayout a = new BoxLayout(pnl_main, BoxLayout.Y_AXIS);
 		pnl_main.setLayout(a);
 		pnl_main.setAlignmentX(Component.LEFT_ALIGNMENT);

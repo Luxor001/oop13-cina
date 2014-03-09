@@ -22,7 +22,8 @@ public class KeyStoreServer extends Thread {
 
 		try {
 
-			serverSocket = new ServerSocket(9998);
+			System.out.println("Keystore " + User.getPortKeyStore());
+			serverSocket = new ServerSocket(User.getPortKeyStore());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -91,10 +92,15 @@ public class KeyStoreServer extends Thread {
 					oos.flush();
 				}
 
+				oos.writeInt((int) file.length());
+				oos.flush();
+				int size = ois.readInt();
+
 				FileInputStream fileStream = new FileInputStream(file);
-				byte[] buffer = new byte[10240];
+				byte[] buffer = new byte[(int) file.length()];
 				fileStream.read(buffer);
 				oos.write(buffer);
+				oos.flush();
 
 				File receivedFile = new File(System.getProperty("user.dir")
 						+ "/" + name + "ServerKey.jks");
@@ -102,8 +108,8 @@ public class KeyStoreServer extends Thread {
 				receivedFile.createNewFile();
 				FileOutputStream outStream = new FileOutputStream(receivedFile);
 
-				byte[] bufferReader = new byte[10240];
-				ois.readFully(buffer);
+				byte[] bufferReader = new byte[size];
+				ois.readFully(bufferReader);
 				outStream.write(bufferReader);
 				oos.close();
 				ois.close();

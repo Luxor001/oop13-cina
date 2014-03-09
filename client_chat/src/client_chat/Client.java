@@ -17,6 +17,7 @@ import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -38,12 +39,14 @@ public class Client extends SendReceiveFile implements Runnable {
 	private String ip;
 	private int port;
 	private String nameClient = User.getNickName();
+	private Semaphore s = new Semaphore(0);
 	private String nameServer = null;
 	private boolean resetTime = false;
 	private boolean stop = false;
 	private Downloaded download;
 	private CountDownLatch latch = new CountDownLatch(1);
 	private Object lock = new Object();
+	private Object lockAll = new Object();
 	private int id = 0;
 	private Model model;
 
@@ -105,39 +108,16 @@ public class Client extends SendReceiveFile implements Runnable {
 		// stabilisco la connessione con il server
 		new Thread(this).start();
 
+		try {
+			latch.await();
+			System.out.println("Ciaoo");
+		} catch (InterruptedException e) { // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	public void run() {
-
-		try {
-			sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, port);
-			sslSocket.startHandshake();
-		} catch (IOException e) {
-			model.removeNickName(nameServer);
-		}
-
-		System.out.println("** Sono connesso con il server **");
-		System.out.println("IP: " + sslSocket.getInetAddress());
-		System.out.println("Porta: " + sslSocket.getPort());
-		// inizializzo gli stream che mi permetteranno di inviare e ricevere
-		// i
-		// mess ->
-
-		try {
-			oos = new ObjectOutputStream(sslSocket.getOutputStream());
-			ois = new ObjectInputStream(sslSocket.getInputStream());
-
-			download = model.getDownloaded();
-			oos.writeObject(nameClient);
-			oos.flush();
-			oos.writeInt(9999);
-			oos.flush();
-			model.addNickName(nameServer, sslSocket.getInetAddress().toString()
-					.substring(1), port);
-
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
 
 		class Timer extends Thread {
 			private final static int TIMEOUT = 60000;
@@ -170,11 +150,29 @@ public class Client extends SendReceiveFile implements Runnable {
 			}
 		}
 
-		Timer t = new Timer();
-		t.start();
+		Timer t = null;
 
-		// leggo quello che mi arriva dal server
+		System.out.println("Thread");
+
 		try {
+			synchronized (lockAll) {
+				System.out.println("Mi connetto a : " + port);
+				latch.countDown();
+				sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, port);
+				sslSocket.startHandshake();
+
+				oos = new ObjectOutputStream(sslSocket.getOutputStream());
+				ois = new ObjectInputStream(sslSocket.getInputStream());
+
+				download = model.getDownloaded();
+				oos.writeObject(nameClient);
+				oos.flush();
+				oos.writeInt(User.getPortSSL());
+				oos.flush();
+				model.addNickName(nameServer, ip, port);
+			}
+			t = new Timer();
+			t.start();
 
 			Object o;
 			Map<Integer, DownloadFile> file = new HashMap<>();
@@ -182,7 +180,7 @@ public class Client extends SendReceiveFile implements Runnable {
 			while ((o = ois.readObject()) != null) {
 				if (o instanceof ManagementFiles) {
 
-					receiveFile(o, nameServer, ois, download, file);
+					receiveFile(o, nameServer + nameClient, ois, download, file);
 				} else {
 					controller.commandReceiveMessage(nameServer + " : "
 							+ (String) o, nameServer);
@@ -192,29 +190,33 @@ public class Client extends SendReceiveFile implements Runnable {
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
-
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
-		if (!t.getStateTimeout()) {
-			t.interrupt();
-			sendMessage(null);
-		}
+		System.out.println("** Sono connesso con il server **");
+		System.out.println("IP: " + sslSocket.getInetAddress());
+		System.out.println("Porta: " + sslSocket.getPort());
+
+		// leggo quello che mi arriva dal server
+
 		try {
+
+			sslSocket.close();
 			oos.close();
 			ois.close();
-			sslSocket.close();
-
-			if (!stop) {
-				model.closeServer(nameServer);
-			}
 
 			latch.countDown();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+
+		if (t != null) {
+			if (!t.getStateTimeout()) {
+				t.interrupt();
+				sendMessage(null);
+			}
+		}
+		if (!stop) {
+			model.closeServer(nameServer);
 		}
 
 	}
@@ -224,7 +226,7 @@ public class Client extends SendReceiveFile implements Runnable {
 		File file = new File(path);
 		ManagementFiles managementFile;
 
-		controller.commandReceiveMessage("File sending", nameClient);
+		controller.commandReceiveMessage("File sending", nameServer);
 		synchronized (lock) {
 			id++;
 
@@ -232,38 +234,44 @@ public class Client extends SendReceiveFile implements Runnable {
 					(int) file.length());
 		}
 
-		super.sendFile(file, nameClient, managementFile, download);
+		super.sendFile(file, nameServer, managementFile, download);
 
-		controller.commandReceiveMessage("File sent", nameClient);
+		controller.commandReceiveMessage("File sent", nameServer);
 	}
 
-	public synchronized void sendMessage(ManagementFiles file, byte[] message,
-			int step) throws IOException {
+	public void sendMessage(ManagementFiles file, byte[] message, int step)
+			throws IOException {
+		synchronized (lockAll) {
+			if (sslSocket.isConnected() && !sslSocket.isClosed()) {
+				oos.writeObject(file);
+				oos.flush();
 
-		if (sslSocket.isConnected() && !sslSocket.isClosed()) {
-			oos.writeObject(file);
-			oos.flush();
+				oos.writeInt(step);
+				oos.flush();
+				oos.write(message, 0, step);
+				oos.flush();
 
-			oos.writeInt(step);
-			oos.flush();
-			oos.write(message, 0, step);
-			oos.flush();
-
-			resetTime = true;
+				resetTime = true;
+			}
 		}
 
 	}
 
-	public synchronized void sendMessage(Object message) {
+	public void sendMessage(Object message) {
 
-		if (sslSocket.isConnected() && !sslSocket.isClosed()) {
-			try {
-				resetTime = true;
-				oos.writeObject(message);
-				oos.flush();
-			} catch (IOException e) {
+		System.out.println("messaggio");
+		synchronized (lockAll) {
+
+			System.out.println(message);
+			if (sslSocket.isConnected() && !sslSocket.isClosed()) {
+				try {
+					resetTime = true;
+					oos.writeObject(message);
+					oos.flush();
+				} catch (IOException e) {
+				}
+
 			}
-
 		}
 
 	}
@@ -279,6 +287,7 @@ public class Client extends SendReceiveFile implements Runnable {
 
 	public static String ObtainKeyStore(String ip, int port, String who) {
 
+		System.out.println("Mi connetto a keystore : " + port);
 		File file = new File(System.getProperty("user.dir") + "/"
 				+ User.getNickName() + "ServerKey.jks");
 		String name = "";
@@ -304,16 +313,21 @@ public class Client extends SendReceiveFile implements Runnable {
 				return name;
 			}
 
+			oos.writeInt((int) file.length());
+			oos.flush();
+			int size = ois.readInt();
+
 			FileInputStream fileStream = new FileInputStream(file);
-			byte[] buffer = new byte[10240];
+			byte[] buffer = new byte[(int) file.length()];
 			fileStream.read(buffer);
 			oos.write(buffer);
+
 			File receivedFile = new File(System.getProperty("user.dir") + "/"
 					+ name + "ServerKey.jks");
 			receivedFile.createNewFile();
 			FileOutputStream outStream = new FileOutputStream(receivedFile);
 
-			byte[] bufferReader = new byte[10240];
+			byte[] bufferReader = new byte[size];
 			ois.readFully(bufferReader);
 			outStream.write(bufferReader);
 			oos.close();
