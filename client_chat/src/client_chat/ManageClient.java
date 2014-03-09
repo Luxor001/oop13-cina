@@ -48,7 +48,10 @@ public class ManageClient {
 		if (client != null) {
 			for (Client c : client) {
 				if (c.getNameServer().equals(name)) {
-					c.sendMessage(message);
+					try {
+						c.sendMessage(message);
+					} catch (IOException e) {
+					}
 					return true;
 				}
 			}

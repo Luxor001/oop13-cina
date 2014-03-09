@@ -33,7 +33,7 @@ public interface ViewObserver {
 
 	void notifyChatUser(String name) throws IOException, EncodeException;
 
-	void notifyChatUserIp(String ip, int port);
+	void notifyChatUserIp(String ip, int keyPort, int sslPort);
 
 	void notifySendFileUser(String path, String name) throws IOException,
 			EncodeException;

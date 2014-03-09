@@ -57,59 +57,51 @@ public abstract class SendReceiveFile {
 			int step) throws IOException;
 
 	protected void receiveFile(Object o, String name, ObjectInputStream ois,
-			Downloaded download, Map<Integer, DownloadFile> fileReceive) {
-		try {
-			ManagementFiles managementFile = (ManagementFiles) o;
+			Downloaded download, Map<Integer, DownloadFile> fileReceive)
+			throws IOException {
+		ManagementFiles managementFile = (ManagementFiles) o;
 
-			int step = ois.readInt();
-			byte[] bufferReceive = new byte[step];
-			ois.readFully(bufferReceive, 0, step);
+		int step = ois.readInt();
+		byte[] bufferReceive = new byte[step];
+		ois.readFully(bufferReceive, 0, step);
 
-			DownloadFile value = fileReceive.get(managementFile.getIdFile());
+		DownloadFile value = fileReceive.get(managementFile.getIdFile());
 
-			if (value == null) {
+		if (value == null) {
 
-				String nameFile = managementFile.getFileName();
+			String nameFile = managementFile.getFileName();
 
-				String newName = nameFile;
-				int i = 1;
-				String dfaddress = User.getStoredPath();
+			String newName = nameFile;
+			int i = 1;
+			String dfaddress = User.getStoredPath();
 
-				while (new File(dfaddress + "/" + newName).exists()) {
+			while (new File(dfaddress + "/" + newName).exists()) {
 
-					String[] nameExtension = nameFile.split("\\.");
+				String[] nameExtension = nameFile.split("\\.");
 
-					nameExtension[0] = nameExtension[0] + "(" + i + ")";
-					newName = nameExtension[0] + "." + nameExtension[1];
-					i++;
-				}
-
-				download.addFile(name, managementFile.getIdFile(), newName,
-						managementFile.getFileSize());
-
-				value = new DownloadFile(new FileOutputStream(new File(
-						dfaddress + "/" + newName)));
+				nameExtension[0] = nameExtension[0] + "(" + i + ")";
+				newName = nameExtension[0] + "." + nameExtension[1];
+				i++;
 			}
 
-			download.updateProgressBar(name, managementFile.getIdFile(), step);
+			download.addFile(name, managementFile.getIdFile(), newName,
+					managementFile.getFileSize());
 
-			value.write(bufferReceive, 0, step);
-			value.incrementSize(step);
+			value = new DownloadFile(new FileOutputStream(new File(dfaddress
+					+ "/" + newName)));
+		}
 
-			fileReceive.put(managementFile.getIdFile(), value);
+		download.updateProgressBar(name, managementFile.getIdFile(), step);
 
-			if (value.getSize() == managementFile.getFileSize()) {
-				System.out.println("File received "
-						+ managementFile.getFileName());
-				fileReceive.get(managementFile.getIdFile()).close();
-				fileReceive.remove(managementFile.getIdFile());
-			}
+		value.write(bufferReceive, 0, step);
+		value.incrementSize(step);
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		fileReceive.put(managementFile.getIdFile(), value);
+
+		if (value.getSize() == managementFile.getFileSize()) {
+			System.out.println("File received " + managementFile.getFileName());
+			fileReceive.get(managementFile.getIdFile()).close();
+			fileReceive.remove(managementFile.getIdFile());
 		}
 
 	}

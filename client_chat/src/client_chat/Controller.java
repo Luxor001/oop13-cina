@@ -1,6 +1,7 @@
 package client_chat;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
@@ -204,24 +205,24 @@ public class Controller implements ViewObserver {
 
 	}
 
-	public void notifyChatUserIp(String ip, int port) {
+	public void notifyChatUserIp(String ip, int keyPort, int sslPort) {
 		synchronized (lockNotification) {
-			String name = existIp(ip, port);
+			String name = existIp(ip, sslPort);
 
 			if (name == null || name.equals("exist")) {
-				model.addIp(ip, port, "pending");
-				if (!model.isConnect(ip, port)) {
-					name = Client.ObtainKeyStore(ip, port, "user");
+				model.addIp(ip, sslPort, "pending");
+				if (!model.isConnect(ip, sslPort)) {
+					name = Client.ObtainKeyStore(ip, keyPort, "user");
 
 					if (name != null) {
-						commandCreateTab(ip, port, name, name + "ServerKey.jks");
+						commandCreateTab(ip, sslPort, name, name
+								+ "ServerKey.jks");
 					} else {
-						model.removeIp(ip, port);
-						showMessageMain(name
-								+ " has refused the request of private chat");
+						model.removeIp(ip, sslPort);
+						showMessageMain("The user has refused the request of private chat or an invalid ip address has been entered");
 					}
 				} else {
-					model.removeIp(ip, port);
+					model.removeIp(ip, sslPort);
 				}
 			}
 		}
@@ -230,13 +231,28 @@ public class Controller implements ViewObserver {
 	public void notifySendFileUser(String path, String name)
 			throws IOException, EncodeException {
 
-		ChatMessage message = new ChatMessage("Connect to",
-				Type.REQUESTSENDFILE);
-		ChatMessage.Param params = new ChatMessage.Param();
-		params.setNickname(name);
-		params.setFileName(path);
-		message.setAdditionalParams(params);
-		WebsocketHandler.getWebSocketHandler().SendMex(message);
+		if (new File(path).length() <= 26214400) {
+
+			ChatMessage message = new ChatMessage("Connect to",
+					Type.REQUESTSENDFILE);
+			ChatMessage.Param params = new ChatMessage.Param();
+			params.setNickname(name);
+			params.setFileName(path);
+			message.setAdditionalParams(params);
+			WebsocketHandler.getWebSocketHandler().SendMex(message);
+
+		} else {
+
+			System.out.println("File's size over the limit of 25 Mb");
+			JOptionPane
+					.showOptionDialog(
+							null,
+							"Impossible send file.\nFile's size over the limit of 25 Mb",
+							"Alert", JOptionPane.PLAIN_MESSAGE,
+							JOptionPane.ERROR, null, null, null);
+
+		}
+
 	}
 
 	public void closeChat() throws IOException, EncodeException {
