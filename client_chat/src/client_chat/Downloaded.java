@@ -21,11 +21,20 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
 
+/**
+ * /**
+ * This class shows the JFrame associated with the "Downloaded" files
+ * of the application.
+ * This class uses a simply JPanel with a BoxLayout layout, along the 
+ * Y Axis.
+ * Every istance of a "file" (downloaded or uploaded it doesn't matter)
+ * is shown as a JPanel with "null" layout, and it's stored in a Map<String, JPanel>
+ * with String as unique Id of the file.
+ * @author Stefano Belli
+ * @author Francesco Cozzolino
+ * */
+
 public class Downloaded {
-
-	// private List<Pair<Pair<String, Integer>, JPanel>> fileReferences = new
-	// LinkedList<>();
-
 	private Map<String, JPanel> fileReferences = new HashMap<>();
 
 	private final JPanel pnl_main;
@@ -35,6 +44,7 @@ public class Downloaded {
 	private Color LIGHT_LIGHT_GRAY = new Color(243, 243, 243);
 	private Color ALMOST_WHITE = new Color(251, 251, 251);
 	private Dimension frameSize = new Dimension(400, 85);
+	private Dimension maxframeSize=new Dimension(400,300);
 
 	public Downloaded() throws BadLocationException {
 		frame = new JFrame();
@@ -79,11 +89,13 @@ public class Downloaded {
 		});
 
 		frame.setBackground(Color.WHITE);
-
 	}
 
+	/**
+	 * This method creates a JPanel which rapresents an istance of a file.
+	 * @return JPanel which rapresents an istance of a file.
+	 * */
 	private JPanel buildFilePanel(String fileName, int max) {
-
 		JPanel container = new JPanel();
 		container.setAlignmentX(Component.LEFT_ALIGNMENT);
 		container.setMaximumSize(new Dimension(400, 55));
@@ -123,12 +135,11 @@ public class Downloaded {
 		return container;
 	}
 
-	public static class FileReference {
-		public FileReference() {
-
-		}
-	}
-
+    /**
+     * This methods updates the progressbar of the correspective file istance 
+     * with the specified id
+     * @return true if the panel has been found. False otherwise.
+     * */
 	public boolean updateProgressBar(String user, int id, int percentage) {
 		JPanel pnl = null;
 
@@ -152,12 +163,13 @@ public class Downloaded {
 
 	}
 
+	/**
+	 * Add a file istance in the fileReferences map.
+	 * */
 	public synchronized void addFile(String user, int id, String name, int max) {
-
 		String key = user + id;
 		JPanel local_pnl = buildFilePanel(name, max);
 		fileReferences.put(key, local_pnl);
-		// fileReferences.add(new Pair<>(new Pair<>(user, id), local_pnl));
 		pnl_main.add(local_pnl);
 		resizeFrame();
 	}
@@ -179,20 +191,25 @@ public class Downloaded {
 		}
 	}
 
+	/**
+	 * Resize the JFrame using JFrame.pack() until it reaches the maximum height.
+	 * if no fileistance is present in the map, it creates a blank JFrame.
+	 * */
 	private void resizeFrame() {
 
 		if (fileReferences.size() == 0) {
 			frame.setSize(100, 100);
 		} else {
-			frame.pack();
-			frame.setSize(new Dimension(pnl_main.getSize().width, frame
-					.getSize().height));
+			if(frame.getSize().height <= maxframeSize.height){
+				frame.pack();
+			}
 		}
 	}
 
+	/**
+	 * Clear all the JFrame and the map.
+	 * */
 	private synchronized void clear() {
-
-		int i = 0;
 
 		for (Container a : fileReferences.values()) {
 			for (Component child : a.getComponents()) {
@@ -205,14 +222,10 @@ public class Downloaded {
 				}
 			}
 		}
-
-		// redraw_colors();
-
 		resizeFrame();
 	}
 
 	public boolean isVisible() {
 		return frame.isVisible();
 	}
-
 }

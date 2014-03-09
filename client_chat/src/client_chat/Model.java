@@ -336,7 +336,7 @@ public class Model implements ModelInterface {
 							new JFrame(),
 							"Socket Ports are not set.\n "
 									+ "Please edit file Config/config.conf accordingly");
-			System.exit(0);
+			WebsocketHandler.getWebSocketHandler().closeConnection();
 
 		} else {/* file exist, open it up */
 
@@ -366,6 +366,7 @@ public class Model implements ModelInterface {
 				JOptionPane.showMessageDialog(new JFrame(),
 						"An error occurred. \n"
 								+ "Your config file may be corrupt");
+				WebsocketHandler.getWebSocketHandler().closeConnection();
 				System.exit(0);
 
 			}

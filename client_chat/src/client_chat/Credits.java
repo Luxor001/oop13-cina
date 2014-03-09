@@ -13,6 +13,11 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
+/**
+ * This class shows the JFrame associated with the credits of the application.
+ * it uses a JTextPane as main component for displaying the credits. * 
+ * @author Stefano Belli
+ * */
 public class Credits {
 
 	private Dimension FRAME_SIZE = new Dimension(400, 200);
@@ -62,7 +67,11 @@ public class Credits {
 
 	}
 
-	/* All the below code comes directly from the Java Docs. */
+	/**
+	 * Add some "static" styles to the StyledDocument of the JTextPane.
+	 * This method is, for the large part, "inspired" directly from the 
+	 * docs.oracle.com documentation.
+	 * */
 	protected void addStylesToDocument(StyledDocument doc) {
 		// Initialize some styles.
 		Style def = StyleContext.getDefaultStyleContext().getStyle(
