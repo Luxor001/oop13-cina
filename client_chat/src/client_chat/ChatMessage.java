@@ -2,26 +2,38 @@ package client_chat;
 
 import java.util.ArrayList;
 
-/*
- * @(#)ChatMessage.java        1.0 02/12/2013
- *
- * Belli Stefano 0000652935, Cozzolino Francesco 0000xxxxxxx
- *
- */
-
-/* Class that describes the actual messages sent from (and to) the users
- * The below class is then converted in json format by MessageEncoder.java class
+/** Class that describes the "Object" messages sent from (and to) the users
+ * The below class is then converted in json format by MessageEncoder.java class * 
  * Please note that this class is equal to the server correspective.
+ * @author Stefano Belli
  */
 public class ChatMessage {
 
+	/** 
+	 * Type ofChatMessage. Needed to quickly identify a chatmessage.
+	 * */
 	enum Type {
 		INITIALIZE, /* Used to Registry a new user to the channel */
-		CONNECTIONGRANTED, TEXT, /* Duh. */
+		CONNECTIONGRANTED, 
+		TEXT,
 		NEWUSER, /* Needed to tell to server there's a new boy in town */
-		USERDISCONNECTED, USERLIST, DISCONNECTING, REQUESTPRIVATECHAT, REQUESTEDPRIVATECHAT, YESPRIVATECHAT, NOPRIVATECHAT, NICKNAMEUNAVAIABLE, REQUESTSENDFILE, REQUESTEDSENDFILE, YESSENDFILE, NOSENDFILE, RESETFLAG, PING
+		USERDISCONNECTED,
+		USERLIST, 
+		DISCONNECTING, 
+		REQUESTPRIVATECHAT,
+		REQUESTEDPRIVATECHAT,
+		YESPRIVATECHAT, 
+		NOPRIVATECHAT, 
+		NICKNAMEUNAVAIABLE, 
+		REQUESTSENDFILE, 
+		REQUESTEDSENDFILE, 
+		YESSENDFILE,
+		NOSENDFILE,
+		RESETFLAG, 
+		PING
 	}
 
+	
 	private Param additionalParams;
 	private Type messageType;
 	private String message;
@@ -48,6 +60,11 @@ public class ChatMessage {
 		return messageType;
 	}
 
+	/**
+	 * If no additionalParams were already added, a new (blank) one will be
+	 * created on the istance of this class
+	 * @return the Param istance of this object
+	 * */
 	public Param getAdditionalParams() {
 		if (additionalParams == null)
 			additionalParams = new Param();
@@ -65,26 +82,15 @@ public class ChatMessage {
 			return true;
 	}
 
-	/**
-	 * Return message
-	 * 
-	 * @return the message
-	 */
 	public String getMessage() {
 		return message;
 	}
 
-	/**
-	 * Set message
-	 * 
-	 * @param message
-	 *            the message to set
-	 */
 	public void setMessage(String message) {
 		this.message = message;
 	}
 
-	/*
+	/**
 	 * This inner class exist to encapsulate all the optional parameters of a
 	 * message for e.g. the users list sent by a "User List" request, or a
 	 * nickname notification on connection. It has been created to get a smaller
@@ -100,20 +106,10 @@ public class ChatMessage {
 		private String SSLPort;
 		private String KEYPort;
 
-		public Param() {
-
-		}
-
-		/*
-		 * ricoradrsi di specificare che il nickname in questi parametri
-		 * addizionali � usato SOLO per il primo avvio. Dopo la faccenda dei
-		 * nickname sar� gestita SOLO dal webserver: sar� lui a inserirlo, per
-		 * un motivo di sicurezza.
-		 */
+		
 		public void setNickname(String Nick) {
 			nickname = Nick;
 		}
-
 		public void setFileName(String fileName) {
 			this.fileName = fileName;
 		}
@@ -139,6 +135,10 @@ public class ChatMessage {
 			return usersList;
 		}
 
+		/**
+		 * Append a user in the usersList field, needed for a 
+		 * USERSLIST Chatmessage Type.
+		 * */
 		public void appendUser(String UserNickname) {
 			usersList.add(UserNickname);
 		}
@@ -151,7 +151,6 @@ public class ChatMessage {
 			return fileName;
 		}
 
-		/* Those will be deleted in the final version of the app */
 		public void setSSLPort(String port) {
 			this.SSLPort = port;
 		}
