@@ -64,7 +64,7 @@ public class View extends JFrame implements ViewInterface {
 	final private static int VGAP = 10;
 	final private static int WIDTH_USERJLIST = 130;
 	Preferences prefs = Preferences.userRoot();
-	Downloaded d;
+	// Downloaded d;
 	private ViewObserver controller;
 
 	public enum sfx {
@@ -86,7 +86,7 @@ public class View extends JFrame implements ViewInterface {
 														 * PRIVATE PROPERTY! ##
 														 */
 	private List<JTextArea> chatList = new ArrayList<>();
-	private List<JScrollPane> scrollList = new ArrayList<>();
+	// private List<JScrollPane> scrollList = new ArrayList<>();
 	// create listview
 	private JList<String> usersJList; /*
 									 * it's not parametized, but oracle's
@@ -166,7 +166,7 @@ public class View extends JFrame implements ViewInterface {
 		// add to the list a custom TextArea
 		textList.add(this.getMyText());
 		chatList.add(chat);
-		scrollList.add(this.getMyScroll(chat));
+		// scrollList.add(this.getMyScroll(chat));
 
 		south.add(enter);
 		south.add(send);
@@ -174,7 +174,8 @@ public class View extends JFrame implements ViewInterface {
 		this.add(south, BorderLayout.SOUTH);
 
 		textPanel.add(textList.get(0), BorderLayout.CENTER);
-		mainPanel.add(scrollList.get(0), BorderLayout.CENTER);
+		mainPanel.add(/* scrollList.get(0) */getMyScroll(chat),
+				BorderLayout.CENTER);
 		mainPanel.add(textPanel, BorderLayout.SOUTH);
 		mainPanel.add(new JPanel().add(scroll), BorderLayout.EAST);
 
@@ -211,7 +212,7 @@ public class View extends JFrame implements ViewInterface {
 			JButton button1 = (JButton) panel.getComponent(1);
 			if (button.equals(button1)) {
 				tabView.remove(i);
-				scrollList.remove(i);
+				// scrollList.remove(i);
 				chatList.remove(i);
 				textList.remove(i);
 				return;
@@ -238,12 +239,14 @@ public class View extends JFrame implements ViewInterface {
 			chatList.add(chatTmp);
 			textList.add(this.getMyText());
 
-			scrollList.add(this.getMyScroll(chatTmp));
+			// scrollList.add(this.getMyScroll(chatTmp));
 
 			textPanelTmp.add(textList.get(textList.size() - 1),
 					BorderLayout.CENTER);
 
-			main.add(scrollList.get(textList.size() - 1), BorderLayout.CENTER);
+			main.add(
+			/* scrollList.get(textList.size() - 1) */getMyScroll(chatTmp),
+					BorderLayout.CENTER);
 			main.add(textPanelTmp, BorderLayout.SOUTH);
 
 			tabView.addTab(title, main);
@@ -340,7 +343,6 @@ public class View extends JFrame implements ViewInterface {
 
 					class ChatTo {
 						private JFrame frame = new JFrame();
-						private String invalidIp = "Invalid ip";
 						private JTextArea txtIp = new JTextArea();
 						private JButton chat = new JButton("Chat");
 						private JPanel panel = new JPanel(null);
@@ -369,8 +371,6 @@ public class View extends JFrame implements ViewInterface {
 								public void actionPerformed(ActionEvent e) {
 
 									ip = txtIp.getText();
-									// if (ip.trim().isEmpty()) {
-
 									new Thread() {
 										public void run() {
 											controller.notifyChatUserIp(ip,
@@ -378,7 +378,6 @@ public class View extends JFrame implements ViewInterface {
 										}
 									}.start();
 									frame.dispose();
-									// }
 
 								}
 

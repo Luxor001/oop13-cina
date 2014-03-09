@@ -20,6 +20,11 @@ public class ManageClient {
 	public void addClient(String ip, int port, String name, String keyStore)
 			throws ClassNotFoundException, IOException {
 
+		for (int i = 0; i < client.size(); i++) {
+			if (client.get(i).getIp().equals(ip)) {
+				return;
+			}
+		}
 		client.add(new Client(ip, port, name, password, controller, model,
 				keyStore));
 
@@ -42,8 +47,7 @@ public class ManageClient {
 
 		if (client != null) {
 			for (Client c : client) {
-				if (c.getNameServer().equals(name) && !c.isClosed()
-						&& c.isConnected()) {
+				if (c.getNameServer().equals(name)) {
 					c.sendMessage(message);
 					return true;
 				}
@@ -55,8 +59,7 @@ public class ManageClient {
 	public synchronized boolean sendFile(String path, String name) {
 		if (client != null) {
 			for (Client c : client) {
-				if (c.getNameServer().equals(name) && !c.isClosed()
-						&& c.isConnected()) {
+				if (c.getNameServer().equals(name)) {
 
 					class SendFile extends Thread {
 						String path;

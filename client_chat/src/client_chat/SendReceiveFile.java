@@ -73,11 +73,11 @@ public abstract class SendReceiveFile {
 
 				String newName = nameFile;
 				int i = 1;
-				String dfaddress=User.getStoredPath();
+				String dfaddress = User.getStoredPath();
 
 				while (new File(dfaddress + "/" + newName).exists()) {
 
-					String[] nameExtension = name.split("\\.");
+					String[] nameExtension = nameFile.split("\\.");
 
 					nameExtension[0] = nameExtension[0] + "(" + i + ")";
 					newName = nameExtension[0] + "." + nameExtension[1];
