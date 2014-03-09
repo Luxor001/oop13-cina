@@ -87,12 +87,8 @@ public class Server implements Runnable {
 		for (int i = 0; i < client.size(); i++) {
 			if (!client.get(i).isClosed() && client.get(i).isConnected()
 					&& client.get(i).getNameClient().equals(name)) {
-				try {
-					client.get(i).sendMessage(message);
-					return true;
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				client.get(i).sendMessage(message);
+				return true;
 
 			}
 		}
@@ -148,12 +144,8 @@ public class Server implements Runnable {
 
 	public synchronized void close() {
 		while (client.size() > 0) {
-			try {
-				client.get(client.size() - 1).sendMessage(null);
-				client.remove(client.size() - 1);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			client.get(client.size() - 1).sendMessage(null);
+			client.remove(client.size() - 1);
 
 		}
 
@@ -281,11 +273,22 @@ public class Server implements Runnable {
 
 		}
 
-		public synchronized void sendMessage(Object message) throws IOException {
+		public synchronized void sendMessage(Object message) {
 
 			if (!close) {
-				oos.writeObject(message);
-				oos.flush();
+				try {
+					oos.writeObject(message);
+					oos.flush();
+				} catch (IOException e) {
+					try {
+						oos.close();
+						ois.close();
+						sslSocket.close();
+						model.closeClient(ip);
+					} catch (IOException e1) {
+					}
+				}
+
 			}
 
 			if (message == null) {
@@ -294,17 +297,28 @@ public class Server implements Runnable {
 		}
 
 		public synchronized void sendMessage(ManagementFiles file,
-				byte[] message, int step) throws IOException {
+				byte[] message, int step) {
 
 			if (!close) {
 
-				oos.writeObject(file);
-				oos.flush();
+				try {
+					oos.writeObject(file);
+					oos.flush();
 
-				oos.writeInt(step);
-				oos.flush();
-				oos.write(message, 0, step);
-				oos.flush();
+					oos.writeInt(step);
+					oos.flush();
+					oos.write(message, 0, step);
+					oos.flush();
+				} catch (IOException e) {
+					try {
+						oos.close();
+						ois.close();
+						sslSocket.close();
+						model.closeClient(ip);
+					} catch (IOException e1) {
+					}
+				}
+
 			}
 
 			if (message == null) {

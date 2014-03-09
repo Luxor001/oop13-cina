@@ -1,7 +1,5 @@
 package client_chat;
 
-
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,7 +40,7 @@ public class WebsocketHandler {
 			+ " while you are invisible: please login as visible and repeat"
 			+ " this operation";
 
-	private static String WEBSERVER_IP="79.46.241.126";
+	private static String WEBSERVER_IP = "79.46.241.126";
 	public final static Object monitor = 1;
 	public Timer timer;
 
@@ -244,6 +242,7 @@ public class WebsocketHandler {
 					controller.showMessageMain("Error during send of file");
 				}
 			}
+			Thread.sleep(500);
 
 			if (name != null) {
 				controller.sendFile(filename, name);
@@ -382,8 +381,8 @@ public class WebsocketHandler {
 		/* Attemp connection to web service */
 		try {
 
-			client.connectToServer(this, null, new URI(
-					"ws://"+WEBSERVER_IP+":8080/ServerWebSocket/websocket"));
+			client.connectToServer(this, null, new URI("ws://" + WEBSERVER_IP
+					+ ":8080/ServerWebSocket/websocket"));
 			/*
 			 * client.connectToServer(WebsocketHandler.class, new URI(
 			 * "ws://localhost:8080/ServerWebSocket/websocket"));

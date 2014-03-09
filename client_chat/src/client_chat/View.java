@@ -137,13 +137,12 @@ public class View extends JFrame implements ViewInterface {
 		// add tabview to form
 		this.getContentPane().add(tabView);
 
-		DefaultCaret caret = (DefaultCaret) chat.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-
 		/* add the adapter to intercept the exiting operation from the app */
 		this.addWindowListener(new CustomWindowAdapter(this));
 		chat.setLineWrap(true);
 		chat.setEditable(false);
+		DefaultCaret caret = (DefaultCaret) chat.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 		usersJList = new JList<String>(usersList);
 
@@ -344,22 +343,53 @@ public class View extends JFrame implements ViewInterface {
 					class ChatTo {
 						private JFrame frame = new JFrame();
 						private JTextArea txtIp = new JTextArea();
+						private JTextArea txtKeyport = new JTextArea();
+						private JTextArea txtSSLport = new JTextArea();
+						private JLabel lblIp = new JLabel("Ip : ");
+						private JLabel lblportKey = new JLabel(
+								"Keystore port :");
+						private JLabel lblportSSL = new JLabel("SSL port :");
 						private JButton chat = new JButton("Chat");
 						private JPanel panel = new JPanel(null);
 						private String ip = "";
+						private int positiion = 100;
 
 						public ChatTo() {
 							frame.setTitle("Chat to");
-							frame.setSize(350, 100);
+							frame.setSize(400, 200);
 							frame.setVisible(true);
 							frame.setLocationRelativeTo(null);
 							frame.getContentPane().add(panel);
 							frame.setResizable(false);
 
-							txtIp.setSize(125, 20);
+							lblIp.setSize(lblIp.getPreferredSize());
+							lblIp.setLocation(frame.getSize().width / 2 - 189,
+									25);
+
+							lblportKey.setSize(lblportKey.getPreferredSize());
+							lblportKey.setLocation(
+									frame.getSize().width / 2 - 189, 65);
+
+							lblportSSL.setSize(lblportSSL.getPreferredSize());
+							lblportSSL.setLocation(
+									frame.getSize().width / 2 - 189, 105);
+
+							txtIp.setSize(new Dimension(125, 20));
 							txtIp.setLocation(frame.getSize().width / 2 - 102,
 									25);
 							txtIp.setBorder(BorderFactory
+									.createLineBorder(Color.BLACK));
+
+							txtKeyport.setSize(new Dimension(50, 20));
+							txtKeyport.setLocation(
+									frame.getSize().width / 2 - 102, 65);
+							txtKeyport.setBorder(BorderFactory
+									.createLineBorder(Color.BLACK));
+
+							txtSSLport.setSize(new Dimension(50, 20));
+							txtSSLport.setLocation(
+									frame.getSize().width / 2 - 102, 105);
+							txtSSLport.setBorder(BorderFactory
 									.createLineBorder(Color.BLACK));
 
 							chat.setSize(50, 20);
@@ -371,19 +401,52 @@ public class View extends JFrame implements ViewInterface {
 								public void actionPerformed(ActionEvent e) {
 
 									ip = txtIp.getText();
-									new Thread() {
-										public void run() {
-											controller.notifyChatUserIp(ip,
-													9998);
+									try {
+										final int keyPort = Integer
+												.parseInt(txtKeyport.getText());
+										final int sslPort = Integer
+												.parseInt(txtSSLport.getText());
+
+										if (keyPort < 1 || keyPort > 9999
+												|| sslPort < 1
+												|| sslPort > 9999) {
+											JOptionPane.showOptionDialog(null,
+													"Incorrect values",
+													"Error",
+													JOptionPane.PLAIN_MESSAGE,
+													JOptionPane.ERROR_MESSAGE,
+													null, null, null);
+										} else {
+
+											new Thread() {
+												public void run() {
+													controller
+															.notifyChatUserIp(
+																	ip,
+																	keyPort,
+																	sslPort);
+												}
+											}.start();
+											frame.dispose();
 										}
-									}.start();
-									frame.dispose();
+									} catch (NumberFormatException e1) {
+										JOptionPane.showOptionDialog(null,
+												"Incorrect values", "Error",
+												JOptionPane.PLAIN_MESSAGE,
+												JOptionPane.ERROR_MESSAGE,
+												null, null, null);
+									}
 
 								}
 
 							});
 
+							panel.add(lblIp);
+							panel.add(lblportKey);
+							panel.add(lblportSSL);
 							panel.add(txtIp);
+							panel.add(txtKeyport);
+							panel.add(txtSSLport);
 							panel.add(chat);
 						}
 

@@ -139,7 +139,10 @@ public class Client extends SendReceiveFile implements Runnable {
 						currentTime = 0;
 					}
 					if (currentTime > TIMEOUT || stop) {
-						sendMessage(null);
+						try {
+							sendMessage(null);
+						} catch (IOException e) {
+						}
 						timeout = true;
 					}
 				}
@@ -151,6 +154,7 @@ public class Client extends SendReceiveFile implements Runnable {
 		}
 
 		Timer t = null;
+		Map<Integer, DownloadFile> file = null;
 
 		System.out.println("Thread");
 
@@ -160,6 +164,7 @@ public class Client extends SendReceiveFile implements Runnable {
 				latch.countDown();
 				sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, port);
 				sslSocket.startHandshake();
+				model.addNickName(nameServer, ip, port);
 
 				oos = new ObjectOutputStream(sslSocket.getOutputStream());
 				ois = new ObjectInputStream(sslSocket.getInputStream());
@@ -169,13 +174,13 @@ public class Client extends SendReceiveFile implements Runnable {
 				oos.flush();
 				oos.writeInt(User.getPortSSL());
 				oos.flush();
-				model.addNickName(nameServer, ip, port);
+
 			}
 			t = new Timer();
 			t.start();
 
 			Object o;
-			Map<Integer, DownloadFile> file = new HashMap<>();
+			file = new HashMap<>();
 
 			while ((o = ois.readObject()) != null) {
 				if (o instanceof ManagementFiles) {
@@ -190,6 +195,7 @@ public class Client extends SendReceiveFile implements Runnable {
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
+
 		}
 
 		System.out.println("** Sono connesso con il server **");
@@ -212,7 +218,10 @@ public class Client extends SendReceiveFile implements Runnable {
 		if (t != null) {
 			if (!t.getStateTimeout()) {
 				t.interrupt();
-				sendMessage(null);
+				try {
+					sendMessage(null);
+				} catch (IOException e) {
+				}
 			}
 		}
 		if (!stop) {
@@ -243,13 +252,20 @@ public class Client extends SendReceiveFile implements Runnable {
 			throws IOException {
 		synchronized (lockAll) {
 			if (sslSocket.isConnected() && !sslSocket.isClosed()) {
-				oos.writeObject(file);
-				oos.flush();
+				try {
+					oos.writeObject(file);
+					oos.flush();
 
-				oos.writeInt(step);
-				oos.flush();
-				oos.write(message, 0, step);
-				oos.flush();
+					oos.writeInt(step);
+					oos.flush();
+					oos.write(message, 0, step);
+					oos.flush();
+				} catch (IOException e) {
+					sslSocket.close();
+					model.closeServer(nameServer);
+					oos.close();
+					ois.close();
+				}
 
 				resetTime = true;
 			}
@@ -257,7 +273,7 @@ public class Client extends SendReceiveFile implements Runnable {
 
 	}
 
-	public void sendMessage(Object message) {
+	public void sendMessage(Object message) throws IOException {
 
 		System.out.println("messaggio");
 		synchronized (lockAll) {
@@ -269,6 +285,10 @@ public class Client extends SendReceiveFile implements Runnable {
 					oos.writeObject(message);
 					oos.flush();
 				} catch (IOException e) {
+					sslSocket.close();
+					model.closeServer(nameServer);
+					oos.close();
+					ois.close();
 				}
 
 			}
