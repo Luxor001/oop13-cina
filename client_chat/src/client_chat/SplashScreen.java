@@ -30,6 +30,16 @@ import javax.swing.border.Border;
 
 import net.java.balloontip.BalloonTip;
 
+/**
+ * This class shows the entry screen of the application.
+ * Here the user can select his entry nickname and if it's visible or not.
+ * However it has not been implemented yet, here the user could select the 
+ * main channel to connect.
+ * This class references, for some uses, on the WebsocketHandler class and User.
+ * @see User
+ * @see WebsocketHandler
+ * @author Stefano Belli
+ * **/
 public class SplashScreen {
 
 	private JFrame frame;
@@ -193,10 +203,12 @@ public class SplashScreen {
 		frame.setVisible(true);
 	}
 
+	/**
+	 * Finds the centered X of the component, calculating it's size
+	 * and the frame size.
+	 * */
 	public int CenteredX(Component a) {
-
 		return frameSize.x / 2 - (a.getSize().width / 2);
-
 	}
 
 	public void disposeFrame() {
@@ -205,7 +217,6 @@ public class SplashScreen {
 
 	public int buildChoiceMessageBox(String Message, String title,
 			Object[] options, int IconType) {
-		// Object[] options = { "Yes, please", "No way!" };
 		int n = JOptionPane.showOptionDialog(frame, Message, title,
 				JOptionPane.YES_NO_OPTION, IconType, null, options, null);
 
@@ -216,15 +227,14 @@ public class SplashScreen {
 		loadingCircle.setVisible(visibile);
 	}
 
+	/**shows an error tooltip for an invalid nickname*/
 	public void nicknameInvalid() {
-
 		BalloonTip bln_invalidnick = new BalloonTip(txt_nickname,
 				NICKNAME_ALREADY_USED_MESSAGE);
 		bln_invalidnick.setVisible(true);
 	}
 
 	public void setFrameEnabled(boolean enabled) {
-
 		btn_login.setEnabled(enabled);
 		frame.setEnabled(enabled);
 	}

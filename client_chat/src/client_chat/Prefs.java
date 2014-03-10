@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.prefs.Preferences;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -20,8 +19,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-public class Prefs {
 
+/**
+ * A class that creates a JFrame for preferences of the client.
+ * The main layout manager is a BoxLayout along the Y Class.
+ * Some preferences (like the download location browser) are nested in a JPanel.
+ * This class uses the User Class to store the selected preferences.
+ * @see User class to understand the storing procedure of the preferences.
+ * @author Stefano Belli
+ * */
+public class Prefs {
 	private JFrame frame;
 	private static String TITLE = "Preferences";
 	private static Point frameSize = new Point(370, 230);
@@ -75,7 +82,8 @@ public class Prefs {
 				JFileChooser fc = new JFileChooser();
 				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				int returnVal = fc.showDialog(btn_directory, "Select");
-
+				
+				/*if user has closed the browser selecting a file..*/
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					User.setStoredPath(fc.getSelectedFile().toString());
 					txt_defaultdownloadloc.setText(fc.getSelectedFile()
@@ -146,6 +154,8 @@ public class Prefs {
 		frame.setVisible(true);
 	}
 
+	/**Needed to interecept the act of closing the preferences windows.
+	 * On close, this class saves all the preferences shown in the JFrame. */
 	class CustomWindowAdapter extends WindowAdapter {
 
 		JFrame window = null;
@@ -154,14 +164,11 @@ public class Prefs {
 			this.window = window;
 		}
 
-		// implement windowClosing method
 		public void windowClosing(WindowEvent e) {
-
 			User.setStoredNickname(txt_defaultnick.getText());
 			User.setStoredPath(txt_defaultdownloadloc.getText());
 			User.setStoredSounds(chk_sounds.isSelected());
 			User.setStoredVisibility(chk_visibility.isSelected());
-
 		}
 	}
 }

@@ -10,8 +10,22 @@ import javax.websocket.EndpointConfig;
 
 import client_chat.ChatMessage.Param;
 
+/**
+ * 
+ * This class handles the incoming message from the WebSocketHandler Class.
+ * In fact, it DECODES the messages in a "ChatMessage" istance from an incoming
+ * JSON string.
+ * Be aware: this decoder is similar to the server correspective. 
+ * 
+ * @author Stefano Belli * 
+ **/
 public class MessageDecoder implements Decoder.Text<ChatMessage> {
 
+	/**
+	 * MessageDecoder main method. It's an entry point for every incoming
+	 * message for the websockethandler class.
+	 * @return the decoded ChatMessage.
+	 * */
 	@Override
 	public ChatMessage decode(String jsonMessage) {
 
@@ -33,10 +47,11 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 													// to be sent
 			message.setAdditionalParams(addlParams);
 		}
-		return message;
+		return message;  
 
 	}
 
+	/**check if the incoming mesage is in a valid JSON format*/
 	@Override
 	public boolean willDecode(String jsonMessage) {
 		try {
@@ -50,14 +65,15 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 
 	@Override
 	public void init(EndpointConfig ec) {
-		System.out.println("MessageDecoder -init method called");
 	}
 
 	@Override
 	public void destroy() {
-		System.out.println("MessageDecoder - destroy method called");
 	}
 
+	/**
+	 * Creates the correspective Params object based on the on a Json array
+	 * */
 	private static Param JsonArrayToParam(JsonArray jsonArray) {
 		Param additionalParams = new ChatMessage.Param();
 		if (jsonArray.size() != 0) // if it's not empty
