@@ -23,11 +23,11 @@ import client_chat.Controller.MessageBoxReason;
 import client_chat.Model.connectionResult;
 
 /**
- * Main class for WebSocket Handling.
- * Some methods like @Onmessage, @onOpen etc. are automatically called
- * from the Tyrus Thread created on connect.
- * Other classes like MessageEncoder and MessageDecoder are also called 
- * automatically from the thread.
+ * Main class for WebSocket Handling. Some methods like @Onmessage, @onOpen etc.
+ * are automatically called from the Tyrus Thread created on connect. Other
+ * classes like MessageEncoder and MessageDecoder are also called automatically
+ * from the thread.
+ * 
  * @see MessageDecoder
  * @see MessageEncoder
  * */
@@ -46,9 +46,9 @@ public class WebsocketHandler {
 			+ " while you are invisible: please login as visible and repeat"
 			+ " this operation";
 
-	private static String WEBSERVER_IP = "localhost";
-	
-	/*the connection as been opened, wake up application class.*/
+	private static String WEBSERVER_IP = "79.46.241.126";
+
+	/* the connection as been opened, wake up application class. */
 	public final static Object monitor = 1;
 	public Timer timer;
 
@@ -351,7 +351,7 @@ public class WebsocketHandler {
 			return false;
 		}
 	}
-	
+
 	public void closeConnection() {
 		try {
 			ClientSession.close(new CloseReason(
@@ -360,16 +360,19 @@ public class WebsocketHandler {
 		}
 	}
 
-	/**static rerence of controller. ugly, but needed*/
+	/** static rerence of controller. ugly, but needed */
 	public static void setController(Controller c) {
 		controller = c;
 	}
 
 	private static CountDownLatch latch;
 
-	/**Attemp connection with the server.
+	/**
+	 * Attemp connection with the server.
+	 * 
 	 * @return the result of the connection in ConnectionResult format.
-	 * @see Model*/
+	 * @see Model
+	 */
 	public synchronized connectionResult AttemptConnection() throws IOException {
 
 		latch = new CountDownLatch(1);

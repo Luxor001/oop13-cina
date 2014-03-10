@@ -51,7 +51,7 @@ public abstract class SendReceiveFile {
 		fileStream.close();
 	}
 
-	public abstract void sendMessage(Object message) throws IOException;
+	public abstract void sendMessage(String message) throws IOException;
 
 	public abstract void sendMessage(ManagementFiles file, byte[] message,
 			int step) throws IOException;

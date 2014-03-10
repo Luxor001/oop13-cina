@@ -11,55 +11,82 @@ import java.net.Socket;
 
 import client_chat.Controller.MessageBoxReason;
 
-public class KeyStoreServer extends Thread {
+/**
+ * Creates a socket server.To accept a client you need to have router's port
+ * open.With this class it's possible to exchange keystores with the clients
+ * 
+ * @author Francesco Cozzolino
+ * 
+ */
+public class KeyStoreServer {
 
 	private ServerSocket serverSocket;
-	private ViewObserver controller;
 
-	public KeyStoreServer(ViewObserver controller) {
-
-		this.controller = controller;
+	/**
+	 * Starts new thread that accepts the clients for exchange keystores
+	 * 
+	 * @param controller
+	 * @see Controller
+	 */
+	public KeyStoreServer(final ViewObserver controller) {
 
 		try {
 
-			System.out.println("Keystore " + User.getPortKeyStore());
 			serverSocket = new ServerSocket(User.getPortKeyStore());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		new Thread(this).start();
-	}
 
-	public void run() {
-		while (true) {
-			try {
-				new TransferKeyStore(controller, serverSocket.accept()).start();
+		class Accept implements Runnable {
+			public void run() {
+				while (true) {
+					try {
+						new TransferKeyStore(controller, serverSocket.accept())
+								.start();
 
-			} catch (IOException e) {
+					} catch (IOException e) {
+					}
+				}
 			}
 		}
+		new Thread(new Accept()).start();
 	}
 
 	public void close() {
 		try {
 			serverSocket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * This class permits to exchange keystores with the clients
+	 * 
+	 * @author Francesco
+	 * 
+	 */
 	private static class TransferKeyStore extends Thread {
 		private Socket socket;
 		private ObjectInputStream ois = null;
 		private ObjectOutputStream oos = null;
 		private ViewObserver controller;
 
+		/**
+		 * 
+		 * @param controller
+		 * @param socket
+		 * 
+		 * @see Controller
+		 * @see Socket
+		 */
 		public TransferKeyStore(ViewObserver controller, Socket socket) {
 			this.socket = socket;
 			this.controller = controller;
 		}
 
+		/**
+		 * This thread exchange the keystores with the client
+		 */
 		public void run() {
 
 			File file = new File(System.getProperty("user.dir") + "/"
