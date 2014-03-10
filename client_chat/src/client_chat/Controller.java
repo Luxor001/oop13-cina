@@ -17,7 +17,8 @@ public class Controller implements ViewObserver {
 	private Object lockNotification = new Object();
 
 	public enum MessageBoxReason {
-		REQUEST_PRIVATE_CHAT, REQUEST_RECEIVE_FILE, ALERT_CLOSING_WINDOW
+		REQUEST_PRIVATE_CHAT, REQUEST_RECEIVE_FILE, ALERT_CLOSING_WINDOW,
+		FILESIZELIMIT
 	}
 
 	public void setView(ViewInterface view) {
@@ -177,6 +178,12 @@ public class Controller implements ViewObserver {
 			iconType = JOptionPane.WARNING_MESSAGE;
 			break;
 		}
+		case FILESIZELIMIT:{
+			message = "File size is too big! Limit is 25MB!";
+			title = "Error!";
+			options = new Object[] { "Ok"};
+			iconType = JOptionPane.ERROR_MESSAGE;
+		}
 		}
 
 		return view.buildChoiceMessageBox(message, title, options, iconType);
@@ -242,15 +249,7 @@ public class Controller implements ViewObserver {
 			WebsocketHandler.getWebSocketHandler().SendMex(message);
 
 		} else {
-
-			System.out.println("File's size over the limit of 25 Mb");
-			JOptionPane
-					.showOptionDialog(
-							null,
-							"Impossible send file.\nFile's size over the limit of 25 Mb",
-							"Alert", JOptionPane.PLAIN_MESSAGE,
-							JOptionPane.ERROR, null, null, null);
-
+			buildChoiceMessageBox(MessageBoxReason.FILESIZELIMIT, "ok");
 		}
 
 	}

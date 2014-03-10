@@ -4,7 +4,7 @@ import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-/*N.B. queste sono classi di prova, create per verificare la fattibilità del progetto,
+/*N.B. queste sono classi di prova, create per verificare la fattibilita del progetto,
  per questo motivo sono presenti indirizzi ip,porte,percorsi assoluti inseriti in modo manuale
  dal programmatore*/
 

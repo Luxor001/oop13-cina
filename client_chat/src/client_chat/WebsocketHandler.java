@@ -22,6 +22,15 @@ import client_chat.ChatMessage.Type;
 import client_chat.Controller.MessageBoxReason;
 import client_chat.Model.connectionResult;
 
+/**
+ * Main class for WebSocket Handling.
+ * Some methods like @Onmessage, @onOpen etc. are automatically called
+ * from the Tyrus Thread created on connect.
+ * Other classes like MessageEncoder and MessageDecoder are also called 
+ * automatically from the thread.
+ * @see MessageDecoder
+ * @see MessageEncoder
+ * */
 @ClientEndpoint(encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
 public class WebsocketHandler {
 
@@ -30,9 +39,6 @@ public class WebsocketHandler {
 
 	static Session ClientSession;
 	private static Controller controller;
-	// public static String NICKNAME = System.getProperty("user.name");// "Lux"
-	// +
-	// Math.random();
 	public static boolean VISIBLE_FLAG = true;
 	public static boolean RESET_FLAG_DELETE_ME = false;
 	private long PING_INTERVAL_SECONDS = 15;
@@ -40,7 +46,9 @@ public class WebsocketHandler {
 			+ " while you are invisible: please login as visible and repeat"
 			+ " this operation";
 
-	private static String WEBSERVER_IP = "79.46.241.126";
+	private static String WEBSERVER_IP = "localhost";
+	
+	/*the connection as been opened, wake up application class.*/
 	public final static Object monitor = 1;
 	public Timer timer;
 
@@ -343,7 +351,7 @@ public class WebsocketHandler {
 			return false;
 		}
 	}
-
+	
 	public void closeConnection() {
 		try {
 			ClientSession.close(new CloseReason(
@@ -352,21 +360,16 @@ public class WebsocketHandler {
 		}
 	}
 
+	/**static rerence of controller. ugly, but needed*/
 	public static void setController(Controller c) {
 		controller = c;
 	}
 
-	/*
-	 * public String getIP() throws IOException {
-	 * 
-	 * String surl = "http://vallentinsource.com/globalip.php"; URL url = new
-	 * URL(surl); InputStreamReader inpstrmread = new
-	 * InputStreamReader(url.openStream()); BufferedReader reader = new
-	 * BufferedReader(inpstrmread); String ip = reader.readLine(); return ip; }
-	 */
-
 	private static CountDownLatch latch;
 
+	/**Attemp connection with the server.
+	 * @return the result of the connection in ConnectionResult format.
+	 * @see Model*/
 	public synchronized connectionResult AttemptConnection() throws IOException {
 
 		latch = new CountDownLatch(1);
@@ -376,18 +379,10 @@ public class WebsocketHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		// sockethandler = new WebsocketHandler();
-		/* Attemp connection to web service */
 		try {
 
 			client.connectToServer(this, null, new URI("ws://" + WEBSERVER_IP
 					+ ":8080/ServerWebSocket/websocket"));
-			/*
-			 * client.connectToServer(WebsocketHandler.class, new URI(
-			 * "ws://localhost:8080/ServerWebSocket/websocket"));
-			 */
-
 		} catch (Exception e) {
 			if (e.getClass().isAssignableFrom(DeploymentException.class)) {
 				return connectionResult.TIMEOUT;
