@@ -17,8 +17,6 @@ public interface ViewObserver {
 
 	void commandCreateTab(String ip, int port, String name, String keystore);
 
-	// void commandConnectTo(String ip);
-
 	void commandReceiveMessage(String message, String title);
 
 	void commandRemoveUser(String name);

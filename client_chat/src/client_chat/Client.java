@@ -17,7 +17,6 @@ import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -26,11 +25,15 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
-/*N.B. queste sono classi di prova, create per verificare la fattibilit� del progetto,
- per questo motivo sono presenti indirizzi ip,porte,percorsi assoluti inseriti in modo manuale
- dal programmatore*/
-
+/**
+ * Create a SSl socket and attempts to connect to the server
+ * 
+ * 
+ * @author Francesco Cozzolino
+ * 
+ */
 public class Client extends SendReceiveFile implements Runnable {
+
 	private SSLSocketFactory sslSocketFactory = null;
 	private SSLSocket sslSocket = null;
 	private ObjectOutputStream oos = null;
@@ -39,7 +42,6 @@ public class Client extends SendReceiveFile implements Runnable {
 	private String ip;
 	private int port;
 	private String nameClient = User.getNickName();
-	private Semaphore s = new Semaphore(0);
 	private String nameServer = null;
 	private boolean resetTime = false;
 	private boolean stop = false;
@@ -50,9 +52,32 @@ public class Client extends SendReceiveFile implements Runnable {
 	private int id = 0;
 	private Model model;
 
+	/**
+	 * loads your own keystore and server's keystore you want to connect.Starts
+	 * a new thread that tries to connect to the server
+	 * 
+	 * 
+	 * @param ip
+	 *            ip address of server
+	 * @param port
+	 *            router's port of server
+	 * @param name
+	 *            name of user
+	 * @param password
+	 *            password of your keystore
+	 * @param controller
+	 * @param model
+	 * @param keyStore
+	 *            name of your keystore
+	 * @throws IOException
+	 *             if the keystore doesn't exist or the password is wrong
+	 * 
+	 * @see Controller
+	 * @see Model
+	 */
 	public Client(String ip, int port, String name, String password,
 			ViewObserver controller, Model model, String keyStore)
-			throws IOException, ClassNotFoundException {
+			throws IOException {
 
 		String path = System.getProperty("user.dir") + "/" + nameClient
 				+ "ClientKey.jks";
@@ -69,19 +94,14 @@ public class Client extends SendReceiveFile implements Runnable {
 		nameServer = name;
 
 		try {
-			// indico il tipo della chiave
 			keystore = KeyStore.getInstance("jks");
-			// carico la chiave
 			keystore.load(new FileInputStream(path), null);
 
-			// creo un'istanza che utilizza l'algoritmo "sunx509"
 			KeyManagerFactory clientKeyManager = KeyManagerFactory
 					.getInstance("SunX509");
 			clientKeyManager.init(keystore, passphrase);
 
-			// ottengo la chiave pubblica
 			KeyStore serverPub = KeyStore.getInstance("jks");
-			// successivamente verr� inviata dal webserver
 
 			serverPub.load(new FileInputStream(keyStore), null);
 
@@ -93,6 +113,11 @@ public class Client extends SendReceiveFile implements Runnable {
 			context.init(clientKeyManager.getKeyManagers(), trustManagers,
 					SecureRandom.getInstance("SHA1PRNG"));
 			sslSocketFactory = context.getSocketFactory();
+
+			new Thread(this).start();
+
+			latch.await();
+
 		} catch (KeyStoreException e) {
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
@@ -103,20 +128,18 @@ public class Client extends SendReceiveFile implements Runnable {
 			e.printStackTrace();
 		} catch (UnrecoverableKeyException e) {
 			e.printStackTrace();
-		}
-
-		// stabilisco la connessione con il server
-		new Thread(this).start();
-
-		try {
-			latch.await();
-			System.out.println("Ciaoo");
-		} catch (InterruptedException e) { // TODO Auto-generated catch block
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
 	}
 
+	/**
+	 * Thread tries to connect and listens input stream of server and show
+	 * messages or downlaod file that come from him.if is inactive for a minute
+	 * or more in both sending and receiving, the client will disconnect from
+	 * the server automatically
+	 */
 	public void run() {
 
 		class Timer extends Thread {
@@ -156,11 +179,8 @@ public class Client extends SendReceiveFile implements Runnable {
 		Timer t = null;
 		Map<Integer, DownloadFile> file = null;
 
-		System.out.println("Thread");
-
 		try {
 			synchronized (lockAll) {
-				System.out.println("Mi connetto a : " + port);
 				latch.countDown();
 				sslSocket = (SSLSocket) sslSocketFactory.createSocket(ip, port);
 				sslSocket.startHandshake();
@@ -198,12 +218,6 @@ public class Client extends SendReceiveFile implements Runnable {
 
 		}
 
-		System.out.println("** Sono connesso con il server **");
-		System.out.println("IP: " + sslSocket.getInetAddress());
-		System.out.println("Porta: " + sslSocket.getPort());
-
-		// leggo quello che mi arriva dal server
-
 		try {
 
 			sslSocket.close();
@@ -230,6 +244,15 @@ public class Client extends SendReceiveFile implements Runnable {
 
 	}
 
+	/**
+	 * Sends file to the server
+	 * 
+	 * @param path
+	 *            path of file
+	 * @throws IOException
+	 *             if it's impossible to send byte to the client or read byte
+	 *             from the file
+	 */
 	public void sendFile(String path) throws IOException {
 
 		File file = new File(path);
@@ -248,6 +271,18 @@ public class Client extends SendReceiveFile implements Runnable {
 		controller.commandReceiveMessage("File sent", nameServer);
 	}
 
+	/**
+	 * 
+	 * Sends chunk of bytes to the server
+	 * 
+	 * @param file
+	 * @param message
+	 *            bytes to send
+	 * @param step
+	 *            how many bytes to send
+	 * 
+	 * @see ManagementFiles
+	 */
 	public void sendMessage(ManagementFiles file, byte[] message, int step)
 			throws IOException {
 		synchronized (lockAll) {
@@ -273,7 +308,13 @@ public class Client extends SendReceiveFile implements Runnable {
 
 	}
 
-	public void sendMessage(Object message) throws IOException {
+	/**
+	 * Sends message to the client
+	 * 
+	 * @param message
+	 *            message to send
+	 */
+	public void sendMessage(String message) throws IOException {
 
 		System.out.println("messaggio");
 		synchronized (lockAll) {
@@ -296,6 +337,9 @@ public class Client extends SendReceiveFile implements Runnable {
 
 	}
 
+	/**
+	 * Close the client
+	 */
 	public void close() {
 		stop = true;
 		try {
@@ -305,7 +349,18 @@ public class Client extends SendReceiveFile implements Runnable {
 		}
 	}
 
-	public static String ObtainKeyStore(String ip, int port, String who) {
+	/**
+	 * Exchange keystore with the server of user you want to chat
+	 * 
+	 * @param ip
+	 *            ip address of user's server
+	 * @param port
+	 *            router's port of server
+	 * @param sender
+	 *            who sends request of chat. user or web server
+	 * 
+	 */
+	public static String ObtainKeyStore(String ip, int port, String sender) {
 
 		System.out.println("Mi connetto a keystore : " + port);
 		File file = new File(System.getProperty("user.dir") + "/"
@@ -322,7 +377,7 @@ public class Client extends SendReceiveFile implements Runnable {
 
 			oos.writeUTF(User.getNickName());
 			oos.flush();
-			oos.writeUTF(who);
+			oos.writeUTF(sender);
 			oos.flush();
 			name = ois.readUTF();
 
@@ -363,10 +418,21 @@ public class Client extends SendReceiveFile implements Runnable {
 		return name;
 	}
 
+	/**
+	 * 
+	 * @return ip address and port of server
+	 */
 	public String getIp() {
 		return ip + ":" + port;
 	}
 
+	/**
+	 * 
+	 * Returns the connection state of the server with the specific ip address
+	 * 
+	 * @return true if the server was successfully connected to the server
+	 * 
+	 */
 	public boolean isConnected() {
 
 		if (sslSocket == null) {
@@ -374,6 +440,12 @@ public class Client extends SendReceiveFile implements Runnable {
 		}
 		return sslSocket.isConnected();
 	}
+
+	/**
+	 * Returns the closed state of server
+	 * 
+	 * @return true if the client is closed
+	 */
 
 	public boolean isClosed() {
 		if (sslSocket == null) {

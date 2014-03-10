@@ -18,20 +18,37 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 
-public class Server implements Runnable {
+/**
+ * Creates a SSl socket server.To accept a client you need to have router's port
+ * open.
+ * 
+ * @author Francesco Cozzolino
+ * 
+ */
+public class Server {
 
 	private SSLServerSocket sslServerSocket;
-	private SSLServerSocketFactory sslServerSocketFactory = null;
-	// list of clients connected to server
-	private List<MessageFromClient> client = new ArrayList<>();
-	private ViewObserver controller;
-	private Model model;
+	private List<MessageFromToClient> client = new ArrayList<>();
 
-	public Server(ViewObserver controller, Model model, String password)
-			throws IOException, ClassNotFoundException {
+	/**
+	 * 
+	 * Loads the keystore and creates the server;will be listening on the
+	 * specified port in .ini file and starts a new thread that accepts the
+	 * clients that have server's keystore.
+	 * 
+	 * @param controller
+	 * @param model
+	 * @param password
+	 *            password of keystore
+	 * @throws IOException
+	 *             if the keystore doesn't exist or the password is wrong
+	 * @see Controller
+	 * @see Model
+	 */
+	public Server(final ViewObserver controller, final Model model,
+			String password) throws IOException, ClassNotFoundException {
 
-		this.controller = controller;
-		this.model = model;
+		SSLServerSocketFactory sslServerSocketFactory = null;
 
 		try {
 
@@ -44,7 +61,6 @@ public class Server implements Runnable {
 
 			serverKeyManager.init(serverKeys, password.toCharArray());
 
-			// creo il socket utilizzando il protocollo SSl
 			SSLContext ssl = SSLContext.getInstance("SSL");
 			ssl.init(serverKeyManager.getKeyManagers(), null,
 					SecureRandom.getInstance("SHA1PRNG"));
@@ -55,33 +71,41 @@ public class Server implements Runnable {
 			e.printStackTrace();
 		}
 
-		// creo il server
-		System.out.println("SSL " + User.getPortSSL());
 		sslServerSocket = (SSLServerSocket) sslServerSocketFactory
 				.createServerSocket(User.getPortSSL());
 		sslServerSocket.setNeedClientAuth(false);
-		new Thread(this).start();
 
-	}
+		class Accept implements Runnable {
 
-	public void run() {
+			public void run() {
 
-		System.out.println("In attesa di client...");
+				while (true) {
+					try {
 
-		while (true) {
-			try {
+						client.add(new MessageFromToClient(
+								(SSLSocket) sslServerSocket.accept(),
+								controller, model));
 
-				client.add(new MessageFromClient((SSLSocket) sslServerSocket
-						.accept(), controller, model));
+						new Thread(client.get(client.size() - 1)).start();
 
-				new Thread(client.get(client.size() - 1)).start();
+					} catch (IOException e1) {
+					}
+				}
 
-			} catch (IOException e1) {
 			}
 		}
+		new Thread(new Accept()).start();
 
 	}
 
+	/**
+	 * Send a message to the client with the specified name
+	 * 
+	 * @param message
+	 * @param name
+	 *            name of client
+	 * @return true if the client exist and is connected,false otherwise
+	 */
 	public synchronized boolean sendMessage(String message, String name) {
 
 		for (int i = 0; i < client.size(); i++) {
@@ -96,6 +120,15 @@ public class Server implements Runnable {
 		return false;
 	}
 
+	/**
+	 * Send a file to the client with the specified name
+	 * 
+	 * @param path
+	 *            path of file to send
+	 * @param name
+	 *            name of client
+	 * @return true if the client exist and is connected,false otherwise
+	 */
 	public synchronized boolean sendFile(String path, String name) {
 		for (int i = 0; i < client.size(); i++) {
 
@@ -104,9 +137,9 @@ public class Server implements Runnable {
 
 				class SendFile extends Thread {
 					private String path;
-					private MessageFromClient client;
+					private MessageFromToClient client;
 
-					public SendFile(String path, MessageFromClient client) {
+					public SendFile(String path, MessageFromToClient client) {
 						this.path = path;
 						this.client = client;
 					}
@@ -129,6 +162,13 @@ public class Server implements Runnable {
 		return false;
 	}
 
+	/**
+	 * Returns the connection state of the client with the specific ip address
+	 * 
+	 * @param ip
+	 *            Address of client
+	 * @return true if the client was successfully connected to the server
+	 */
 	public synchronized boolean isConnect(String ip) {
 
 		for (int i = 0; i < client.size(); i++) {
@@ -142,6 +182,9 @@ public class Server implements Runnable {
 		return false;
 	}
 
+	/**
+	 * Close the server
+	 */
 	public synchronized void close() {
 		while (client.size() > 0) {
 			client.get(client.size() - 1).sendMessage(null);
@@ -156,6 +199,11 @@ public class Server implements Runnable {
 		}
 	}
 
+	/**
+	 * Removes a client from the list of connected clients
+	 * 
+	 * @param ip
+	 */
 	public synchronized void closeClient(String ip) {
 		for (int i = 0; i < client.size(); i++) {
 			String[] split = client.get(i).getIp().split(":");
@@ -167,7 +215,14 @@ public class Server implements Runnable {
 		}
 	}
 
-	private static class MessageFromClient extends SendReceiveFile implements
+	/**
+	 * This class permits to sends/receives messages/files from/to other clients
+	 * that connect to the server
+	 * 
+	 * @author Francesco Cozzolino
+	 * 
+	 */
+	private static class MessageFromToClient extends SendReceiveFile implements
 			Runnable {
 
 		private ViewObserver controller;
@@ -184,8 +239,18 @@ public class Server implements Runnable {
 		private boolean close = false;
 		private Downloaded download;
 
-		public MessageFromClient(SSLSocket sslSocket, ViewObserver controller,
-				Model model) {
+		/**
+		 * 
+		 * @param sslSocket
+		 *            client connected to the server
+		 * @param controller
+		 * @param model
+		 * 
+		 * @see Controller
+		 * @see Model
+		 */
+		public MessageFromToClient(SSLSocket sslSocket,
+				ViewObserver controller, Model model) {
 			this.controller = controller;
 			this.sslSocket = sslSocket;
 			this.model = model;
@@ -203,13 +268,11 @@ public class Server implements Runnable {
 			}
 		}
 
+		/**
+		 * Thread listens input stream of client and show messages or downlaod
+		 * file that come from him
+		 */
 		public void run() {
-
-			System.out.println("** Un client si � connesso **");
-			System.out.println("IP: " + sslSocket.getInetAddress());
-			System.out.println("Porta: " + sslSocket.getPort());
-
-			// leggo quello che mi arriva dal client
 			try {
 
 				Object o;
@@ -255,6 +318,15 @@ public class Server implements Runnable {
 
 		}
 
+		/**
+		 * Sends file to the client
+		 * 
+		 * @param path
+		 *            path of file
+		 * @throws IOException
+		 *             if it's impossible to send byte to the client or read
+		 *             byte from the file
+		 */
 		public void sendFile(String path) throws IOException {
 
 			File file = new File(path);
@@ -273,7 +345,13 @@ public class Server implements Runnable {
 
 		}
 
-		public synchronized void sendMessage(Object message) {
+		/**
+		 * Sends message to the client
+		 * 
+		 * @param message
+		 *            message to send
+		 */
+		public synchronized void sendMessage(String message) {
 
 			if (!close) {
 				try {
@@ -296,6 +374,18 @@ public class Server implements Runnable {
 			}
 		}
 
+		/**
+		 * 
+		 * Sends chunk of bytes to the client
+		 * 
+		 * @param file
+		 * @param message
+		 *            bytes to send
+		 * @param step
+		 *            how many bytes to send
+		 * 
+		 * @see ManagementFiles
+		 */
 		public synchronized void sendMessage(ManagementFiles file,
 				byte[] message, int step) {
 
@@ -330,10 +420,22 @@ public class Server implements Runnable {
 			return nameClient;
 		}
 
+		/**
+		 * 
+		 * @return ip address and port of client
+		 */
 		public String getIp() {
 			return ip + ":" + port;
 		}
 
+		/**
+		 * 
+		 * Returns the connection state of the client with the specific ip
+		 * address
+		 * 
+		 * @return true if the client was successfully connected to the server
+		 * 
+		 */
 		public boolean isConnected() {
 			if (sslSocket == null) {
 				return false;
@@ -341,6 +443,11 @@ public class Server implements Runnable {
 			return sslSocket.isConnected();
 		}
 
+		/**
+		 * Returns the closed state of client
+		 * 
+		 * @return true if the client is closed
+		 */
 		public boolean isClosed() {
 			if (sslSocket == null) {
 				return true;

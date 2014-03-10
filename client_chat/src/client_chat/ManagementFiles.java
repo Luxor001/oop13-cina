@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 public class ManagementFiles implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6442953142693862910L;
 	private String fileName;
 	private int fileSize;
