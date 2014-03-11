@@ -26,16 +26,13 @@ public class KeyStoreServer {
 	 * Starts new thread that accepts the clients for exchange keystores
 	 * 
 	 * @param controller
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 * @see Controller
 	 */
-	public KeyStoreServer(final ViewObserver controller) {
+	public KeyStoreServer(final ViewObserver controller) throws IOException {
 
-		try {
-
-			serverSocket = new ServerSocket(User.getPortKeyStore());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		serverSocket = new ServerSocket(User.getPortKeyStore());
 
 		class Accept implements Runnable {
 			public void run() {
@@ -52,11 +49,13 @@ public class KeyStoreServer {
 		new Thread(new Accept()).start();
 	}
 
-	public void close() {
-		try {
-			serverSocket.close();
-		} catch (IOException e) {
-		}
+	/**
+	 * 
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	public void close() throws IOException {
+		serverSocket.close();
 	}
 
 	/**
@@ -91,9 +90,10 @@ public class KeyStoreServer {
 
 			File file = new File(System.getProperty("user.dir") + "/"
 					+ User.getNickName() + "ServerKey.jks");
-			try {
 
+			try {
 				ois = new ObjectInputStream(socket.getInputStream());
+
 				oos = new ObjectOutputStream(socket.getOutputStream());
 
 				String name = ois.readUTF();
@@ -143,10 +143,9 @@ public class KeyStoreServer {
 				socket.close();
 				fileStream.close();
 				outStream.close();
-
 			} catch (IOException e) {
-				e.printStackTrace();
 			}
+
 		}
 	}
 }

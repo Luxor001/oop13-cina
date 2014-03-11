@@ -55,6 +55,12 @@ import javax.swing.text.DefaultCaret;
  http://www.freesound.org/people/cameronmusic/sounds/138413/
  * */
 
+/**
+ * Generates an output representation to the user with a GUI
+ * 
+ * @author Francesco Cozzolino
+ * @author Stefano Belli
+ */
 public class View extends JFrame implements ViewInterface {
 
 	final private static String TITLE = "CryptoChat";
@@ -64,14 +70,13 @@ public class View extends JFrame implements ViewInterface {
 	final private static int VGAP = 10;
 	final private static int WIDTH_USERJLIST = 130;
 	Preferences prefs = Preferences.userRoot();
-	// Downloaded d;
+
 	private ViewObserver controller;
 
 	public enum sfx {
 		REQUEST, PLAIN_TEXT
 	}
 
-	// create Tabview
 	private JTabbedPane tabView = new JTabbedPane();
 	private JButton enter = new JButton("Send");
 	private JButton send = new JButton("Send File");
@@ -81,23 +86,19 @@ public class View extends JFrame implements ViewInterface {
 	private JMenu menu_help = new JMenu("Help");
 	private String icon_path = "resources/Icon.png";
 	private String frame_title = "CryptoChat";
-	private List<JTextArea> textList = new ArrayList<>(); /*
-														 * ## NEED TO IMPLEMENT
-														 * PRIVATE PROPERTY! ##
-														 */
+	private List<JTextArea> textList = new ArrayList<>();
 	private List<JTextArea> chatList = new ArrayList<>();
-	// private List<JScrollPane> scrollList = new ArrayList<>();
-	// create listview
-	private JList<String> usersJList; /*
-									 * it's not parametized, but oracle's
-									 * official docs use so
-									 */
+	private JList<String> usersJList;
 	private DefaultListModel<String> usersList = new DefaultListModel<String>();
 
+	/**
+	 * 
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
 	public View() throws IOException {
 
 		super(TITLE);
-		// this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setSize(WIDTH, HEIGTH);
 		this.buildGUI();
 		this.setAction();
@@ -106,6 +107,17 @@ public class View extends JFrame implements ViewInterface {
 
 	}
 
+	/**
+	 * Creates a GUI for the "main" channel and other components as menu,context
+	 * menu
+	 * 
+	 * 
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 * 
+	 * @author Francesco Cozzolino
+	 * @author Stefano Belli
+	 */
 	private void buildGUI() throws IOException {
 		JPanel mainPanel = new JPanel(new BorderLayout(HGAP, VGAP));
 		JPanel textPanel = new JPanel(new BorderLayout(HGAP, VGAP));
@@ -134,10 +146,8 @@ public class View extends JFrame implements ViewInterface {
 		menuBar.add(menu_help);
 
 		this.setJMenuBar(menuBar);
-		// add tabview to form
 		this.getContentPane().add(tabView);
 
-		/* add the adapter to intercept the exiting operation from the app */
 		this.addWindowListener(new CustomWindowAdapter(this));
 		chat.setLineWrap(true);
 		chat.setEditable(false);
@@ -147,29 +157,19 @@ public class View extends JFrame implements ViewInterface {
 		usersJList = new JList<String>(usersList);
 
 		JScrollPane scroll = new JScrollPane(usersJList);
-		// scroll.setAutoscrolls(true);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scroll.setPreferredSize(new Dimension(WIDTH_USERJLIST, usersJList
 				.getPreferredSize().height));
 
 		usersJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		// set dimension of userList
-
-		/*
-		 * usersJList.setPreferredSize(new Dimension(WIDTH_USERJLIST, usersJList
-		 * .getPreferredSize().height));
-		 */
 		usersJList.remove(0);
 
-		// add to the list a custom TextArea
 		textList.add(this.getMyText());
 		chatList.add(chat);
-		// scrollList.add(this.getMyScroll(chat));
 
 		south.add(enter);
 		south.add(send);
-		// add panel to the form
 		this.add(south, BorderLayout.SOUTH);
 
 		textPanel.add(textList.get(0), BorderLayout.CENTER);
@@ -188,9 +188,16 @@ public class View extends JFrame implements ViewInterface {
 
 	}
 
+	/**
+	 * Get the message from the textarea for writing message and shows the
+	 * message on the textarea sended/received message
+	 * 
+	 * @return message written on the textarea
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	public String sendMessage() {
 
-		// get the selected tab
 		int index = getTabIndex();
 		String message = textList.get(index).getText();
 		if (!message.equals("")) {
@@ -203,6 +210,12 @@ public class View extends JFrame implements ViewInterface {
 		return message;
 	}
 
+	/**
+	 * Close the selected tab
+	 * 
+	 * @author Francesco Cozzolino
+	 * 
+	 */
 	public void closeTab(ActionEvent e) {
 
 		JButton button = (JButton) e.getSource();
@@ -211,7 +224,6 @@ public class View extends JFrame implements ViewInterface {
 			JButton button1 = (JButton) panel.getComponent(1);
 			if (button.equals(button1)) {
 				tabView.remove(i);
-				// scrollList.remove(i);
 				chatList.remove(i);
 				textList.remove(i);
 				return;
@@ -220,6 +232,15 @@ public class View extends JFrame implements ViewInterface {
 		}
 	}
 
+	/**
+	 * Creates a new tab for a private chat with an user
+	 * 
+	 * @param title
+	 *            name for the tab
+	 * 
+	 * @author Francesco Cozzolino
+	 * 
+	 */
 	public void createTab(String title) {
 
 		int index = checkTab(title);
@@ -238,14 +259,10 @@ public class View extends JFrame implements ViewInterface {
 			chatList.add(chatTmp);
 			textList.add(this.getMyText());
 
-			// scrollList.add(this.getMyScroll(chatTmp));
-
 			textPanelTmp.add(textList.get(textList.size() - 1),
 					BorderLayout.CENTER);
 
-			main.add(
-			/* scrollList.get(textList.size() - 1) */getMyScroll(chatTmp),
-					BorderLayout.CENTER);
+			main.add(getMyScroll(chatTmp), BorderLayout.CENTER);
 			main.add(textPanelTmp, BorderLayout.SOUTH);
 
 			tabView.addTab(title, main);
@@ -265,6 +282,11 @@ public class View extends JFrame implements ViewInterface {
 		}
 	}
 
+	/**
+	 * Shows the received messages from other user in different tab
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	public void showMessage(String message, String title) {
 
 		int index = checkTab(title);
@@ -281,6 +303,11 @@ public class View extends JFrame implements ViewInterface {
 		}
 	}
 
+	/**
+	 * Shows the received message (written in main chat) from other users
+	 * 
+	 * @author Stefano Belli
+	 */
 	public void showMessageMain(String message) {
 
 		boolean dfsounds = User.getStoredSounds();
@@ -292,6 +319,11 @@ public class View extends JFrame implements ViewInterface {
 		chatList.get(0).append(" " + message + "\n");
 	}
 
+	/**
+	 * Set action event
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	private void setAction() {
 		enter.addActionListener(getActionListener());
 		send.addActionListener(getActionListener());
@@ -302,6 +334,14 @@ public class View extends JFrame implements ViewInterface {
 		tabView.addMouseListener(getMouseListener());
 	}
 
+	/**
+	 * Set the event of JButton and some component of JMenu
+	 * 
+	 * @return ActionListener object
+	 * 
+	 * @author Francesco Cozzolino
+	 * @author Stefano Belli
+	 */
 	private ActionListener getActionListener() {
 		return new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -352,7 +392,6 @@ public class View extends JFrame implements ViewInterface {
 						private JButton chat = new JButton("Chat");
 						private JPanel panel = new JPanel(null);
 						private String ip = "";
-						private int positiion = 100;
 
 						public ChatTo() {
 							frame.setTitle("Chat to");
@@ -458,6 +497,14 @@ public class View extends JFrame implements ViewInterface {
 		};
 	}
 
+	/**
+	 * Set event of JList,JTabbedPane and JMenu component
+	 * 
+	 * @return MouseAdapter object
+	 * 
+	 * @author Francesco Cozzolino
+	 * @author Stefano Belli
+	 */
 	private MouseAdapter getMouseListener() {
 		return new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -469,7 +516,6 @@ public class View extends JFrame implements ViewInterface {
 
 					}
 
-					// check if i click with righ mouse button
 					if (SwingUtilities.isRightMouseButton(e) && e.isMetaDown()
 							&& e.getClickCount() == 1) {
 
@@ -481,7 +527,6 @@ public class View extends JFrame implements ViewInterface {
 						Rectangle rSelection = usersJList.getCellBounds(sIndex,
 								sIndex + 1);
 						if (rSelection != null) {
-							// centerx allows to have a small offset
 							a.doPop(e, (int) rSelection.getCenterX(),
 									rSelection.y);
 						}
@@ -514,6 +559,13 @@ public class View extends JFrame implements ViewInterface {
 		};
 	}
 
+	/**
+	 * Defines what happens when you clicks on a button for sends message
+	 * 
+	 * @return KeyListener object
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	private KeyListener getKeyListener() {
 		return new KeyListener() {
 
@@ -523,7 +575,7 @@ public class View extends JFrame implements ViewInterface {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 
-					e.consume(); // ignore the key pressed
+					e.consume();
 					if (!textList.get(getTabIndex()).getText().trim().isEmpty()) {
 						new Thread() {
 							public void run() {
@@ -545,6 +597,16 @@ public class View extends JFrame implements ViewInterface {
 		this.controller = controller;
 	}
 
+	/**
+	 * 
+	 * Creates a JscrollPane
+	 * 
+	 * @param chat
+	 *            textarea for writes message
+	 * @return JScrollPane
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	private JScrollPane getMyScroll(JTextArea chat) {
 
 		JScrollPane scroll = new JScrollPane(chat);
@@ -553,6 +615,14 @@ public class View extends JFrame implements ViewInterface {
 		return scroll;
 	}
 
+	/**
+	 * 
+	 * Creates a JTextArea for shows written/received messages
+	 * 
+	 * @return JTextArea
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	private JTextArea getMyText() {
 		JTextArea text = new JTextArea();
 		text.setLineWrap(true);
@@ -563,18 +633,38 @@ public class View extends JFrame implements ViewInterface {
 		return text;
 	}
 
+	/**
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	public String getTitle() {
 		return usersJList.getSelectedValue();
 	}
 
+	/**
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	public String getTabName() {
 		return tabView.getTitleAt(getTabIndex());
 	}
 
+	/**
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	public int getTabIndex() {
 		return tabView.getSelectedIndex();
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param title
+	 * @return
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	private int checkTab(String title) {
 		for (int i = 0; i < tabView.getTabCount(); i++) {
 			if (tabView.getTitleAt(i).equals(title)) {
@@ -585,19 +675,30 @@ public class View extends JFrame implements ViewInterface {
 		return -1;
 	}
 
+	/**
+	 * 
+	 * @author Stefano Belli
+	 */
 	public int buildChoiceMessageBox(String Message, String title,
 			Object[] options, int IconType) {
-		// Object[] options = { "Yes, please", "No way!" };
 		int n = JOptionPane.showOptionDialog(this, Message, title,
 				JOptionPane.YES_NO_OPTION, IconType, null, options, null);
 
 		return n;
 	}
 
+	/**
+	 * 
+	 * @author Stefano Belli
+	 */
 	public void appendUser(String user) {
 		usersList.addElement(user);
 	}
 
+	/**
+	 * 
+	 * @author Stefano Belli
+	 */
 	public boolean removeUser(String user) {
 		boolean found = false;
 		for (int i = 0; i < usersList.size(); i++) {
@@ -624,6 +725,10 @@ public class View extends JFrame implements ViewInterface {
 		return found;
 	}
 
+	/**
+	 * 
+	 * @author Stefano Belli
+	 */
 	public void playSound(sfx soundeffect) {
 		String path = "";
 
@@ -653,6 +758,11 @@ public class View extends JFrame implements ViewInterface {
 
 	/* needed to intercept the action of closing window */
 
+	/**
+	 * 
+	 * @author Stefano Belli
+	 * 
+	 */
 	class CustomWindowAdapter extends WindowAdapter {
 
 		JFrame window = null;
@@ -661,7 +771,6 @@ public class View extends JFrame implements ViewInterface {
 			this.window = window;
 		}
 
-		// implement windowClosing method
 		public void windowClosing(WindowEvent e) {
 			controller.commandCloseAll();
 
@@ -682,6 +791,13 @@ public class View extends JFrame implements ViewInterface {
 
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param clickFromButton
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	public void sendFile(final boolean clickFromButton) {
 
 		chooser = new JFileChooser();
@@ -707,6 +823,10 @@ public class View extends JFrame implements ViewInterface {
 
 	}
 
+	/**
+	 * 
+	 * @author Francesco Cozzolino
+	 */
 	public void privateChat() {
 
 		new Thread() {
@@ -720,6 +840,12 @@ public class View extends JFrame implements ViewInterface {
 
 	}
 
+	/**
+	 * 
+	 * 
+	 * @author Stefano Belli
+	 * 
+	 */
 	private class PopUpDemo extends JPopupMenu {
 		private JMenuItem anItem;
 
@@ -752,7 +878,6 @@ public class View extends JFrame implements ViewInterface {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// View.This.notify()
 					System.out.println("Clicked Poke!");
 
 				}
@@ -761,16 +886,8 @@ public class View extends JFrame implements ViewInterface {
 
 		public void doPop(MouseEvent e, int x, int y) {
 
-			/*
-			 * this.setInvoker(e.getComponent()); this.setLocation(x, y);
-			 * this.setSize(this.getPreferredSize()); this.setVisible(true);
-			 */
 			this.show(e.getComponent(), x, y);
 
-			/*
-			 * PopUpDemo menu = new PopUpDemo(); menu.show(e.getComponent(), x,
-			 * y);
-			 */
 		}
 	}
 

@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -31,11 +30,11 @@ import javax.swing.border.Border;
 import net.java.balloontip.BalloonTip;
 
 /**
- * This class shows the entry screen of the application.
- * Here the user can select his entry nickname and if it's visible or not.
- * However it has not been implemented yet, here the user could select the 
- * main channel to connect.
- * This class references, for some uses, on the WebsocketHandler class and User.
+ * This class shows the entry screen of the application. Here the user can
+ * select his entry nickname and if it's visible or not. However it has not been
+ * implemented yet, here the user could select the main channel to connect. This
+ * class references, for some uses, on the WebsocketHandler class and User.
+ * 
  * @see User
  * @see WebsocketHandler
  * @author Stefano Belli
@@ -60,7 +59,6 @@ public class SplashScreen {
 	private JLabel loadingCircle = new JLabel();
 	private String icon_path = "resources/Icon.png";
 
-	private static int offsetcenter = 30;
 	private static int centerscaling;
 
 	public SplashScreen() throws IOException {
@@ -122,24 +120,26 @@ public class SplashScreen {
 
 		String dfnickname = User.getStoredNickname();
 		txt_nickname.setText(dfnickname);
-		
-		/*check if user has entered an invalid char..*/
-		txt_nickname.addKeyListener(new KeyListener() {			
+
+		/* check if user has entered an invalid char.. */
+		txt_nickname.addKeyListener(new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-			  String  invalidChars = "\\/:*?\"<>|";
+				String invalidChars = "\\/:*?\"<>|";
 				char keypressed = e.getKeyChar();
-			  
-				for(char c:invalidChars.toCharArray()){
-					if(c == keypressed){
+
+				for (char c : invalidChars.toCharArray()) {
+					if (c == keypressed) {
 						e.consume();
 					}
-				}			  
+				}
 			}
-			/*useless methods i must declare ç_ç*/
+
+			/* useless methods i must declare ç_ç */
 			@Override
 			public void keyReleased(KeyEvent e) {
-			}			
+			}
+
 			@Override
 			public void keyPressed(KeyEvent e) {
 			}
@@ -166,13 +166,12 @@ public class SplashScreen {
 		loadingCircle.setLocation(5, 5);
 		pnl_main.add(loadingCircle);
 		loadingCircle.setVisible(false);
-		
-	
+
 		btn_login.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {				
-				
+			public void actionPerformed(ActionEvent e) {
+
 				if (txt_nickname.getText().equals("")
 						|| txt_nickname.getText().length() > 12) {
 					BalloonTip bln_invalidnick = new BalloonTip(txt_nickname,
@@ -195,8 +194,8 @@ public class SplashScreen {
 	}
 
 	/**
-	 * Finds the centered X of the component, calculating it's size
-	 * and the frame size.
+	 * Finds the centered X of the component, calculating it's size and the
+	 * frame size.
 	 * */
 	public int CenteredX(Component a) {
 		return frameSize.x / 2 - (a.getSize().width / 2);
@@ -218,7 +217,7 @@ public class SplashScreen {
 		loadingCircle.setVisible(visibile);
 	}
 
-	/**shows an error tooltip for an invalid nickname*/
+	/** shows an error tooltip for an invalid nickname */
 	public void nicknameInvalid() {
 		BalloonTip bln_invalidnick = new BalloonTip(txt_nickname,
 				NICKNAME_ALREADY_USED_MESSAGE);

@@ -44,7 +44,7 @@ public class WebsocketHandler {
 			+ " while you are invisible: please login as visible and repeat"
 			+ " this operation";
 
-	private static String WEBSERVER_IP = "localhost";
+	private static String WEBSERVER_IP = "79.46.241.126";
 
 	/* the connection as been opened, wake up application class. */
 	public final static Object monitor = 1;
@@ -68,17 +68,17 @@ public class WebsocketHandler {
 	public void onOpen(Session session) throws IOException, EncodeException,
 			InterruptedException {
 
-		ClientSession = session;		
+		ClientSession = session;
 
-			ChatMessage Message = new ChatMessage("hello", Type.INITIALIZE);
-			Message.getAdditionalParams().setNickname(User.getNickName());
-			Message.getAdditionalParams().SetVisibility(User.getVisibility());
-			SendMex(Message); /* send my request of connection to the server */
-			
-			/*for "ping" messages*/
-			timer = new Timer();
-			timer.schedule(new PingTimer(), PING_INTERVAL_SECONDS * 1000,
-					PING_INTERVAL_SECONDS * 1000);
+		ChatMessage Message = new ChatMessage("hello", Type.INITIALIZE);
+		Message.getAdditionalParams().setNickname(User.getNickName());
+		Message.getAdditionalParams().SetVisibility(User.getVisibility());
+		SendMex(Message); /* send my request of connection to the server */
+
+		/* for "ping" messages */
+		timer = new Timer();
+		timer.schedule(new PingTimer(), PING_INTERVAL_SECONDS * 1000,
+				PING_INTERVAL_SECONDS * 1000);
 
 	}
 
@@ -235,6 +235,7 @@ public class WebsocketHandler {
 					controller.showMessageMain("Error during send of file");
 				}
 			}
+
 			Thread.sleep(500);
 
 			if (name != null) {
@@ -318,8 +319,8 @@ public class WebsocketHandler {
 	}
 
 	public void SendMex(ChatMessage Mex) throws IOException, EncodeException {
-		
-		/*if the user it's invisible, don't let him do critical actions*/
+
+		/* if the user it's invisible, don't let him do critical actions */
 		if (User.getVisibility() == false) {
 			if (Mex.getType() == Type.REQUESTSENDFILE
 					|| Mex.getType() == Type.REQUESTPRIVATECHAT
@@ -385,9 +386,8 @@ public class WebsocketHandler {
 	}
 
 	/**
-	 * Ping thread scheduled every PING_INTERVAL_SECONDS interval.
-	 * Those ping messages are necessary to keep the connection alive 
-	 * with the webserver.
+	 * Ping thread scheduled every PING_INTERVAL_SECONDS interval. Those ping
+	 * messages are necessary to keep the connection alive with the webserver.
 	 * */
 	public class PingTimer extends TimerTask {
 

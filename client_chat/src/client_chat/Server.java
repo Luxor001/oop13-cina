@@ -99,11 +99,11 @@ public class Server {
 	}
 
 	/**
-	 * Send a message to the client with the specified name
+	 * Tries to send a message to the client with the specified name
 	 * 
 	 * @param message
 	 * @param name
-	 *            name of client
+	 *            user's name of client side
 	 * @return true if the client exist and is connected,false otherwise
 	 */
 	public synchronized boolean sendMessage(String message, String name) {
@@ -121,7 +121,7 @@ public class Server {
 	}
 
 	/**
-	 * Send a file to the client with the specified name
+	 * Tries to send a file to the client with the specified name
 	 * 
 	 * @param path
 	 *            path of file to send
@@ -129,31 +129,20 @@ public class Server {
 	 *            name of client
 	 * @return true if the client exist and is connected,false otherwise
 	 */
-	public synchronized boolean sendFile(String path, String name) {
+	public synchronized boolean sendFile(final String path, String name) {
 		for (int i = 0; i < client.size(); i++) {
 
 			if (!client.get(i).isClosed() && client.get(i).isConnected()
 					&& client.get(i).getNameClient().equals(name)) {
 
-				class SendFile extends Thread {
-					private String path;
-					private MessageFromToClient client;
+				final MessageFromToClient clientTmp = client.get(i);
 
-					public SendFile(String path, MessageFromToClient client) {
-						this.path = path;
-						this.client = client;
-					}
-
+				new Thread() {
 					public void run() {
-						try {
-							client.sendFile(path);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
+						clientTmp.sendFile(path);
 
-				new SendFile(path, client.get(i)).start();
+					}
+				}.start();
 
 				return true;
 			}
@@ -184,19 +173,19 @@ public class Server {
 
 	/**
 	 * Close the server
+	 * 
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
-	public synchronized void close() {
+	public synchronized void close() throws IOException {
 		while (client.size() > 0) {
 			client.get(client.size() - 1).sendMessage(null);
 			client.remove(client.size() - 1);
 
 		}
 
-		try {
-			sslServerSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		sslServerSocket.close();
+
 	}
 
 	/**
@@ -230,7 +219,6 @@ public class Server {
 		private ObjectInputStream ois = null;
 		private ObjectOutputStream oos = null;
 		private SSLSocket sslSocket;
-		private String nameServer = User.getNickName();
 		private String nameClient = null;
 		private String ip = "";
 		private int id = 0;
@@ -287,8 +275,7 @@ public class Server {
 				while ((o = ois.readObject()) != null) {
 					if (o instanceof ManagementFiles) {
 
-						receiveFile(o, nameClient + nameServer, ois, download,
-								file);
+						receiveFile(o, nameClient, ois, download, file);
 
 					} else {
 						controller.commandReceiveMessage(nameClient + " : "
@@ -323,11 +310,8 @@ public class Server {
 		 * 
 		 * @param path
 		 *            path of file
-		 * @throws IOException
-		 *             if it's impossible to send byte to the client or read
-		 *             byte from the file
 		 */
-		public void sendFile(String path) throws IOException {
+		public void sendFile(String path) {
 
 			File file = new File(path);
 			ManagementFiles managementFile;
@@ -340,8 +324,13 @@ public class Server {
 						(int) file.length());
 			}
 
-			super.sendFile(file, nameClient, managementFile, download);
-			controller.commandReceiveMessage("File sent", nameClient);
+			try {
+				super.sendFile(file, nameClient, managementFile, download);
+				controller.commandReceiveMessage("File sent", nameClient);
+			} catch (IOException e) {
+				controller.commandReceiveMessage("Impossible send file",
+						nameClient);
+			}
 
 		}
 
@@ -358,6 +347,8 @@ public class Server {
 					oos.writeObject(message);
 					oos.flush();
 				} catch (IOException e) {
+					controller.commandReceiveMessage("Impossible send message",
+							nameClient);
 					try {
 						oos.close();
 						ois.close();
@@ -400,6 +391,7 @@ public class Server {
 					oos.write(message, 0, step);
 					oos.flush();
 				} catch (IOException e) {
+
 					try {
 						oos.close();
 						ois.close();
@@ -430,8 +422,7 @@ public class Server {
 
 		/**
 		 * 
-		 * Returns the connection state of the client with the specific ip
-		 * address
+		 * Returns the connection state
 		 * 
 		 * @return true if the client was successfully connected to the server
 		 * 
