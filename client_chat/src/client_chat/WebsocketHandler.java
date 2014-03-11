@@ -39,14 +39,12 @@ public class WebsocketHandler {
 
 	static Session ClientSession;
 	private static Controller controller;
-	public static boolean VISIBLE_FLAG = true;
-	public static boolean RESET_FLAG_DELETE_ME = false;
 	private long PING_INTERVAL_SECONDS = 15;
 	public static String UNABLE_VISIBLE_MESSAGE = "You can't perform this operation"
 			+ " while you are invisible: please login as visible and repeat"
 			+ " this operation";
 
-	private static String WEBSERVER_IP = "79.46.241.126";
+	private static String WEBSERVER_IP = "localhost";
 
 	/* the connection as been opened, wake up application class. */
 	public final static Object monitor = 1;
@@ -70,28 +68,17 @@ public class WebsocketHandler {
 	public void onOpen(Session session) throws IOException, EncodeException,
 			InterruptedException {
 
-		System.out.println("Sending my INITIALIZE message..");
-
-		ClientSession = session;
-		if (RESET_FLAG_DELETE_ME) {
-			ChatMessage message = new ChatMessage("reset", Type.RESETFLAG);
-			SendMex(message);
-			RESET_FLAG_DELETE_ME = false;
-		} else {
+		ClientSession = session;		
 
 			ChatMessage Message = new ChatMessage("hello", Type.INITIALIZE);
 			Message.getAdditionalParams().setNickname(User.getNickName());
-			// Message.getAdditionalParams().setNickname(NICKNAME);
-			Message.getAdditionalParams().SetVisibility(VISIBLE_FLAG);
+			Message.getAdditionalParams().SetVisibility(User.getVisibility());
 			SendMex(Message); /* send my request of connection to the server */
-
-			System.out.println("Sent!");
-
+			
+			/*for "ping" messages*/
 			timer = new Timer();
 			timer.schedule(new PingTimer(), PING_INTERVAL_SECONDS * 1000,
 					PING_INTERVAL_SECONDS * 1000);
-
-		}
 
 	}
 
@@ -124,9 +111,7 @@ public class WebsocketHandler {
 			}
 
 			synchronized (WebsocketHandler.monitor) {
-				System.out.println("Waiting");
 				monitor.wait();
-				System.out.println("escaped");
 			}
 			SendMex(new ChatMessage("userlist", Type.USERLIST));
 
@@ -333,7 +318,9 @@ public class WebsocketHandler {
 	}
 
 	public void SendMex(ChatMessage Mex) throws IOException, EncodeException {
-		if (!VISIBLE_FLAG) {
+		
+		/*if the user it's invisible, don't let him do critical actions*/
+		if (User.getVisibility() == false) {
 			if (Mex.getType() == Type.REQUESTSENDFILE
 					|| Mex.getType() == Type.REQUESTPRIVATECHAT
 					|| Mex.getType() == Type.TEXT) {
@@ -397,6 +384,11 @@ public class WebsocketHandler {
 		return connectionResult.OK;
 	}
 
+	/**
+	 * Ping thread scheduled every PING_INTERVAL_SECONDS interval.
+	 * Those ping messages are necessary to keep the connection alive 
+	 * with the webserver.
+	 * */
 	public class PingTimer extends TimerTask {
 
 		@Override
@@ -405,12 +397,8 @@ public class WebsocketHandler {
 				if (WebsocketHandler.getWebSocketHandler().isConnected()) {
 					WebsocketHandler.getWebSocketHandler().SendMex(
 							new ChatMessage("alive", ChatMessage.Type.PING));
-
-					System.out.println("PING!");
 				} else {
-					System.out.println("Abort!");
 					this.cancel();
-
 				}
 			} catch (Exception e) {
 			}

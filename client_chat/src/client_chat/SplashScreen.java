@@ -181,7 +181,7 @@ public class SplashScreen {
 				} else {
 					try {
 						User.setNickName(txt_nickname.getText());
-						// WebsocketHandler.NICKNAME = txt_nickname.getText();
+						User.setVisibility(chb_visible.isSelected());
 						Application.chat_initialization();
 					} catch (IOException e1) {
 					}
@@ -189,15 +189,6 @@ public class SplashScreen {
 				}
 			}
 		});
-
-		chb_visible.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				WebsocketHandler.VISIBLE_FLAG = chb_visible.isSelected();
-			}
-		});
-
 
 		frame.setResizable(false);
 		frame.setVisible(true);

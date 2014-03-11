@@ -33,13 +33,7 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 	private int TIMEOUT_SECONDS=45;
 	
 	@OnOpen
-	public void onOpen(Session newSession){ // ## METODO CHIAMATO QUANDO UN CLIENT SI CONNETTE ##
-				
-	//	clientSessions.add(newSession);
-	/*	ChatMessage Message=new ChatMessage("PROVA", Type.INITIALIZE);
-		Message.appendAdditionalParams("Nickname", "Lux");
-		SendMex(Message, newSession);*/
-		
+	public void onOpen(Session newSession){ // ## METODO CHIAMATO QUANDO UN CLIENT SI CONNETTE ##	
 	}
 	
 	@OnClose
@@ -128,7 +122,7 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 			Param addp=new Param();
 			addp.setNickname(searchUser(clientsession).GetNickname());
 			message.setAdditionalParams(addp);
-			sendGlobalMex(message,clientsession);
+			sendBroadcast(message,clientsession);
 		}
 		
 		if(message.getType() == Type.REQUESTPRIVATECHAT
@@ -211,11 +205,20 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 		 }
 	 }
 	 
-	 public void sendGlobalMex(ChatMessage Mex,Session exclude) throws IOException, EncodeException{
+	public void sendBroadcast(ChatMessage Mex,Session exclude) throws IOException, EncodeException{
 		 for (User cUser:UsersList.values()) {
-			 if(!cUser.GetSession().equals(exclude) && 
-					 cUser.GetState() == State.VISIBLE)
+			 if(!cUser.GetSession().equals(exclude)){
 				 sendMex(Mex,cUser.GetSession());		 
+			 }
+		 }
+	 }
+	 
+	 public void sendGlobalMex(ChatMessage mex,Session exclude) throws IOException, EncodeException{
+		 for (User cUser:UsersList.values()) {
+			 if(!cUser.GetSession().equals(exclude) &&
+					 cUser.GetState() == State.VISIBLE){
+					 sendMex(mex,cUser.GetSession());	
+			 }
 		 }
 	 }
 	 
