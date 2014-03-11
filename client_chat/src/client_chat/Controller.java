@@ -74,7 +74,7 @@ public class Controller implements ViewObserver {
 	}
 
 	/**
-	 * Sends message to a specific user or at everybody
+	 * Sends message to a specific user or to everybody
 	 * 
 	 * @param message
 	 *            message to send
@@ -219,8 +219,9 @@ public class Controller implements ViewObserver {
 	}
 
 	/**
+	 * Writes directly in the "main" chat.
 	 * @param
-	 * 
+	 * 		 the plain text message to show.
 	 * @author Stefano Belli
 	 */
 	public synchronized void showMessageMain(String Message) {
@@ -228,18 +229,21 @@ public class Controller implements ViewObserver {
 	}
 
 	/**
-	 * 
-	 * @param user
+	 * calls the correspective view class method to append a 
+	 * user in the JList of users.
+	 * @param the user to append
 	 * 
 	 * @author Stefano Belli
+	 * @see View
 	 */
 	public void appendUser(String user) {
 		this.view.appendUser(user);
 	}
 
 	/**
-	 * 
-	 * @param user
+	 * calls the correspective view class method to remove a 
+	 * user in the JList of users.
+	 * @param the user to remove
 	 * @return
 	 * 
 	 * @author Stefano Belli
@@ -249,8 +253,9 @@ public class Controller implements ViewObserver {
 	}
 
 	/**
-	 * 
-	 * 
+	 * Method called from the view class to notify that a closing attempt
+	 * of the chat has been invoked.
+	 * Here the closing handshake with the server is sent.
 	 * @author Stefano Belli
 	 */
 	public void notifyClosing() throws IOException, EncodeException {
@@ -259,7 +264,9 @@ public class Controller implements ViewObserver {
 	}
 
 	/**
-	 * 
+	 * Creates a standard JOptionPane based on a MessageBoxReason message.
+	 * @param 
+	 * @param Optional informations like the nickname of the sender, etc.
 	 * @author Stefano Belli
 	 */
 	public int buildChoiceMessageBox(MessageBoxReason reason,
@@ -415,7 +422,8 @@ public class Controller implements ViewObserver {
 	}
 
 	/**
-	 * 
+	 * close the application.
+	 * Handles all the closing handshakes of the connection.
 	 * @author Stefano Belli
 	 */
 	public void closeChat() throws IOException, EncodeException {

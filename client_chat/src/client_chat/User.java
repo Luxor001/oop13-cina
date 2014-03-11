@@ -10,6 +10,7 @@ import java.util.prefs.Preferences;
 public class User {
 
 	private static String NICKNAME = "";
+	private static boolean VISIBILITY=true;
 	private static String IPUSER = null;
 	private static int PORTKEYSTORE = 0;
 	private static int PORTSSL = 0;
@@ -28,6 +29,12 @@ public class User {
 		PORTKEYSTORE = port;
 	}
 
+	public static void setVisibility(boolean vis){
+		VISIBILITY=vis;
+	}
+	public static boolean getVisibility(){
+		return VISIBILITY;
+	}
 	public static void setPortSSL(int port) {
 		PORTSSL = port;
 	}

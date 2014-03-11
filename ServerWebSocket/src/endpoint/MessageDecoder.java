@@ -58,12 +58,10 @@ public class MessageDecoder implements Decoder.Text<ChatMessage> {
 
 	  @Override
 	  public void init(EndpointConfig ec) {
-	    System.out.println("MessageDecoder -init method called");
 	  }
 
 	  @Override
 	  public void destroy() {
-	    System.out.println("MessageDecoder - destroy method called");
 	  }
 
 
