@@ -62,7 +62,7 @@ public class Client extends SendReceiveFile implements Runnable {
 	 * @param port
 	 *            router's port of server
 	 * @param name
-	 *            name of user
+	 *            user's name of server side
 	 * @param password
 	 *            password of your keystore
 	 * @param controller
@@ -119,17 +119,11 @@ public class Client extends SendReceiveFile implements Runnable {
 			latch.await();
 
 		} catch (KeyStoreException e) {
-			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
 		} catch (CertificateException e) {
-			e.printStackTrace();
 		} catch (KeyManagementException e) {
-			e.printStackTrace();
 		} catch (UnrecoverableKeyException e) {
-			e.printStackTrace();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 
 	}
@@ -205,7 +199,7 @@ public class Client extends SendReceiveFile implements Runnable {
 			while ((o = ois.readObject()) != null) {
 				if (o instanceof ManagementFiles) {
 
-					receiveFile(o, nameServer + nameClient, ois, download, file);
+					receiveFile(o, nameServer, ois, download, file);
 				} else {
 					controller.commandReceiveMessage(nameServer + " : "
 							+ (String) o, nameServer);
@@ -249,11 +243,8 @@ public class Client extends SendReceiveFile implements Runnable {
 	 * 
 	 * @param path
 	 *            path of file
-	 * @throws IOException
-	 *             if it's impossible to send byte to the client or read byte
-	 *             from the file
 	 */
-	public void sendFile(String path) throws IOException {
+	public void sendFile(String path) {
 
 		File file = new File(path);
 		ManagementFiles managementFile;
@@ -266,9 +257,14 @@ public class Client extends SendReceiveFile implements Runnable {
 					(int) file.length());
 		}
 
-		super.sendFile(file, nameServer, managementFile, download);
+		try {
+			super.sendFile(file, nameServer, managementFile, download);
+			controller.commandReceiveMessage("File sent", nameServer);
+		} catch (IOException e) {
+			controller
+					.commandReceiveMessage("Impossible send file", nameServer);
+		}
 
-		controller.commandReceiveMessage("File sent", nameServer);
 	}
 
 	/**
@@ -296,6 +292,7 @@ public class Client extends SendReceiveFile implements Runnable {
 					oos.write(message, 0, step);
 					oos.flush();
 				} catch (IOException e) {
+
 					sslSocket.close();
 					model.closeServer(nameServer);
 					oos.close();
@@ -316,16 +313,16 @@ public class Client extends SendReceiveFile implements Runnable {
 	 */
 	public void sendMessage(String message) throws IOException {
 
-		System.out.println("messaggio");
 		synchronized (lockAll) {
 
-			System.out.println(message);
 			if (sslSocket.isConnected() && !sslSocket.isClosed()) {
 				try {
 					resetTime = true;
 					oos.writeObject(message);
 					oos.flush();
 				} catch (IOException e) {
+					controller.commandReceiveMessage("Impossible send message",
+							nameServer);
 					sslSocket.close();
 					model.closeServer(nameServer);
 					oos.close();
@@ -362,7 +359,6 @@ public class Client extends SendReceiveFile implements Runnable {
 	 */
 	public static String ObtainKeyStore(String ip, int port, String sender) {
 
-		System.out.println("Mi connetto a keystore : " + port);
 		File file = new File(System.getProperty("user.dir") + "/"
 				+ User.getNickName() + "ServerKey.jks");
 		String name = "";
@@ -428,7 +424,7 @@ public class Client extends SendReceiveFile implements Runnable {
 
 	/**
 	 * 
-	 * Returns the connection state of the server with the specific ip address
+	 * Returns the connection state
 	 * 
 	 * @return true if the server was successfully connected to the server
 	 * 
