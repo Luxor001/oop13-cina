@@ -64,7 +64,7 @@ import javax.swing.text.DefaultCaret;
 @SuppressWarnings("serial")
 public class View extends JFrame implements ViewInterface {
 
-	public enum sfx {
+	public enum SFX {
 		REQUEST,
 		PLAIN_TEXT
 	}
@@ -318,7 +318,7 @@ public class View extends JFrame implements ViewInterface {
 
 		if (getTabIndex() != 0 && dfsounds) {
 			tabView.setBackgroundAt(0, Color.ORANGE);
-			playSound(sfx.PLAIN_TEXT);
+			playSound(SFX.PLAIN_TEXT);
 		}
 		chatList.get(0).append(" " + message + "\n");
 	}
@@ -718,6 +718,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
+	 *JOptionPane building method, usually called from Controller class.
 	 * 
 	 * @author Stefano Belli
 	 */
@@ -730,6 +731,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
+	 * Appends the given user in the JList of users.
 	 * 
 	 * @author Stefano Belli
 	 */
@@ -769,9 +771,12 @@ public class View extends JFrame implements ViewInterface {
 
 	/**
 	 * 
+	 * Play a SFX based on the given SFX enum type variable.
++	 * The soundeffects file address are stored here.
+	 * 
 	 * @author Stefano Belli
 	 */
-	public void playSound(sfx soundeffect) {
+	public void playSound(SFX soundeffect) {
 		String path = "";
 
 		switch (soundeffect) {
@@ -859,6 +864,11 @@ public class View extends JFrame implements ViewInterface {
 	
 	/**
 	 * 
+	 *  
+	 * Catches the closing attempt of the window.
+	 * Here all the closing connections stream methods of Controller are
+	 * called.
+	 * 
 	 * @author Stefano Belli
 	 * 
 	 */
@@ -886,7 +896,7 @@ public class View extends JFrame implements ViewInterface {
 
 
 	/**
-	 * 
+	 * Refers to the "context menu" created by right clicking an username.
 	 * 
 	 * @author Stefano Belli
 	 * 
