@@ -1,5 +1,6 @@
 package client_chat;
 
+import client_chat.View.SFX;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +9,6 @@ import javax.swing.JOptionPane;
 import javax.websocket.EncodeException;
 
 import client_chat.ChatMessage.Type;
-import client_chat.View.sfx;
 
 /**
  * Can send commands to the model to update data structure and can send commands
@@ -295,7 +295,7 @@ public class Controller implements ViewObserver {
 			title = "Private Chat";
 			options = new Object[] { "Yes", "No Way!" };
 			iconType = JOptionPane.WARNING_MESSAGE;
-			view.playSound(sfx.REQUEST);
+			view.playSound(SFX.REQUEST);
 			break;
 		}
 
@@ -305,7 +305,7 @@ public class Controller implements ViewObserver {
 			title = "Receiving File";
 			options = new Object[] { "Yes", "No Way!" };
 			iconType = JOptionPane.WARNING_MESSAGE;
-			view.playSound(sfx.REQUEST);
+			view.playSound(SFX.REQUEST);
 			break;
 		}
 

@@ -14,7 +14,7 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 /**
- * This class shows the JFrame associated with the credits of the application.
+ * Shows the JFrame associated with the credits of the application.
  * it uses a JTextPane as main component for displaying the credits. * 
  * @author Stefano Belli
  * */
