@@ -56,17 +56,11 @@ public class MyServerEndpoint implements ServletContextListener{ //http://mjtool
 		}
 	}
 
+	
 	@OnMessage
 	public void onMessage(ChatMessage message, Session clientsession) throws IOException,
 			EncodeException {
 
-		/*RESET THE SERVER*/
-		if(message.getType() == ChatMessage.Type.RESETFLAG){
-			for(User a:UsersList.values()){
-				a.GetSession().close();
-				removeUser(a);				
-			}			
-		}
 		if(message.getType() == ChatMessage.Type.INITIALIZE){ /*connection request from client*/
 			String UserNickname=message.getAdditionalParams().getNickname();
 			Boolean UserVisibility=message.getAdditionalParams().getVisibility();

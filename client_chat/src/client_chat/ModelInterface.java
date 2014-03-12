@@ -35,8 +35,6 @@ public interface ModelInterface {
 	void closeServer(String name);
 
 	void connectToServer(String ip, int port, String name, String keyStore);
-
-	WebsocketHandler getSocketHandler();
 	
 	public void setSocketPorts() throws IOException;
 }
