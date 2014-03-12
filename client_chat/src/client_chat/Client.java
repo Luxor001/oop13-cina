@@ -81,7 +81,6 @@ public class Client extends SendReceiveFile implements Runnable {
 
 		String path = System.getProperty("user.dir") + "/" + nameClient
 				+ "ClientKey.jks";
-		char[] passphrase = password.toCharArray();
 		KeyStore keystore;
 		TrustManagerFactory tmf;
 		SSLContext context;
@@ -99,7 +98,7 @@ public class Client extends SendReceiveFile implements Runnable {
 
 			KeyManagerFactory clientKeyManager = KeyManagerFactory
 					.getInstance("SunX509");
-			clientKeyManager.init(keystore, passphrase);
+			clientKeyManager.init(keystore, password.toCharArray());
 
 			KeyStore serverPub = KeyStore.getInstance("jks");
 

@@ -61,22 +61,24 @@ import javax.swing.text.DefaultCaret;
  * @author Francesco Cozzolino
  * @author Stefano Belli
  */
+@SuppressWarnings("serial")
 public class View extends JFrame implements ViewInterface {
 
+	public enum sfx {
+		REQUEST,
+		PLAIN_TEXT
+	}
+
+	
 	final private static String TITLE = "CryptoChat";
 	final private static int WIDTH = 600;
 	final private static int HEIGTH = 400;
 	final private static int HGAP = 10;
 	final private static int VGAP = 10;
 	final private static int WIDTH_USERJLIST = 130;
+
 	Preferences prefs = Preferences.userRoot();
-
 	private ViewObserver controller;
-
-	public enum SFX {
-		REQUEST, PLAIN_TEXT
-	}
-
 	private JTabbedPane tabView = new JTabbedPane();
 	private JButton enter = new JButton("Send");
 	private JButton send = new JButton("Send File");
@@ -188,27 +190,6 @@ public class View extends JFrame implements ViewInterface {
 
 	}
 
-	/**
-	 * Get the message from the textarea for writing message and shows the
-	 * message on the textarea sended/received message
-	 * 
-	 * @return message written on the textarea
-	 * 
-	 * @author Francesco Cozzolino
-	 */
-	public String sendMessage() {
-
-		int index = getTabIndex();
-		String message = textList.get(index).getText();
-		if (!message.equals("")) {
-			chatList.get(index).append(
-					" " + User.getNickName() + ": " + message + "\n");
-			textList.get(index).setText("");
-			textList.get(index).requestFocus();
-		}
-
-		return message;
-	}
 
 	/**
 	 * Close the selected tab
@@ -283,6 +264,29 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
+	 * Get the message from the textarea for writing message and shows the
+	 * message on the textarea sended/received message
+	 * 
+	 * @return message written on the textarea
+	 * 
+	 * @author Francesco Cozzolino
+	 */
+	public String sendMessage() {
+
+		int index = getTabIndex();
+		String message = textList.get(index).getText();
+		if (!message.equals("")) {
+			chatList.get(index).append(
+					" " + User.getNickName() + ": " + message + "\n");
+			textList.get(index).setText("");
+			textList.get(index).requestFocus();
+		}
+
+		return message;
+	}
+	
+	
+	/**
 	 * Shows the received messages from other user in different tabs
 	 * 
 	 * @author Francesco Cozzolino
@@ -314,7 +318,7 @@ public class View extends JFrame implements ViewInterface {
 
 		if (getTabIndex() != 0 && dfsounds) {
 			tabView.setBackgroundAt(0, Color.ORANGE);
-			playSound(SFX.PLAIN_TEXT);
+			playSound(sfx.PLAIN_TEXT);
 		}
 		chatList.get(0).append(" " + message + "\n");
 	}
@@ -335,14 +339,19 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
-	 * Set the event of JButton and some component of JMenu. When you press
-	 * JButton "Send",is invoked the routine for send a message. When you click
-	 * on JMenuItem "exit",is invoked the routine for exit from chat.When you
-	 * click on "x" in a tab,is invoked the routine for close the selected
-	 * tab.When you click on JMenuItem "Downloads",is invoked the routine for
-	 * shows frame of downloads.When you click on JMenuItem "Preferences",is
-	 * invoked the routine for shows frame of preferences.When you press JButton
-	 * "Send file", is invoked the routine for send a file to a specific user
+	 * Set the event of JButton and some component of JMenu:
+	 * 
+	 * When you press JButton "Send",is invoked the routine for send a message.
+	 * When you clickon JMenuItem "exit",is invoked the routine for exit from
+	 * chat.
+	 * When you click on "x" in a tab,is invoked the routine for close the
+	 * selected tab.
+	 * When you click on JMenuItem "Downloads",is invoked the routine for shows
+	 * frame of downloads.
+	 * When you click on JMenuItem "Preferences",is invoked the routine for 
+	 * shows frame of preferences.
+	 * When you press JButton"Send file", is invoked the routine for send a file
+	 * to a specific user
 	 * 
 	 * 
 	 * @return ActionListener object
@@ -354,7 +363,8 @@ public class View extends JFrame implements ViewInterface {
 		return new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				if (e.getActionCommand().equals("Send")) {
+				switch (e.getActionCommand()) {
+				case "Send":{
 					new Thread() {
 						public void run() {
 							controller.commandSendMessage(sendMessage(),
@@ -362,32 +372,37 @@ public class View extends JFrame implements ViewInterface {
 						}
 					}.start();
 				}
-				if (e.getActionCommand().equals("Exit")) {
+					break;
+
+				case "Exit":{
 					try {
 						controller.closeChat();
 					} catch (Exception e1) {
 					}
 				}
+					break;
 
-				if (e.getActionCommand().equals("x")) {
+				case "x":{
 					controller.commandCloseTab(e);
 				}
+					break;
 
-				if (e.getActionCommand().equals("Downloads")) {
+				case "Downloads":{
 					controller.commandShowDownloads();
 				}
-				if (e.getActionCommand().equals("Preferences")) {
+					break;
+				case "Preferences":{
 					controller.commandShowPreferences();
 				}
-				if (e.getActionCommand().equals("Send File")) {
-
+					break;
+				case "Send File":{
 					if (!getTabName().equals("Main")) {
 						sendFile(true);
 					}
 				}
+					break;
 
-				if (e.getActionCommand().equals("Chat to..")) {
-
+				case "Chat to..":{
 					class ChatTo {
 						private JFrame frame = new JFrame();
 						private JTextArea txtIp = new JTextArea();
@@ -500,19 +515,23 @@ public class View extends JFrame implements ViewInterface {
 					}
 					new ChatTo();
 				}
+					break;
+				}
 
 			}
 		};
 	}
 
 	/**
-	 * Set event of JList,JTabbedPane and JMenu component. When you click two
-	 * times on an item from JList,is invoked the routine for a private chat
-	 * with this user. When you right click on an item from JList,shows a
-	 * context menu with some option like as private chat,send file,poke. When
-	 * you click on JMenuItem "Help",is shows a frame with credits. When you
-	 * click on a tab, if it was an another color than the default (a message
-	 * has arrived),is reset to the default color
+	 * Set event of JList,JTabbedPane and JMenu component:
+	 * 
+	 *When you click two times on an item from JList,is invoked the routine 
+	 *for a private chat with this user.
+	 *When you right click on an item from JList,shows a context menu with some
+	 *option like as private chat,send file,poke.
+	 *When you click on JMenuItem "Help",is shows a frame with credits.
+	 *When you click on a tab, if it was an another color than the default 
+	 *(a message has arrived),is reset to the default color
 	 * 
 	 * @return MouseAdapter object
 	 * 
@@ -553,7 +572,7 @@ public class View extends JFrame implements ViewInterface {
 							new Thread() {
 								public void run() {
 									try {
-										Credits a = new Credits();
+										new Credits();
 									} catch (BadLocationException e) {
 									}
 								};
@@ -623,6 +642,7 @@ public class View extends JFrame implements ViewInterface {
 	 * 
 	 * @author Francesco Cozzolino
 	 */
+	
 	private JScrollPane getMyScroll(JTextArea chat) {
 
 		JScrollPane scroll = new JScrollPane(chat);
@@ -654,7 +674,7 @@ public class View extends JFrame implements ViewInterface {
 	 * 
 	 * @author Francesco Cozzolino
 	 */
-	public String getTitle() {
+	private String getTitleTab() {
 		return usersJList.getSelectedValue();
 	}
 
@@ -698,7 +718,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
-	 * JOptionPane building method, usually called from Controller class.
+	 * 
 	 * @author Stefano Belli
 	 */
 	public int buildChoiceMessageBox(String Message, String title,
@@ -710,7 +730,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
-	 * Appends the given user in the JList of users.
+	 * 
 	 * @author Stefano Belli
 	 */
 	public void appendUser(String user) {
@@ -741,17 +761,17 @@ public class View extends JFrame implements ViewInterface {
 				}
 
 				new RemoveUser(user).start();
+
 			}
 		}
 		return found;
 	}
 
 	/**
-	 * Play a SFX based on the given SFX enum type variable.
-	 * The soundeffects file address are stored here.
+	 * 
 	 * @author Stefano Belli
 	 */
-	public void playSound(SFX soundeffect) {
+	public void playSound(sfx soundeffect) {
 		String path = "";
 
 		switch (soundeffect) {
@@ -778,13 +798,70 @@ public class View extends JFrame implements ViewInterface {
 		}
 	}
 
+	
+	public void closeChat() throws IOException {
+
+		this.dispose();
+		Application.start();
+
+	}
+
 	/**
-	 * Catches the closing attempt of the window.
-	 * Here all the closing connections stream methods of Controller are
-	 * called.
+	 * Shows a JFileChooser that permits to select a file to send. Once time you
+	 * chooses the file, is invoked the routine for to send the file
+	 * 
+	 * @param clickFromButton
+	 * 
+	 * @author Francesco Cozzolino
+	 */
+	private void sendFile(final boolean clickFromButton) {
+
+		chooser = new JFileChooser();
+
+		int returnVal = chooser.showDialog(new JButton("Send"), "Send");
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			new Thread() {
+				public void run() {
+					try {
+						String name = "";
+						if (clickFromButton) {
+							name = getTabName();
+						} else {
+							name = getTitleTab();
+						}
+						controller.notifySendFileUser(chooser.getSelectedFile()
+								.getAbsolutePath(), name);
+					} catch (Exception e) {
+					}
+				}
+			}.start();
+		}
+
+	}
+
+	/**
+	 * Invokes the routine for send a request of private chat
+	 * 
+	 * @author Francesco Cozzolino
+	 */
+	private void privateChat() {
+
+		new Thread() {
+			public void run() {
+				try {
+					controller.notifyChatUser(getTitleTab());
+				} catch (Exception e1) {
+				}
+			}
+		}.start();
+
+	}
+	
+	/**
+	 * 
 	 * @author Stefano Belli
 	 * 
-	 * */
+	 */
 	class CustomWindowAdapter extends WindowAdapter {
 
 		JFrame window = null;
@@ -806,66 +883,11 @@ public class View extends JFrame implements ViewInterface {
 		}
 	}
 
-	public void closeChat() throws IOException {
 
-		this.dispose();
-		Application.start();
-
-	}
 
 	/**
-	 * Shows a JFileChooser that permits to select a file to send. Once time you
-	 * chooses the file, is invoked the routine for to send the file
 	 * 
-	 * @param clickFromButton
 	 * 
-	 * @author Francesco Cozzolino
-	 */
-	public void sendFile(final boolean clickFromButton) {
-
-		chooser = new JFileChooser();
-
-		int returnVal = chooser.showDialog(new JButton("Send"), "Send");
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			new Thread() {
-				public void run() {
-					try {
-						String name = "";
-						if (clickFromButton) {
-							name = getTabName();
-						} else {
-							name = getTitle();
-						}
-						controller.notifySendFileUser(chooser.getSelectedFile()
-								.getAbsolutePath(), name);
-					} catch (Exception e) {
-					}
-				}
-			}.start();
-		}
-
-	}
-
-	/**
-	 * Invokes the routine for send a request of private chat
-	 * 
-	 * @author Francesco Cozzolino
-	 */
-	public void privateChat() {
-
-		new Thread() {
-			public void run() {
-				try {
-					controller.notifyChatUser(getTitle());
-				} catch (Exception e1) {
-				}
-			}
-		}.start();
-
-	}
-
-	/**
-	 * Refers to the "context menu" created by right clicking an username.
 	 * @author Stefano Belli
 	 * 
 	 */

@@ -5,6 +5,14 @@ import java.io.IOException;
 
 import javax.websocket.EncodeException;
 
+/**
+ * The observer interface for control the view and data structure for a chat.
+ * The class that is interested to manage the GUI and data structure of a chat
+ * implements this interface
+ * 
+ * @author Francesco Cozzolino
+ * @author Stefano Belli
+ */
 public interface ViewObserver {
 
 	void commandSendMessage(String message, String name);

@@ -34,20 +34,25 @@ import client_chat.Model.connectionResult;
 @ClientEndpoint(encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
 public class WebsocketHandler {
 
+	
+	public static String UNABLE_VISIBLE_MESSAGE = "You can't perform this operation"
+			+ " while you are invisible: please login as visible and repeat"
+			+ " this operation";
+	public final static Object monitor = 1;
+	
 	/* Let's make this a sigleton class, shall we? */
 	private final static WebsocketHandler wshandler = new WebsocketHandler();
 
 	static Session ClientSession;
 	private static Controller controller;
 	private long PING_INTERVAL_SECONDS = 15;
-	public static String UNABLE_VISIBLE_MESSAGE = "You can't perform this operation"
-			+ " while you are invisible: please login as visible and repeat"
-			+ " this operation";
+	
 
 	private static String WEBSERVER_IP = "79.46.241.126";
+	private static CountDownLatch latch;
 
 	/* the connection as been opened, wake up application class. */
-	public final static Object monitor = 1;
+	
 	public Timer timer;
 
 	private WebsocketHandler() {
@@ -352,8 +357,6 @@ public class WebsocketHandler {
 	public static void setController(Controller c) {
 		controller = c;
 	}
-
-	private static CountDownLatch latch;
 
 	/**
 	 * Attemp connection with the server.
