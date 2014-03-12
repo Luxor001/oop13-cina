@@ -2,6 +2,14 @@ package client_chat;
 
 import java.io.IOException;
 
+/**
+ * The model interface for define a data structure for a chat. The class that is
+ * interested to developing a data structure for a chat implements this
+ * interface
+ * 
+ * @author Francesco Cozzolino
+ * @author Stefano Belli
+ */
 public interface ModelInterface {
 
 	void attachViewObserver(ViewObserver controller);
@@ -35,6 +43,8 @@ public interface ModelInterface {
 	void closeServer(String name);
 
 	void connectToServer(String ip, int port, String name, String keyStore);
-	
+
+	WebsocketHandler getSocketHandler();
+
 	public void setSocketPorts() throws IOException;
 }

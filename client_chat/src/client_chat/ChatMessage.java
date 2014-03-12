@@ -3,7 +3,7 @@ package client_chat;
 import java.util.ArrayList;
 
 /** Class that describes the "Object" messages sent from (and to) the users
- * The below class is then converted in json format by MessageEncoder.java class * 
+ * The below class is then converted in json format by MessageEncoder.java class 
  * Please note that this class is equal to the server correspective.
  * @author Stefano Belli
  */
