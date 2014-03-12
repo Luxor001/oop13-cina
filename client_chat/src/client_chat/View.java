@@ -283,7 +283,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
-	 * Shows the received messages from other user in different tab
+	 * Shows the received messages from other user in different tabs
 	 * 
 	 * @author Francesco Cozzolino
 	 */
@@ -335,7 +335,15 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
-	 * Set the event of JButton and some component of JMenu
+	 * Set the event of JButton and some component of JMenu. When you press
+	 * JButton "Send",is invoked the routine for send a message. When you click
+	 * on JMenuItem "exit",is invoked the routine for exit from chat.When you
+	 * click on "x" in a tab,is invoked the routine for close the selected
+	 * tab.When you click on JMenuItem "Downloads",is invoked the routine for
+	 * shows frame of downloads.When you click on JMenuItem "Preferences",is
+	 * invoked the routine for shows frame of preferences.When you press JButton
+	 * "Send file", is invoked the routine for send a file to a specific user
+	 * 
 	 * 
 	 * @return ActionListener object
 	 * 
@@ -498,7 +506,13 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
-	 * Set event of JList,JTabbedPane and JMenu component
+	 * Set event of JList,JTabbedPane and JMenu component. When you click two
+	 * times on an item from JList,is invoked the routine for a private chat
+	 * with this user. When you right click on an item from JList,shows a
+	 * context menu with some option like as private chat,send file,poke. When
+	 * you click on JMenuItem "Help",is shows a frame with credits. When you
+	 * click on a tab, if it was an another color than the default (a message
+	 * has arrived),is reset to the default color
 	 * 
 	 * @return MouseAdapter object
 	 * 
@@ -560,7 +574,9 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
-	 * Defines what happens when you clicks on a button for sends message
+	 * When you press enter key (from keyboard) and the cursor of mouse is
+	 * focused in JTextarea for sends message,invokes the routine for sends
+	 * message
 	 * 
 	 * @return KeyListener object
 	 * 
@@ -634,6 +650,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
+	 * @return the selected value from JList
 	 * 
 	 * @author Francesco Cozzolino
 	 */
@@ -642,6 +659,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
+	 * @return the name of current tab
 	 * 
 	 * @author Francesco Cozzolino
 	 */
@@ -650,6 +668,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
+	 * @return the index of current tab
 	 * 
 	 * @author Francesco Cozzolino
 	 */
@@ -659,9 +678,12 @@ public class View extends JFrame implements ViewInterface {
 
 	/**
 	 * 
+	 * Check if a tab with a specific name exist
 	 * 
 	 * @param title
-	 * @return
+	 *            name of tab
+	 * @return an index that represent the position of tab, returns -1 if
+	 *         doesn't exist a tab with that title
 	 * 
 	 * @author Francesco Cozzolino
 	 */
@@ -756,8 +778,6 @@ public class View extends JFrame implements ViewInterface {
 		}
 	}
 
-	/* needed to intercept the action of closing window */
-
 	/**
 	 * 
 	 * @author Stefano Belli
@@ -792,7 +812,8 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
-	 * 
+	 * Shows a JFileChooser that permits to select a file to send. Once time you
+	 * chooses the file, is invoked the routine for to send the file
 	 * 
 	 * @param clickFromButton
 	 * 
@@ -824,6 +845,7 @@ public class View extends JFrame implements ViewInterface {
 	}
 
 	/**
+	 * Invokes the routine for send a request of private chat
 	 * 
 	 * @author Francesco Cozzolino
 	 */
