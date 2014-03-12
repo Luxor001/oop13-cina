@@ -3,7 +3,7 @@ package client_chat;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 
-import client_chat.View.sfx;
+import client_chat.View.SFX;
 
 public interface ViewInterface {
 
@@ -32,7 +32,7 @@ public interface ViewInterface {
 
     boolean removeUser(String user);
     
-    public void playSound(sfx soundeffect);
+    public void playSound(SFX soundeffect);
     
     public void closeChat() throws IOException;
 }

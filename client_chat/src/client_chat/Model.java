@@ -36,7 +36,6 @@ public class Model implements ModelInterface {
 	private KeyStoreServer keyStoreServer;
 	private Map<String, String> peopleChat = new HashMap<>();
 	private Map<String, String> peopleIp = new HashMap<>();
-	private WebsocketHandler sockethandler;
 	private Object lockPeopleChat = new Object();
 	private Object lockPeopleIp = new Object();
 
@@ -102,7 +101,7 @@ public class Model implements ModelInterface {
 	}
 
 	/**
-	 * Show frame of downloads
+	 * Show the JFrame of downloads
 	 * 
 	 * @author Stefano Belli
 	 */
@@ -114,7 +113,7 @@ public class Model implements ModelInterface {
 	}
 
 	/**
-	 * Show frame of preferences
+	 * Show the JFrame of preferences
 	 * 
 	 * @author Stefano Belli
 	 */
@@ -477,15 +476,10 @@ public class Model implements ModelInterface {
 	}
 
 	/**
-	 * 
-	 * @author Stefano Belli
-	 */
-	public WebsocketHandler getSocketHandler() {
-		return sockethandler;
-	}
-
-	/**
-	 * 
+	 * Check if config/conf.config file exists and, if not, build it with
+	 * default indentation.
+	 * In addition, it checks also if the ports entered are valid or not,
+	 * and shows an error message otherwise.
 	 * 
 	 * @author Stefano Belli
 	 */
