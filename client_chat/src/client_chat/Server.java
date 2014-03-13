@@ -42,10 +42,10 @@ public class Server {
 	 *            password of keystore
 	 * @throws IOException
 	 *             if the keystore doesn't exist or the password is wrong
-	 * @see Controller
-	 * @see Model
+	 * @see ViewObserver
+	 * @see ModelInterface
 	 */
-	public Server(final ViewObserver controller, final Model model,
+	public Server(final ViewObserver controller, final ModelInterface model,
 			String password) throws IOException, ClassNotFoundException {
 
 		SSLServerSocketFactory sslServerSocketFactory = null;
@@ -215,7 +215,7 @@ public class Server {
 			Runnable {
 
 		private ViewObserver controller;
-		private Model model;
+		private ModelInterface model;
 		private ObjectInputStream ois = null;
 		private ObjectOutputStream oos = null;
 		private SSLSocket sslSocket;
@@ -234,11 +234,11 @@ public class Server {
 		 * @param controller
 		 * @param model
 		 * 
-		 * @see Controller
-		 * @see Model
+		 * @see ViewObserver
+		 * @see ModelInterface
 		 */
 		public MessageFromToClient(SSLSocket sslSocket,
-				ViewObserver controller, Model model) {
+				ViewObserver controller, ModelInterface model) {
 			this.controller = controller;
 			this.sslSocket = sslSocket;
 			this.model = model;

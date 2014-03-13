@@ -50,7 +50,7 @@ public class Client extends SendReceiveFile implements Runnable {
 	private Object lock = new Object();
 	private Object lockAll = new Object();
 	private int id = 0;
-	private Model model;
+	private ModelInterface model;
 
 	/**
 	 * loads your own keystore and server's keystore you want to connect.Starts
@@ -72,11 +72,11 @@ public class Client extends SendReceiveFile implements Runnable {
 	 * @throws IOException
 	 *             if the keystore doesn't exist or the password is wrong
 	 * 
-	 * @see Controller
-	 * @see Model
+	 * @see ViewObserver
+	 * @see ModelInterface
 	 */
 	public Client(String ip, int port, String name, String password,
-			ViewObserver controller, Model model, String keyStore)
+			ViewObserver controller, ModelInterface model, String keyStore)
 			throws IOException {
 
 		String path = System.getProperty("user.dir") + "/" + nameClient

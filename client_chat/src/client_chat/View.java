@@ -628,6 +628,7 @@ public class View extends JFrame implements ViewInterface {
 		};
 	}
 
+	
 	public void attachViewObserver(ViewObserver controller) {
 		this.controller = controller;
 	}

@@ -48,5 +48,9 @@ public interface ViewObserver {
 			String... optsender);
 
 	public void closeChat() throws IOException, EncodeException;
+	
+	public void setView(ViewInterface view);
+	
+	public void setModel(ModelInterface view);
 
 }
