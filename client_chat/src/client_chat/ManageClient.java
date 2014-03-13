@@ -13,7 +13,7 @@ public class ManageClient {
 
 	private List<Client> client = new ArrayList<>();
 	private ViewObserver controller;
-	private Model model;
+	private ModelInterface model;
 	private String password;
 
 	/**
@@ -23,10 +23,10 @@ public class ManageClient {
 	 * @param password
 	 *            password of keystore
 	 * 
-	 * @see Controller
-	 * @see Model
+	 * @see ViewObserver
+	 * @see ModelInterface
 	 */
-	public ManageClient(ViewObserver controller, Model model, String password) {
+	public ManageClient(ViewObserver controller, ModelInterface model, String password) {
 		this.controller = controller;
 		this.model = model;
 		this.password = password;

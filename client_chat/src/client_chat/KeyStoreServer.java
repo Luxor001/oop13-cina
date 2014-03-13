@@ -28,7 +28,7 @@ public class KeyStoreServer {
 	 * @param controller
 	 * @throws IOException
 	 *             if an I/O error occurs
-	 * @see Controller
+	 * @see ViewObserver
 	 */
 	public KeyStoreServer(final ViewObserver controller) throws IOException {
 

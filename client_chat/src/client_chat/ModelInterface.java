@@ -44,5 +44,7 @@ public interface ModelInterface {
 
 	void connectToServer(String ip, int port, String name, String keyStore);
 
-	public void setSocketPorts() throws IOException;
+	void setSocketPorts() throws IOException;
+	
+	Downloaded getDownloaded();
 }
