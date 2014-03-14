@@ -556,7 +556,7 @@ public class View extends JFrame implements ViewInterface {
 					if (SwingUtilities.isRightMouseButton(e) && e.isMetaDown()
 							&& e.getClickCount() == 1) {
 
-						PopUpDemo a = new PopUpDemo();
+						Popup a = new Popup();
 
 						int sIndex = usersJList.locationToIndex(e.getPoint());
 						usersJList.setSelectedIndex(sIndex);
@@ -913,10 +913,10 @@ public class View extends JFrame implements ViewInterface {
 	 * @author Stefano Belli
 	 * 
 	 */
-	private class PopUpDemo extends JPopupMenu {
+	private class Popup extends JPopupMenu {
 		private JMenuItem anItem;
 
-		public PopUpDemo() {
+		public Popup() {
 			anItem = new JMenuItem("Private Chat (ssl)");
 			add(anItem);
 			anItem.addActionListener(new ActionListener() {

@@ -11,7 +11,7 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import mainChat.Model.connectionResult;
+import webSocket.WebsocketHandler.connectionResult;
 
 public class Application {
 
@@ -33,7 +33,6 @@ public class Application {
 		} catch (AlreadyLockedException e) {
 			alreadyRunning = true;
 		}
-		alreadyRunning=false;
 		if (!alreadyRunning) {
 			start(); // Start sequence here
 		}else{
