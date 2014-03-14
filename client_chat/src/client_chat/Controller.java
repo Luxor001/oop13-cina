@@ -228,8 +228,8 @@ public class Controller implements ViewObserver {
 	 *            plain text message to show.
 	 * @author Stefano Belli
 	 */
-	public synchronized void showMessageMain(String Message) {
-		this.view.showMessageMain(Message);
+	public synchronized void showMessageMain(String message) {
+		this.view.showMessageMain(message);
 	}
 
 	/**

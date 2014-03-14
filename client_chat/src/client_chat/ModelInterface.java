@@ -1,6 +1,5 @@
 package client_chat;
 
-import java.io.IOException;
 
 /**
  * The model interface for define a data structure for a chat. The class that is
@@ -44,7 +43,5 @@ public interface ModelInterface {
 
 	void connectToServer(String ip, int port, String name, String keyStore);
 
-	void setSocketPorts() throws IOException;
-	
 	Downloaded getDownloaded();
 }

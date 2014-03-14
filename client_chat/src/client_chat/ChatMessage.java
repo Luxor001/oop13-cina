@@ -41,19 +41,19 @@ public class ChatMessage {
 	public ChatMessage() {
 	}
 
-	public ChatMessage(String message, Type MessageType) {
+	public ChatMessage(String message, Type messageType) {
 		this.message = message;
-		this.messageType = MessageType;
+		this.messageType = messageType;
 	}
 
-	public ChatMessage(String message, Type MessageType, Param additionalParams) {
+	public ChatMessage(String message, Type messageType, Param additionalParams) {
 		this.message = message;
-		this.messageType = MessageType;
+		this.messageType = messageType;
 		this.additionalParams = additionalParams;
 	}
 
-	public void setType(Type MessageType) {
-		this.messageType = MessageType;
+	public void setType(Type messageType) {
+		this.messageType = messageType;
 	}
 
 	public Type getType() {
@@ -107,8 +107,8 @@ public class ChatMessage {
 		private String KEYPort;
 
 		
-		public void setNickname(String Nick) {
-			nickname = Nick;
+		public void setNickname(String nick) {
+			nickname = nick;
 		}
 		public void setFileName(String fileName) {
 			this.fileName = fileName;
@@ -139,8 +139,8 @@ public class ChatMessage {
 		 * Append a user in the usersList field, needed for a 
 		 * USERSLIST Chatmessage Type.
 		 * */
-		public void appendUser(String UserNickname) {
-			usersList.add(UserNickname);
+		public void appendUser(String userNickname) {
+			usersList.add(userNickname);
 		}
 
 		public String getIP() {

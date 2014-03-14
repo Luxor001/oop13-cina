@@ -17,6 +17,8 @@ public class Application {
 	private static String programName = "Cryptochat";
 	private static String ERROR_DUPLICATE_STRING = "Only one instance of "
 			+ "Cryptochat\n can be run at time";
+	public static boolean granted = false;
+	public static boolean loaded = false;
 
 	public static void main(String[] args) throws IOException {
 
@@ -28,6 +30,7 @@ public class Application {
 		} catch (AlreadyLockedException e) {
 			alreadyRunning = true;
 		}
+		alreadyRunning=false;
 		if (!alreadyRunning) {
 			start(); // Start sequence here
 		}else{
@@ -39,6 +42,7 @@ public class Application {
 	}
 
 	public static void start() throws IOException {
+		User.loadConfigFile();
 		splash = new SplashScreen();
 	}
 
@@ -62,12 +66,12 @@ public class Application {
 					if (result == connectionResult.TIMEOUT && userchoice == 0) {
 
 						splash.setVisibilityLoadingCircle(false);
+						
 						userchoice = splash.buildChoiceMessageBox(
-								"Chat Channel is not responding,"
-										+ "\nconnection failed",
-								"Connection Failed", new Object[] {
-										"Reconnect", "Cancel" },
+								"Chat Channel is not responding,\nconnection failed",
+								"Connection Failed", new Object[] {"Reconnect", "Cancel" },
 								JOptionPane.ERROR_MESSAGE);
+						
 						splash.setFrameEnabled(true);
 					}
 				} while ((result == connectionResult.TIMEOUT && userchoice == 0));
@@ -84,15 +88,14 @@ public class Application {
 
 	}
 
-	public static boolean granted = false;
-	public static boolean loaded = false;
 
 	public static void draw() throws IOException, InterruptedException {
 
-		/* websockethandler has received response for INITIALIZE from server */
+		/* websockethandler has received response for INITIALIZE from server
+		 * let's build the GUI */
 		synchronized (WebsocketHandler.monitor) {
 			WebsocketHandler.monitor.wait();
-			if (granted == false) {
+			if (granted == false) { /* the server rejected the connection*/
 				splash.nicknameInvalid();
 				splash.setVisibilityLoadingCircle(false);
 				splash.setFrameEnabled(true);
@@ -102,7 +105,7 @@ public class Application {
 		}
 		splash.setVisibilityLoadingCircle(false);
 		Model m = new Model();
-		m.setSocketPorts();
+		//m.getSocketPorts();
 		Controller c = new Controller();
 		View v = new View();
 		c.setView(v);
@@ -110,7 +113,7 @@ public class Application {
 
 		WebsocketHandler.setController(c);
 
-		/* chat window builded, websockethandler can now list the players. */
+		/* the GUI has been builded, websockethandler can now list the players. */
 		synchronized (WebsocketHandler.monitor) {
 			WebsocketHandler.monitor.notifyAll();
 		}

@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.Line;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -316,7 +318,7 @@ public class View extends JFrame implements ViewInterface {
 
 		boolean dfsounds = User.getStoredSounds();
 
-		if (getTabIndex() != 0 && dfsounds) {
+		if ((getTabIndex() != 0 && dfsounds) || !this.isFocused()) {
 			tabView.setBackgroundAt(0, Color.ORANGE);
 			playSound(SFX.PLAIN_TEXT);
 		}
@@ -786,22 +788,29 @@ public class View extends JFrame implements ViewInterface {
 			break;
 
 		case PLAIN_TEXT:
-			path = "resources/sfx/plain.wav";
+			path = "resources/sfx/plain.wav"; 
 			break;
 		}
-
+		
 		try {
+			final Clip clip = (Clip)AudioSystem.getLine(new Line.Info(Clip.class));
 
-			AudioInputStream audioIn = AudioSystem
-					.getAudioInputStream(new File(path));
-			// Get a sound clip resource.
-			Clip clip = AudioSystem.getClip();
-			// Open audio clip and load samples from the audio input stream.
-			clip.open(audioIn);
-			clip.start();
+	        clip.addLineListener(new LineListener()
+	        {
+	            @Override
+	            public void update(LineEvent event)
+	            {
+	                if (event.getType() == LineEvent.Type.STOP)
+	                    clip.close();
+	            }
+	        });
+
+	        clip.open(AudioSystem.getAudioInputStream(new File(path)));
+	        clip.start();
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 		}
+		
 	}
 
 	

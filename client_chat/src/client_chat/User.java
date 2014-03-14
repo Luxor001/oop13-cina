@@ -1,10 +1,17 @@
 package client_chat;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.prefs.Preferences;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  * This class offers static methods for set/get user information like as
@@ -22,6 +29,7 @@ public class User {
 	private static String IPUSER = null;
 	private static int PORTKEYSTORE = 0;
 	private static int PORTSSL = 0;
+	private static String WEBSERVER_IP;
 	private static Preferences prefs = Preferences.userRoot();
 
 	private enum PrefType {
@@ -220,6 +228,79 @@ public class User {
 	 */
 	public static void setStoredPath(String path) {
 		prefs.put(PrefType.DEFAULTPATH.toString(), path);
+	}
+	
+	public static String getWebServerIP() {
+		return WEBSERVER_IP;
+	}
+	
+	
+	/**
+	 * Check if config/conf.config file exists and, if not, build it with
+	 * default indentation.
+	 * In addition, it checks also if the ports and ip entered are valid or not,
+	 * and shows an error message otherwise.
+	 * 
+	 * @author Stefano Belli
+	 */
+	public static void loadConfigFile() throws IOException {
+
+		
+		File file = new File("config/config.conf");
+		if (!file.exists()) {
+
+			if (!new File("config").exists()) {
+				new File("config").mkdir();
+			}
+			FileWriter outFile = new FileWriter(file);
+			PrintWriter out = new PrintWriter(outFile);
+
+			out.println("#SET SOCKET PORTS AFTER THE ':'");
+			out.println("#YOU SHOULD OBIVOUSLY OPEN THEM ON YOUR ROUTER SETTINGS");
+			out.println("WebServer Ip:localhost");
+			out.println("SSLPort:9999");
+			out.println("KEYPort:9998");
+			out.close();
+			JOptionPane.showMessageDialog(new JFrame(),"Socket Ports are not set.\n "
+				+ "Please edit file Config/config.conf accordingly.");
+			System.exit(0);
+
+		} else {
+
+			try {
+				FileReader freader = new FileReader(file);
+				BufferedReader reader = new BufferedReader(freader);
+
+				String line;
+				while ((line = reader.readLine()) != null) {
+
+					String[] split;
+					if (line.contains("WebServer Ip")) {
+						split = line.split(":");
+						String ip = split[1];
+						WEBSERVER_IP = ip;
+					}
+					if (line.contains("SSLPort")) {
+						split = line.split(":");
+						int ssl = Integer.parseInt(split[1]);
+						PORTSSL=ssl;
+					}
+					if (line.contains("KEYPort")) {
+						split = line.split(":");
+						int key = Integer.parseInt(split[1]);
+						PORTKEYSTORE=key;
+					}
+				}
+				freader.close();
+				reader.close();
+			} catch (Exception e) {
+
+				JOptionPane.showMessageDialog(new JFrame(),
+						"An error occurred. \nYour config file may be corrupt");
+				WebsocketHandler.getWebSocketHandler().closeConnection();
+				System.exit(0);
+			}
+		}
 	}
 
 }

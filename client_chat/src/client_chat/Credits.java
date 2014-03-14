@@ -20,7 +20,7 @@ import javax.swing.text.StyledDocument;
  * */
 public class Credits {
 
-	private Dimension FRAME_SIZE = new Dimension(400, 200);
+	private Dimension FRAME_SIZE = new Dimension(400, 290);
 	private String FRAME_TITLE = "About CriptoChat";
 	/*private String ABOUT_TXT = "CryptoChat allows you to have private, encrypted SSL chat with other users."
 			+ "\nAll the private informations (such as IP and private informations) are NOT \nstored in our main server,\n allowing you "
@@ -28,6 +28,10 @@ public class Credits {
 			+ "your personal informations with anyone in public chat!";*/
 	private String CREDITS_TXT = "CryptoChat(c) Version 1.0 Precise Fat Cat\n\n"
 			+ "Copyright(c) Stefano Belli & Francesco Cozzolino,\nAll right reserved.";
+	
+	private String SPECIAL_THANKS_TXT="Special Thanks to: \nA43 on freesound.org for Toc 02.wav\n"
+			+ "The BalloonTip Team for Java\n"
+			+ "The JUnite Team for Java";
 
 	public Credits() throws BadLocationException {
 
@@ -46,8 +50,8 @@ public class Credits {
 		pnl_main.setLayout(brd_layout);
 
 		String[] initString = { " ", // icon
-				"\n\n" + CREDITS_TXT }; // regular
-		String[] initStyles = { "icon", "regular" };
+				"\n\n" + CREDITS_TXT,"\n\n\n"+ SPECIAL_THANKS_TXT}; // regular
+		String[] initStyles = { "icon", "regular","italic" };
 
 		JTextPane textPane = new JTextPane();
 		StyledDocument doc = textPane.getStyledDocument();
@@ -57,9 +61,12 @@ public class Credits {
 			doc.insertString(doc.getLength(), initString[i],
 					doc.getStyle(initStyles[i]));
 		}
-
+		
 		textPane.setEditable(false);
-
+		textPane.setSize(FRAME_SIZE);
+		textPane.setMinimumSize(FRAME_SIZE);
+		textPane.setPreferredSize(FRAME_SIZE);
+		textPane.setMaximumSize(FRAME_SIZE);
 		pnl_main.add(textPane, BorderLayout.NORTH);
 
 		frame.setResizable(false);
@@ -83,9 +90,14 @@ public class Credits {
 
 		doc.setParagraphAttributes(0, doc.getLength(), regular, false);
 
+
+		
+		
 		Style s = doc.addStyle("italic", regular);
 		StyleConstants.setItalic(s, true);
-
+		StyleConstants.setAlignment(s, StyleConstants.ALIGN_LEFT);
+		StyleConstants.setAlignment(s, 0);
+		
 		s = doc.addStyle("bold", regular);
 		StyleConstants.setBold(s, true);
 
@@ -100,7 +112,6 @@ public class Credits {
 		if (pigIcon != null) {
 			StyleConstants.setIcon(s, pigIcon);
 		}
-		StyleConstants.setAlignment(s, StyleConstants.ALIGN_CENTER);
 	}
 
 	/** Returns an ImageIcon, or null if the path was invalid. */
