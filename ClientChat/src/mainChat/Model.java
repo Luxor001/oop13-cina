@@ -26,12 +26,6 @@ import javax.swing.text.BadLocationException;
  */
 public class Model implements ModelInterface {
 
-	public enum connectionResult {
-		OK,
-		TIMEOUT, 
-		BAD_URI
-	}
-
 	private Downloaded download;
 	private ManageClient client;
 	private Server server;

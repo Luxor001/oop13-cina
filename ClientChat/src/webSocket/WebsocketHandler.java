@@ -1,9 +1,5 @@
 package webSocket;
 
-import encryptChat.Client;
-import mainChat.Application;
-import preferences.User;
-import mainChat.Controller;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -20,11 +16,16 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
+import mainChat.Application;
+import mainChat.Controller;
+import mainChat.Controller.MessageBoxReason;
+import mainChat.Model;
+
 import org.glassfish.tyrus.client.ClientManager;
 
+import preferences.User;
 import webSocket.ChatMessage.Type;
-import mainChat.Controller.MessageBoxReason;
-import mainChat.Model.connectionResult;
+import encryptChat.Client;
 
 /**
  * Main class for WebSocket Handling. Some methods like @Onmessage, @onOpen etc.
@@ -37,8 +38,6 @@ import mainChat.Model.connectionResult;
  * */
 @ClientEndpoint(encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
 public class WebsocketHandler {
-
-	
 	public static String UNABLE_VISIBLE_MESSAGE = "You can't perform this operation"
 			+ " while you are invisible: please login as visible and repeat"
 			+ " this operation";
@@ -53,6 +52,12 @@ public class WebsocketHandler {
 	private static CountDownLatch latch;	
 	public Timer timer;
 
+
+	public enum connectionResult {
+		OK,
+		TIMEOUT, 
+		BAD_URI
+	}
 	private WebsocketHandler() {
 	}
 
