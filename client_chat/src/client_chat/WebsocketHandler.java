@@ -42,17 +42,11 @@ public class WebsocketHandler {
 	
 	/* Let's make this a sigleton class, shall we? */
 	private final static WebsocketHandler wshandler = new WebsocketHandler();
-
 	static Session ClientSession;
 	private static Controller controller;
-	private long PING_INTERVAL_SECONDS = 15;
-	
-
-	private static String WEBSERVER_IP = "79.46.241.126";
-	private static CountDownLatch latch;
-
-	/* the connection as been opened, wake up application class. */
-	
+	private long PING_INTERVAL_SECONDS = 15;	
+	@SuppressWarnings("unused")
+	private static CountDownLatch latch;	
 	public Timer timer;
 
 	private WebsocketHandler() {
@@ -171,10 +165,8 @@ public class WebsocketHandler {
 						msg = new ChatMessage("Yes", Type.YESPRIVATECHAT);
 						msg.getAdditionalParams().setNickname(senderNick);
 						msg.getAdditionalParams().setIP(ip);
-						msg.getAdditionalParams().setSSLPort(
-								User.getPortSSL() + "");
-						msg.getAdditionalParams().setKEYPort(
-								User.getPortKeyStore() + "");
+						msg.getAdditionalParams().setSSLPort(User.getPortSSL() + "");
+						msg.getAdditionalParams().setKEYPort(User.getPortKeyStore() + "");
 					} else {
 						msg = new ChatMessage("No", Type.NOPRIVATECHAT);
 						msg.getAdditionalParams().setNickname(senderNick);
@@ -375,7 +367,7 @@ public class WebsocketHandler {
 		}
 		try {
 
-			client.connectToServer(this, null, new URI("ws://" + WEBSERVER_IP
+			client.connectToServer(this, null, new URI("ws://" + User.getWebServerIP()
 					+ ":8080/ServerWebSocket/websocket"));
 		} catch (Exception e) {
 			if (e.getClass().isAssignableFrom(DeploymentException.class)) {
