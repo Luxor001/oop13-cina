@@ -8,39 +8,54 @@ import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
+/**
+ * This class handles the outgoing message from the MyServerEndpoint Class.
+ * In fact, it ENCODES the messages from a "ChatMessage" istance to an outgoing
+ * JSON string.
+ * Be aware: this decoder is similar to the client correspective. 
+ * 
+ * @author Stefano Belli
+ **/
 public class MessageEncoder implements Encoder.Text<ChatMessage> {
 
-	  @Override
-	  public String encode(ChatMessage message) throws EncodeException {
-		  JsonObject jsonObject;
-		  if(message.isParamSet())
-		     jsonObject = Json.createObjectBuilder()
-		        .add("Type", message.getType().toString())
-		        .add("Message", message.getMessage())
-		        .add("addParams",ParamToJsonArray(message))
-		        .build();
-		  else
-			  jsonObject = Json.createObjectBuilder()
-		        .add("Type", message.getType().toString())
-		        .add("Message", message.getMessage())
-		        .build();
-		
-	    return jsonObject.toString();
+	
+	/**
+	 * MessageDecoder main method. It's an entry point for every incoming
+	 * message for the MyServerEndpoint class.
+	 * 
+	 * @return the encoded chatmessage in JSON format.
+	 * */
+	@Override
+	public String encode(ChatMessage message) throws EncodeException {
+		JsonObject jsonObject;
+		if (message.isParamSet())
+			jsonObject = Json.createObjectBuilder()
+					.add("Type", message.getType().toString())
+					.add("Message", message.getMessage())
+					.add("addParams", ParamToJsonArray(message)).build();
+		else
+			jsonObject = Json.createObjectBuilder()
+					.add("Type", message.getType().toString())
+					.add("Message", message.getMessage()).build();
 
-	  }
+		return jsonObject.toString();
 
-  @Override
-  public void init(EndpointConfig ec) {
-    System.out.println("MessageEncoder - init method called");
-    
-  }
+	}
 
-  @Override
-  public void destroy() {
-    System.out.println("MessageEncoder - destroy method called");
-  }
-  
-  private static JsonArray ParamToJsonArray(ChatMessage message){
+	@Override
+	public void init(EndpointConfig ec) {
+	}
+
+	@Override
+	public void destroy() {
+	}  
+
+	/**
+	 * This method creates a JsonArray based on a chatmessage istance
+	 * 
+	 * @return A JsonArray istance based on a chatmessage istance.
+	 * */
+	private static JsonArray ParamToJsonArray(ChatMessage message) {
 	     
 	    ChatMessage.Param param=message.getAdditionalParams();
 		JsonArrayBuilder builder = Json.createArrayBuilder(); 
@@ -66,9 +81,7 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
 			return builder.build();
 		}
 		
-		
-
-		
+	
 		if (message.getType() == ChatMessage.Type.TEXT) {
 			builder.add(Json.createObjectBuilder().add("Nickname",
 					param.getNickname()));

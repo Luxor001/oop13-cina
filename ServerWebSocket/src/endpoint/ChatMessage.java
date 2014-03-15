@@ -4,8 +4,17 @@ import java.util.ArrayList;
 
 
 
+/** Class that describes the "Object" messages sent from (and to) the users
+ * The below class is then converted in json format by MessageEncoder.java class 
+ * Please note that this class is equal to the client correspective.
+ * @author Stefano Belli
+ */
 public class ChatMessage {
 	  
+
+	/** 
+	 * Type ofChatMessage. Needed to quickly identify a chatmessage.
+	 * */
 	public enum Type {
 		INITIALIZE,
 		CONNECTIONGRANTED,
@@ -34,25 +43,30 @@ public class ChatMessage {
     
     public ChatMessage(){
     }
-    public ChatMessage(String message, Type MessageType){
+    public ChatMessage(String message, Type messageType){
     	this.message=message;
-    	this.messageType=MessageType;
+    	this.messageType=messageType;
     }
     
-    public ChatMessage(String message, Type MessageType,Param additionalParam){
+    public ChatMessage(String message, Type messageType,Param additionalParam){
     	this.message=message;
-    	this.messageType=MessageType;    	
+    	this.messageType=messageType;    	
     	this.additionalParams=additionalParam;    	
     }
   
-    public void setType(Type MessageType) {
-    	this.messageType=MessageType;
+    public void setType(Type messageType) {
+    	this.messageType=messageType;
     }
     public Type getType() {
     	return messageType;
     }
 
 
+	/**
+	 * If no additionalParams were already added, a new (blank) one will be
+	 * created on the istance of this class
+	 * @return the Param istance of this object
+	 * */
     public Param getAdditionalParams() {
     	if(additionalParams == null)
     		additionalParams=new Param();
@@ -86,9 +100,15 @@ public class ChatMessage {
         this.message = message;
     }    
     
-    
-    /* Before you start screaming on why i created this class,please,read
-     * the doc at the beginning of this class							*/    
+
+
+	/**
+	 * This inner class exist to encapsulate all the optional parameters of a
+	 * message for e.g. the users list sent by a "User List" request, or a
+	 * nickname notification on connection. It has been created to get a smaller
+	 * size of data packets sent: in fact, the Param class is completely
+	 * optional and not necessarily needed.
+	 */
 	public static class Param {
 		private String nickname;
 		private Boolean visibility;
@@ -103,8 +123,8 @@ public class ChatMessage {
 			
 		}
 		
-		public void setNickname(String Nick){
-			nickname=Nick;
+		public void setNickname(String nick){
+			nickname=nick;
 		}		
 
 		public void setFileName(String fileName){
@@ -135,8 +155,13 @@ public class ChatMessage {
 			return nickname;
 		}
 		
-		public void appendUser(String UserNickname){
-			usersList.add(UserNickname);
+
+		/**
+		 * Append a user in the usersList field, needed for a 
+		 * USERSLIST Chatmessage Type.
+		 * */
+		public void appendUser(String userNickname){
+			usersList.add(userNickname);
 		}	
 
 		public String getFileName(){

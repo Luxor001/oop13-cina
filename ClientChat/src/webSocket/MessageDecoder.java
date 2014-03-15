@@ -11,7 +11,6 @@ import javax.websocket.EndpointConfig;
 import webSocket.ChatMessage.Param;
 
 /**
- * 
  * This class handles the incoming message from the WebSocketHandler Class.
  * In fact, it DECODES the messages in a "ChatMessage" istance from an incoming
  * JSON string.
