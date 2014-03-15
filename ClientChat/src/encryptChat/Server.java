@@ -328,7 +328,7 @@ public class Server {
 			}
 
 			try {
-				super.sendFile(file, nameClient, managementFile, download);
+				super.sendFile(file, User.getNickName(), managementFile, download);
 				controller.commandReceiveMessage("File sent", nameClient);
 			} catch (IOException e) {
 				controller.commandReceiveMessage("Impossible send file",

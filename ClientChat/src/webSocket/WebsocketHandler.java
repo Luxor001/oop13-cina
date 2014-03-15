@@ -38,6 +38,13 @@ import encryptChat.Client;
  * */
 @ClientEndpoint(encoders = { MessageEncoder.class }, decoders = { MessageDecoder.class })
 public class WebsocketHandler {
+	
+	public enum connectionResult {
+		OK,
+		TIMEOUT, 
+		BAD_URI
+	}
+	
 	public static String UNABLE_VISIBLE_MESSAGE = "You can't perform this operation"
 			+ " while you are invisible: please login as visible and repeat"
 			+ " this operation";
@@ -53,11 +60,7 @@ public class WebsocketHandler {
 	public Timer timer;
 
 
-	public enum connectionResult {
-		OK,
-		TIMEOUT, 
-		BAD_URI
-	}
+	
 	private WebsocketHandler() {
 	}
 
