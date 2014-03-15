@@ -18,39 +18,39 @@ public  class User {
 		SNOOZE,
 		INVISIBLE		
 	}
-	private String Nickname;
-	private InetAddress Ip;
-	private State CurrState;
+	private String nickName;
+	private InetAddress ip;
+	private State currState;
 	private Session session;
 	
-	public User(String NickName, State InitialState,Session session){
-		this.Nickname=NickName;
-		CurrState=InitialState;
+	public User(String nickName, State initialState,Session session){
+		this.nickName=nickName;
+		currState=initialState;
 		this.session=session;		
 	}
 	public User(Session session){
 		this.session=session;		
 	}
 	
-	public void SetNickname(String Nick){
-		this.Nickname=Nick;
+	public void SetNickname(String nick){
+		this.nickName=nick;
 	}
 	public String GetNickname(){
-		return Nickname;
+		return nickName;
 	}
 		
-	public void SetIp(InetAddress Ip){
-		this.Ip=Ip;
+	public void SetIp(InetAddress ip){
+		this.ip=ip;
 	}
 	public InetAddress GetIp(){
-		return Ip;
+		return ip;
 	}
 	
 	public void SetState(State newstate){
-		this.CurrState=newstate;
+		this.currState=newstate;
 	}
 	public State GetState(){
-		return CurrState;
+		return currState;
 	}
 	
 	public Session GetSession(){

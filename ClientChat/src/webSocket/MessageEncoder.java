@@ -9,8 +9,7 @@ import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
 
-/**
- * 
+/** 
  * This class handles the outgoing message from the WebSocketHandler Class.
  * In fact, it ENCODES the messages from a "ChatMessage" istance to an outgoing
  * JSON string.
