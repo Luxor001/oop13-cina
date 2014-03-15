@@ -429,37 +429,37 @@ public class View extends JFrame implements ViewInterface {
 							frame.setResizable(false);
 
 							lblIp.setSize(lblIp.getPreferredSize());
-							lblIp.setLocation(frame.getSize().width / 2 - 189,
+							lblIp.setLocation(frame.getSize().width / 2 - 169,
 									25);
 
 							lblportKey.setSize(lblportKey.getPreferredSize());
 							lblportKey.setLocation(
-									frame.getSize().width / 2 - 189, 65);
+									frame.getSize().width / 2 - 169, 65);
 
 							lblportSSL.setSize(lblportSSL.getPreferredSize());
 							lblportSSL.setLocation(
-									frame.getSize().width / 2 - 189, 105);
+									frame.getSize().width / 2 - 169, 105);
 
 							txtIp.setSize(new Dimension(125, 20));
-							txtIp.setLocation(frame.getSize().width / 2 - 102,
+							txtIp.setLocation(frame.getSize().width / 2 - 82,
 									25);
 							txtIp.setBorder(BorderFactory
 									.createLineBorder(Color.BLACK));
 
 							txtKeyport.setSize(new Dimension(50, 20));
 							txtKeyport.setLocation(
-									frame.getSize().width / 2 - 102, 65);
+									frame.getSize().width / 2 - 82, 65);
 							txtKeyport.setBorder(BorderFactory
 									.createLineBorder(Color.BLACK));
 
 							txtSSLport.setSize(new Dimension(50, 20));
 							txtSSLport.setLocation(
-									frame.getSize().width / 2 - 102, 105);
+									frame.getSize().width / 2 - 82, 105);
 							txtSSLport.setBorder(BorderFactory
 									.createLineBorder(Color.BLACK));
 
 							chat.setSize(50, 20);
-							chat.setLocation(frame.getSize().width / 2 + 50, 25);
+							chat.setLocation(frame.getSize().width / 2 + 70, 25);
 							chat.setBorder(BorderFactory
 									.createLineBorder(Color.BLACK));
 

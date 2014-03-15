@@ -215,17 +215,6 @@ public class Client extends SendReceiveFile implements Runnable {
 
 		}
 
-		try {
-
-			sslSocket.close();
-			oos.close();
-			ois.close();
-
-			latch.countDown();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 		if (t != null) {
 			if (!t.getStateTimeout()) {
 				t.interrupt();
@@ -235,6 +224,19 @@ public class Client extends SendReceiveFile implements Runnable {
 				}
 			}
 		}
+		
+		try {
+
+			
+			oos.close();
+			ois.close();
+			sslSocket.close();
+			latch.countDown();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		
 		if (!stop) {
 			model.closeServer(nameServer);
 		}
@@ -261,7 +263,7 @@ public class Client extends SendReceiveFile implements Runnable {
 		}
 
 		try {
-			super.sendFile(file, nameServer, managementFile, download);
+			super.sendFile(file, nameClient, managementFile, download);
 			controller.commandReceiveMessage("File sent", nameServer);
 		} catch (IOException e) {
 			controller
@@ -295,11 +297,11 @@ public class Client extends SendReceiveFile implements Runnable {
 					oos.write(message, 0, step);
 					oos.flush();
 				} catch (IOException e) {
-
-					sslSocket.close();
+					
 					model.closeServer(nameServer);
 					oos.close();
 					ois.close();
+					sslSocket.close();
 				}
 
 				resetTime = true;
@@ -326,10 +328,11 @@ public class Client extends SendReceiveFile implements Runnable {
 				} catch (IOException e) {
 					controller.commandReceiveMessage("Impossible send message",
 							nameServer);
-					sslSocket.close();
+					
 					model.closeServer(nameServer);
 					oos.close();
 					ois.close();
+					sslSocket.close();
 				}
 
 			}

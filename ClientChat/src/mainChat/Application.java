@@ -3,6 +3,7 @@ package mainChat;
 import preferences.User;
 import additionalFrames.SplashScreen;
 import webSocket.WebsocketHandler;
+import webSocket.WebsocketHandler.connectionResult;
 import it.sauronsoftware.junique.AlreadyLockedException;
 import it.sauronsoftware.junique.JUnique;
 
@@ -11,7 +12,6 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import webSocket.WebsocketHandler.connectionResult;
 
 public class Application {
 
