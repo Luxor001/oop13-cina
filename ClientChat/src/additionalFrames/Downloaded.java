@@ -21,8 +21,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
 
-/**
- * /**
+/** 
  * This class shows the JFrame associated with the "Downloaded" files
  * of the application.
  * This class uses a simply JPanel with a BoxLayout layout, along the 
